@@ -3611,8 +3611,8 @@ const LogosGame = () => {
       <div className="w-screen h-screen overflow-hidden relative" style={{ maxHeight: '100dvh' }}>
         {/* 배경 이미지 */}
         <div
-          className="absolute inset-0 bg-contain bg-center bg-no-repeat"
-          style={{ backgroundImage: `url('/menu_bg.png')`, backgroundColor: '#1a1a2e' }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url('/menu_bg.png')` }}
         />
 
         {/* 왼쪽 메뉴 영역 */}
