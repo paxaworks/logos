@@ -3624,33 +3624,33 @@ const LogosGame = () => {
           </div>
 
           {/* 메뉴 버튼들 */}
-          <div className="flex flex-col gap-6 w-96">
+          <div className="flex flex-col gap-8 w-[500px]">
             {/* 시작하기 */}
             <button
               onClick={() => startGame()}
-              className="group bg-amber-500 hover:bg-amber-400 text-black font-black text-3xl py-6 px-10 rounded-2xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 flex items-center gap-4"
-              style={{ boxShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}
+              className="group bg-amber-500 hover:bg-amber-400 text-black font-black text-5xl py-10 px-14 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 flex items-center gap-6"
+              style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <Play size={36} />
+              <Play size={56} />
               시작하기
             </button>
 
             {/* 맵 만들기 */}
             <button
-              className="group bg-black/50 hover:bg-black/70 text-white font-black text-3xl py-6 px-10 rounded-2xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-4"
-              style={{ boxShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}
+              className="group bg-black/50 hover:bg-black/70 text-white font-black text-5xl py-10 px-14 rounded-3xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-6"
+              style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <PenTool size={36} />
+              <PenTool size={56} />
               맵 만들기
             </button>
 
             {/* 설정 */}
             <button
               onClick={() => setShowSettings(true)}
-              className="group bg-black/50 hover:bg-black/70 text-white font-black text-3xl py-6 px-10 rounded-2xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-4"
-              style={{ boxShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}
+              className="group bg-black/50 hover:bg-black/70 text-white font-black text-5xl py-10 px-14 rounded-3xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-6"
+              style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <Settings size={36} />
+              <Settings size={56} />
               설정
             </button>
           </div>
