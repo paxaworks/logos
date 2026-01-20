@@ -3616,45 +3616,48 @@ const LogosGame = () => {
         />
 
         {/* 왼쪽 메뉴 영역 */}
-        <div className="absolute left-0 top-0 bottom-0 w-[45%] bg-gradient-to-r from-black/80 via-black/60 to-transparent flex flex-col justify-center px-12">
+        <div className="absolute left-0 top-0 bottom-0 w-[50%] flex flex-col justify-center px-16">
           {/* 로고 */}
-          <div className="mb-12">
-            <h1 className="text-6xl font-black tracking-wider text-white mb-2 drop-shadow-lg">LOGOS</h1>
-            <p className="text-lg text-white/70">말로 만드는 퍼즐 플랫포머</p>
+          <div className="mb-16">
+            <h1 className="text-8xl font-black tracking-wider text-white mb-4" style={{ textShadow: '4px 4px 8px rgba(0,0,0,0.8), -2px -2px 4px rgba(0,0,0,0.5)' }}>LOGOS</h1>
+            <p className="text-2xl text-white font-bold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>말로 만드는 퍼즐 플랫포머</p>
           </div>
 
           {/* 메뉴 버튼들 */}
-          <div className="flex flex-col gap-4 w-72">
+          <div className="flex flex-col gap-6 w-96">
             {/* 시작하기 */}
             <button
               onClick={() => startGame()}
-              className="group bg-amber-500 hover:bg-amber-400 text-black font-bold text-xl py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-amber-500/30 flex items-center gap-3"
+              className="group bg-amber-500 hover:bg-amber-400 text-black font-black text-3xl py-6 px-10 rounded-2xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 flex items-center gap-4"
+              style={{ boxShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}
             >
-              <Play size={24} />
+              <Play size={36} />
               시작하기
             </button>
 
             {/* 맵 만들기 */}
             <button
-              className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-bold text-xl py-4 px-6 rounded-xl border border-white/20 hover:border-white/40 transition-all duration-200 hover:scale-105 flex items-center gap-3"
+              className="group bg-black/50 hover:bg-black/70 text-white font-black text-3xl py-6 px-10 rounded-2xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-4"
+              style={{ boxShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}
             >
-              <PenTool size={24} />
+              <PenTool size={36} />
               맵 만들기
             </button>
 
             {/* 설정 */}
             <button
               onClick={() => setShowSettings(true)}
-              className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-bold text-xl py-4 px-6 rounded-xl border border-white/20 hover:border-white/40 transition-all duration-200 hover:scale-105 flex items-center gap-3"
+              className="group bg-black/50 hover:bg-black/70 text-white font-black text-3xl py-6 px-10 rounded-2xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-4"
+              style={{ boxShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}
             >
-              <Settings size={24} />
+              <Settings size={36} />
               설정
             </button>
           </div>
 
           {/* 하단 정보 */}
-          <div className="mt-12">
-            <p className="text-white/40 text-sm">© 2025 LOGOS Game</p>
+          <div className="mt-16">
+            <p className="text-white/60 text-lg font-bold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>© 2025 LOGOS Game</p>
           </div>
         </div>
       </div>
