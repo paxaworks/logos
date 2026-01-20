@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Key, Check, Sparkles, Box, Package, MessageSquare, Zap } from 'lucide-react';
+import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2 } from 'lucide-react';
 import objectsData from './objects.json';
 
 const LogosGame = () => {
@@ -20,14 +20,13 @@ const LogosGame = () => {
   const MAX_TOKENS = 8;
   const [tokens, setTokens] = useState(MAX_TOKENS);
 
-  // API 키 설정
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
+  // 설정
   const [showSettings, setShowSettings] = useState(false);
-  const [tempApiKey, setTempApiKey] = useState('');
-  const [selectedMode, setSelectedMode] = useState(null); // 'basic' | 'ai'
+  const [selectedMode, setSelectedMode] = useState('basic');
 
-  // AI 모드 여부
-  const isAIMode = selectedMode === 'ai' && apiKey.length > 0;
+  // 게임 설정
+  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('sound_enabled') !== 'false');
+  const [musicEnabled, setMusicEnabled] = useState(() => localStorage.getItem('music_enabled') !== 'false');
 
   // 채팅 상태
   const [messages, setMessages] = useState([]);
@@ -183,16 +182,11 @@ const LogosGame = () => {
     idle: [{ x: 10, y: 0, w: 98, h: 181 }]  // 서있는 자세
   };
 
-  // API 키 저장
-  const saveApiKey = () => {
-    localStorage.setItem('gemini_api_key', tempApiKey);
-    setApiKey(tempApiKey);
+  // 설정 저장
+  const saveSettings = () => {
+    localStorage.setItem('sound_enabled', soundEnabled);
+    localStorage.setItem('music_enabled', musicEnabled);
     setShowSettings(false);
-    setMessages(prev => [...prev, {
-      id: Date.now(),
-      role: 'ai',
-      text: tempApiKey ? "AI 모드 활성화! 이제 무엇이든 만들 수 있어요." : "기본 모드로 전환되었습니다."
-    }]);
   };
 
   useEffect(() => {
@@ -209,60 +203,6 @@ const LogosGame = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedSlot, showSettings]);
-
-  // --- Gemini API 호출 ---
-  const callGemini = async (userText) => {
-    if (!apiKey) return null;
-
-    try {
-      const systemPrompt = `
-      You are a 'Vector Game Asset Generator' for a puzzle platformer game.
-
-      Create objects that players can use as platforms to help a character reach a goal.
-
-      RULES:
-      1. Use 'parts' array with rects, circles, and triangles to create the object.
-      2. All coordinates are relative (0-100 scale).
-      3. Be creative but keep objects functional as platforms.
-      4. Include a friendly Korean message describing what you made.
-
-      Output JSON Schema:
-      {
-        "renderType": "vector",
-        "shape": "custom",
-        "parts": [
-          { "type": "rect|circle|triangle", "x": 0-100, "y": 0-100, "w": 1-100, "h": 1-100, "color": "#HexColor" }
-        ],
-        "physics": "solid|bounce|ice|hazard",
-        "width": 60-200,
-        "height": 40-150,
-        "name": "한글이름(6자이내)",
-        "message": "친근한 한국어 설명"
-      }
-      `;
-
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: userText }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-            generationConfig: { responseMimeType: "application/json", temperature: 0.7 }
-          })
-        }
-      );
-
-      if (!response.ok) throw new Error("API Error");
-      const data = await response.json();
-      const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      return JSON.parse(textResponse);
-    } catch (error) {
-      console.error("Gemini API Error:", error);
-      return null;
-    }
-  };
 
   // --- 색상 파서 ---
   const parseColor = (text) => {
@@ -490,24 +430,10 @@ const LogosGame = () => {
     setPrompt('');
     setIsTyping(true);
 
-    let itemData = null;
-    let chatResponse = "";
-
-    // AI 모드면 Gemini 호출
-    if (isAIMode) {
-      const aiData = await callGemini(currentPrompt);
-      if (aiData) {
-        itemData = aiData;
-        chatResponse = aiData.message || "만들었어요!";
-      }
-    }
-
-    // AI 실패하거나 기본 모드면 로컬 파서 사용
-    if (!itemData) {
-      const localData = localParsePrompt(currentPrompt);
-      itemData = localData;
-      chatResponse = localData.message;
-    }
+    // 로컬 파서로 오브젝트 생성
+    const localData = localParsePrompt(currentPrompt);
+    let itemData = localData;
+    let chatResponse = localData.message;
 
     // 기본값 보정 (이미지 타입이 아닌 경우에만)
     if (itemData.renderType !== 'image') {
@@ -3655,16 +3581,9 @@ const LogosGame = () => {
   };
 
   // 게임 시작 함수
-  const startGame = (mode) => {
-    setSelectedMode(mode);
-    if (mode === 'ai' && !apiKey) {
-      setShowSettings(true);
-    }
+  const startGame = () => {
     setMessages([
-      { id: 1, role: 'ai', text: mode === 'ai'
-        ? "AI 모드 활성화! 무엇이든 만들어드릴게요."
-        : "기본 모드입니다. 프리셋 오브젝트를 사용해보세요!"
-      },
+      { id: 1, role: 'ai', text: "안녕하세요! 무엇을 만들어볼까요?" },
       { id: 2, role: 'ai', text: "자동차, 상자, 다리, 계단, 나무, 집, 로봇 등을 만들 수 있어요." }
     ]);
     // 배경 이미지 로드 확인 후 게임 시작
@@ -3713,49 +3632,25 @@ const LogosGame = () => {
           <p className="text-xl text-white/80 font-medium">말로 만드는 퍼즐 플랫포머</p>
         </div>
 
-        {/* 모드 선택 */}
+        {/* 버튼 영역 */}
         <div className="relative z-10 flex flex-col gap-4 w-96 max-w-[90vw]">
-          {/* 기본 모드 */}
+          {/* 게임 시작 */}
           <button
-            onClick={() => startGame('basic')}
+            onClick={() => startGame()}
             className="group relative bg-black/50 backdrop-blur-md border-2 border-white/20 hover:border-amber-400 rounded-2xl p-5 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-amber-500/20 hover:bg-black/60"
           >
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Box size={32} className="text-white" />
+                <Play size={32} className="text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white mb-1">기본 모드</h2>
-                <p className="text-sm text-white/60">프리셋 오브젝트로 퍼즐 해결</p>
+                <h2 className="text-2xl font-bold text-white mb-1">게임 시작</h2>
+                <p className="text-sm text-white/60">말로 만드는 퍼즐 게임</p>
               </div>
               <div className="text-white/40 group-hover:text-amber-400 transition-colors">
                 <Play size={28} />
               </div>
             </div>
-          </button>
-
-          {/* AI 모드 */}
-          <button
-            onClick={() => startGame('ai')}
-            className="group relative bg-black/50 backdrop-blur-md border-2 border-white/20 hover:border-purple-400 rounded-2xl p-5 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20 hover:bg-black/60"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Sparkles size={32} className="text-white" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white mb-1">AI 모드</h2>
-                <p className="text-sm text-white/60">Gemini AI로 무한한 창작</p>
-              </div>
-              <div className="text-white/40 group-hover:text-purple-400 transition-colors">
-                <Play size={28} />
-              </div>
-            </div>
-            {apiKey && (
-              <div className="absolute top-3 right-3 bg-green-500/30 text-green-300 text-xs px-2 py-1 rounded-full border border-green-500/50">
-                API 연결됨
-              </div>
-            )}
           </button>
 
           {/* 설정 버튼 */}
@@ -3786,8 +3681,8 @@ const LogosGame = () => {
           <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-96 max-w-[90vw]">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold flex items-center gap-2">
-                <Key size={20} className="text-purple-400" />
-                API 설정
+                <Settings size={20} className="text-amber-400" />
+                설정
               </h2>
               <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-slate-800 rounded">
                 <X size={20} />
@@ -3795,38 +3690,42 @@ const LogosGame = () => {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-slate-400 mb-2">Gemini API 키</label>
-                <input
-                  type="password"
-                  value={tempApiKey}
-                  onChange={(e) => setTempApiKey(e.target.value)}
-                  placeholder="API 키를 입력하세요"
-                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-purple-500"
-                />
-              </div>
-
-              <div className="text-xs text-slate-500 space-y-1">
-                <p>1. Google AI Studio 접속 (aistudio.google.com)</p>
-                <p>2. API 키 발급 (무료)</p>
-                <p>3. 위에 붙여넣기</p>
-              </div>
-
-              <div className="flex gap-2">
+              {/* 효과음 */}
+              <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  {soundEnabled ? <Volume2 size={20} className="text-amber-400" /> : <VolumeX size={20} className="text-slate-500" />}
+                  <span className="text-sm font-medium">효과음</span>
+                </div>
                 <button
-                  onClick={() => { setTempApiKey(''); saveApiKey(); }}
-                  className="flex-1 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm"
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className={`w-12 h-6 rounded-full transition-colors ${soundEnabled ? 'bg-amber-500' : 'bg-slate-600'}`}
                 >
-                  기본 모드
-                </button>
-                <button
-                  onClick={saveApiKey}
-                  className="flex-1 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm flex items-center justify-center gap-2"
-                >
-                  <Check size={16} />
-                  저장
+                  <div className={`w-5 h-5 bg-white rounded-full transition-transform ${soundEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                 </button>
               </div>
+
+              {/* 배경음악 */}
+              <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  {musicEnabled ? <Music size={20} className="text-amber-400" /> : <Music2 size={20} className="text-slate-500" />}
+                  <span className="text-sm font-medium">배경음악</span>
+                </div>
+                <button
+                  onClick={() => setMusicEnabled(!musicEnabled)}
+                  className={`w-12 h-6 rounded-full transition-colors ${musicEnabled ? 'bg-amber-500' : 'bg-slate-600'}`}
+                >
+                  <div className={`w-5 h-5 bg-white rounded-full transition-transform ${musicEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                </button>
+              </div>
+
+              {/* 저장 버튼 */}
+              <button
+                onClick={saveSettings}
+                className="w-full py-3 bg-amber-500 hover:bg-amber-400 rounded-lg text-sm font-bold text-black flex items-center justify-center gap-2 transition-colors"
+              >
+                <Check size={16} />
+                저장
+              </button>
             </div>
           </div>
         </div>
@@ -3840,8 +3739,8 @@ const LogosGame = () => {
             <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center font-black text-xl shadow-lg">L</div>
             <div>
               <h1 className="text-sm font-bold text-white tracking-wider">LOGOS</h1>
-              <div className={`text-[10px] font-medium ${isAIMode ? 'text-purple-400' : 'text-amber-400'}`}>
-                {isAIMode ? 'AI MODE' : 'BASIC MODE'}
+              <div className="text-[10px] font-medium text-amber-400">
+                PUZZLE GAME
               </div>
             </div>
           </div>
@@ -3945,29 +3844,19 @@ const LogosGame = () => {
         <div className="p-4 border-b border-white/10 bg-black/40 backdrop-blur-sm flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-lg ${
-                isAIMode
-                  ? 'bg-gradient-to-br from-purple-500 to-blue-600'
-                  : 'bg-gradient-to-br from-amber-400 to-orange-500'
-              }`}>
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-amber-400 to-orange-500">
                 <MessageSquare size={22} className="text-white" />
               </div>
-              <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-slate-900 ${
-                isAIMode ? 'bg-green-400' : 'bg-amber-400'
-              }`} />
+              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-slate-900 bg-green-400" />
             </div>
             <div>
-              <div className="font-bold text-sm text-white">
-                {isAIMode ? 'AI Generator' : 'Basic Generator'}
-              </div>
-              <div className={`text-xs font-medium ${isAIMode ? 'text-purple-400' : 'text-amber-400'}`}>
-                {isAIMode ? 'Gemini Powered' : 'Preset Mode'}
-              </div>
+              <div className="font-bold text-sm text-white">Object Generator</div>
+              <div className="text-xs font-medium text-amber-400">말로 만드는 오브젝트</div>
             </div>
           </div>
           <div className="flex gap-1">
             <button
-              onClick={() => { setTempApiKey(apiKey); setShowSettings(true); }}
+              onClick={() => setShowSettings(true)}
               className="p-2 hover:bg-white/10 rounded-lg text-white/50 hover:text-white/90 transition-all"
               title="설정"
             >
@@ -4013,7 +3902,7 @@ const LogosGame = () => {
               type="text"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder={isAIMode ? "무엇이든 만들어보세요!" : "자동차, 상자, 다리 등..."}
+              placeholder="자동차, 상자, 다리, 계단, 나무 등..."
               className="w-full bg-white/10 border border-white/10 rounded-xl pl-4 pr-12 py-4 focus:outline-none focus:border-purple-500/50 focus:bg-white/15 text-base text-white placeholder-white/40 transition-all"
               disabled={gameState !== 'planning' || isTyping}
             />
