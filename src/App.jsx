@@ -3608,66 +3608,54 @@ const LogosGame = () => {
   // 메뉴 화면
   if (screen === 'menu') {
     return (
-      <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden relative" style={{ maxHeight: '100dvh' }}>
+      <div className="w-screen h-screen overflow-hidden relative" style={{ maxHeight: '100dvh' }}>
         {/* 배경 이미지 */}
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url('/bg_evening.png')`,
-            filter: 'brightness(0.6)'
-          }}
+          style={{ backgroundImage: `url('/menu_bg.png')` }}
         />
 
-        {/* 오버레이 그라데이션 */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-
-        {/* 로고 */}
-        <div className="relative z-10 text-center mb-8 animate-fade-in">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl flex items-center justify-center font-black text-5xl shadow-2xl shadow-orange-500/40 border-4 border-white/20">
-              L
-            </div>
+        {/* 왼쪽 메뉴 영역 */}
+        <div className="absolute left-0 top-0 bottom-0 w-[45%] bg-gradient-to-r from-black/80 via-black/60 to-transparent flex flex-col justify-center px-12">
+          {/* 로고 */}
+          <div className="mb-12">
+            <h1 className="text-6xl font-black tracking-wider text-white mb-2 drop-shadow-lg">LOGOS</h1>
+            <p className="text-lg text-white/70">말로 만드는 퍼즐 플랫포머</p>
           </div>
-          <h1 className="text-7xl font-black tracking-wider text-white mb-3 drop-shadow-lg">LOGOS</h1>
-          <p className="text-xl text-white/80 font-medium">말로 만드는 퍼즐 플랫포머</p>
-        </div>
 
-        {/* 버튼 영역 */}
-        <div className="relative z-10 flex flex-col gap-4 w-96 max-w-[90vw]">
-          {/* 게임 시작 */}
-          <button
-            onClick={() => startGame()}
-            className="group relative bg-black/50 backdrop-blur-md border-2 border-white/20 hover:border-amber-400 rounded-2xl p-5 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-amber-500/20 hover:bg-black/60"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Play size={32} className="text-white" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white mb-1">게임 시작</h2>
-                <p className="text-sm text-white/60">말로 만드는 퍼즐 게임</p>
-              </div>
-              <div className="text-white/40 group-hover:text-amber-400 transition-colors">
-                <Play size={28} />
-              </div>
-            </div>
-          </button>
+          {/* 메뉴 버튼들 */}
+          <div className="flex flex-col gap-4 w-72">
+            {/* 시작하기 */}
+            <button
+              onClick={() => startGame()}
+              className="group bg-amber-500 hover:bg-amber-400 text-black font-bold text-xl py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-amber-500/30 flex items-center gap-3"
+            >
+              <Play size={24} />
+              시작하기
+            </button>
 
-          {/* 설정 버튼 */}
-          <button
-            onClick={() => setShowSettings(true)}
-            className="group relative bg-black/30 backdrop-blur-md border border-white/10 hover:border-white/30 rounded-xl p-4 text-center transition-all duration-300 hover:bg-black/40"
-          >
-            <div className="flex items-center justify-center gap-2 text-white/60 group-hover:text-white/90">
-              <Settings size={20} />
-              <span className="font-medium">설정</span>
-            </div>
-          </button>
-        </div>
+            {/* 맵 만들기 */}
+            <button
+              className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-bold text-xl py-4 px-6 rounded-xl border border-white/20 hover:border-white/40 transition-all duration-200 hover:scale-105 flex items-center gap-3"
+            >
+              <PenTool size={24} />
+              맵 만들기
+            </button>
 
-        {/* 하단 정보 */}
-        <div className="relative z-10 mt-10 text-center">
-          <p className="text-white/40 text-sm">© 2025 LOGOS Game</p>
+            {/* 설정 */}
+            <button
+              onClick={() => setShowSettings(true)}
+              className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-bold text-xl py-4 px-6 rounded-xl border border-white/20 hover:border-white/40 transition-all duration-200 hover:scale-105 flex items-center gap-3"
+            >
+              <Settings size={24} />
+              설정
+            </button>
+          </div>
+
+          {/* 하단 정보 */}
+          <div className="mt-12">
+            <p className="text-white/40 text-sm">© 2025 LOGOS Game</p>
+          </div>
         </div>
       </div>
     );
