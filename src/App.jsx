@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Key, Check, Sparkles, Box } from 'lucide-react';
+import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Key, Check, Sparkles, Box, Package, MessageSquare, Zap } from 'lucide-react';
 import objectsData from './objects.json';
 
 const LogosGame = () => {
@@ -3667,79 +3667,112 @@ const LogosGame = () => {
       },
       { id: 2, role: 'ai', text: "자동차, 상자, 다리, 계단, 나무, 집, 로봇 등을 만들 수 있어요." }
     ]);
-    setScreen('game');
+    // 배경 이미지 로드 확인 후 게임 시작
+    if (bgImagesLoadedRef.current) {
+      setScreen('game');
+    } else {
+      // 이미지 로드 대기
+      const checkLoaded = setInterval(() => {
+        if (bgImagesLoadedRef.current) {
+          clearInterval(checkLoaded);
+          setScreen('game');
+        }
+      }, 50);
+      // 최대 2초 대기 후 강제 시작
+      setTimeout(() => {
+        clearInterval(checkLoaded);
+        setScreen('game');
+      }, 2000);
+    }
   };
 
   // 메뉴 화면
   if (screen === 'menu') {
     return (
-      <div className="w-screen h-screen bg-slate-950 flex flex-col items-center justify-center overflow-hidden" style={{ maxHeight: '100dvh' }}>
-        {/* 배경 효과 */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl" />
-        </div>
+      <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden relative" style={{ maxHeight: '100dvh' }}>
+        {/* 배경 이미지 */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url('/bg_evening.png')`,
+            filter: 'brightness(0.6)'
+          }}
+        />
+
+        {/* 오버레이 그라데이션 */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
         {/* 로고 */}
-        <div className="relative z-10 text-center mb-12">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center font-black text-4xl shadow-2xl shadow-purple-500/30">
+        <div className="relative z-10 text-center mb-8 animate-fade-in">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl flex items-center justify-center font-black text-5xl shadow-2xl shadow-orange-500/40 border-4 border-white/20">
               L
             </div>
           </div>
-          <h1 className="text-6xl font-black tracking-wider text-white mb-2">LOGOS</h1>
-          <p className="text-slate-400 text-lg">말로 만드는 퍼즐 플랫포머</p>
+          <h1 className="text-7xl font-black tracking-wider text-white mb-3 drop-shadow-lg">LOGOS</h1>
+          <p className="text-xl text-white/80 font-medium">말로 만드는 퍼즐 플랫포머</p>
         </div>
 
         {/* 모드 선택 */}
-        <div className="relative z-10 flex flex-col gap-4 w-80">
+        <div className="relative z-10 flex flex-col gap-4 w-96 max-w-[90vw]">
           {/* 기본 모드 */}
           <button
             onClick={() => startGame('basic')}
-            className="group relative bg-slate-900 border-2 border-slate-700 hover:border-yellow-500 rounded-xl p-6 text-left transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-yellow-500/10"
+            className="group relative bg-black/50 backdrop-blur-md border-2 border-white/20 hover:border-amber-400 rounded-2xl p-5 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-amber-500/20 hover:bg-black/60"
           >
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Box size={28} className="text-white" />
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                <Box size={32} className="text-white" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-white mb-1">기본 모드</h2>
-                <p className="text-sm text-slate-400">프리셋 오브젝트 사용</p>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white mb-1">기본 모드</h2>
+                <p className="text-sm text-white/60">프리셋 오브젝트로 퍼즐 해결</p>
               </div>
-            </div>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 group-hover:text-yellow-500 transition-colors">
-              <Play size={24} />
+              <div className="text-white/40 group-hover:text-amber-400 transition-colors">
+                <Play size={28} />
+              </div>
             </div>
           </button>
 
           {/* AI 모드 */}
           <button
             onClick={() => startGame('ai')}
-            className="group relative bg-slate-900 border-2 border-slate-700 hover:border-purple-500 rounded-xl p-6 text-left transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/10"
+            className="group relative bg-black/50 backdrop-blur-md border-2 border-white/20 hover:border-purple-400 rounded-2xl p-5 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20 hover:bg-black/60"
           >
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Sparkles size={28} className="text-white" />
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Sparkles size={32} className="text-white" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-white mb-1">AI 모드</h2>
-                <p className="text-sm text-slate-400">Gemini AI로 무한한 창작</p>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white mb-1">AI 모드</h2>
+                <p className="text-sm text-white/60">Gemini AI로 무한한 창작</p>
+              </div>
+              <div className="text-white/40 group-hover:text-purple-400 transition-colors">
+                <Play size={28} />
               </div>
             </div>
             {apiKey && (
-              <div className="absolute top-2 right-2 bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full">
+              <div className="absolute top-3 right-3 bg-green-500/30 text-green-300 text-xs px-2 py-1 rounded-full border border-green-500/50">
                 API 연결됨
               </div>
             )}
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 group-hover:text-purple-500 transition-colors">
-              <Play size={24} />
+          </button>
+
+          {/* 설정 버튼 */}
+          <button
+            onClick={() => setShowSettings(true)}
+            className="group relative bg-black/30 backdrop-blur-md border border-white/10 hover:border-white/30 rounded-xl p-4 text-center transition-all duration-300 hover:bg-black/40"
+          >
+            <div className="flex items-center justify-center gap-2 text-white/60 group-hover:text-white/90">
+              <Settings size={20} />
+              <span className="font-medium">설정</span>
             </div>
           </button>
         </div>
 
         {/* 하단 정보 */}
-        <div className="relative z-10 mt-12 text-center">
-          <p className="text-slate-600 text-sm">© 2024 LOGOS Game</p>
+        <div className="relative z-10 mt-10 text-center">
+          <p className="text-white/40 text-sm">© 2025 LOGOS Game</p>
         </div>
       </div>
     );
@@ -3800,33 +3833,38 @@ const LogosGame = () => {
       )}
 
       {/* 게임 영역 */}
-      <div className="flex-1 relative border-r border-slate-800 flex flex-col min-w-0 min-h-0">
-        <div className="absolute top-4 left-4 z-10 flex gap-4">
-          <div className="bg-slate-900/90 px-4 py-2 rounded-lg backdrop-blur-md border border-slate-700 shadow-lg flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center font-bold text-xl shadow-inner">L</div>
+      <div className="flex-1 relative border-r border-white/5 flex flex-col min-w-0 min-h-0">
+        <div className="absolute top-4 left-4 z-10 flex gap-3">
+          {/* 로고 */}
+          <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center font-black text-xl shadow-lg">L</div>
             <div>
-              <h1 className="text-sm font-bold text-slate-200 tracking-wider">LOGOS</h1>
-              <div className={`text-[10px] ${isAIMode ? 'text-green-400' : 'text-yellow-400'}`}>
+              <h1 className="text-sm font-bold text-white tracking-wider">LOGOS</h1>
+              <div className={`text-[10px] font-medium ${isAIMode ? 'text-purple-400' : 'text-amber-400'}`}>
                 {isAIMode ? 'AI MODE' : 'BASIC MODE'}
               </div>
             </div>
           </div>
-          <div className="bg-slate-900/90 px-4 py-2 rounded-lg backdrop-blur-md border border-slate-700 shadow-lg flex items-center gap-3">
-            <Coins className="text-yellow-400" size={20} />
+          {/* 토큰 */}
+          <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-lg">
+              <Zap className="text-white" size={20} />
+            </div>
             <div>
-              <div className="text-xs text-slate-400 font-bold">TOKENS</div>
-              <div className="text-lg font-mono font-bold text-yellow-400 leading-none">
-                {tokens} <span className="text-xs text-slate-500">/ {MAX_TOKENS}</span>
+              <div className="text-[10px] text-white/50 font-bold tracking-wider">TOKENS</div>
+              <div className="text-xl font-black text-white leading-none">
+                {tokens}<span className="text-sm text-white/40 font-medium ml-1">/ {MAX_TOKENS}</span>
               </div>
             </div>
           </div>
+          {/* 리셋 버튼 */}
           <button
             onClick={resetGame}
-            className="bg-slate-900/90 px-4 py-2 rounded-lg backdrop-blur-md border border-slate-700 shadow-lg flex items-center gap-2 hover:bg-slate-800 hover:border-slate-600 transition-colors"
+            className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-2 hover:bg-black/70 hover:border-white/20 transition-all duration-200"
             title="리셋"
           >
-            <RotateCcw className="text-slate-400" size={20} />
-            <span className="text-sm text-slate-300 font-bold">RESET</span>
+            <RotateCcw className="text-white/70" size={20} />
+            <span className="text-sm text-white/90 font-bold">RESET</span>
           </button>
         </div>
 
@@ -3854,11 +3892,12 @@ const LogosGame = () => {
           )}
         </div>
 
-        <div className="h-28 bg-slate-900 border-t border-slate-800 p-2 flex flex-col justify-center items-center relative z-20">
-          <div className="absolute top-1 left-1/2 transform -translate-x-1/2 text-xs text-slate-500 font-bold tracking-widest">
+        <div className="h-28 bg-gradient-to-t from-black/90 to-black/70 backdrop-blur-sm border-t border-white/10 p-2 flex flex-col justify-center items-center relative z-20">
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-xs text-white/50 font-bold tracking-widest flex items-center gap-2">
+            <Package size={14} />
             INVENTORY ({inventory.length}/{MAX_INVENTORY})
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 mt-2">
             {[...Array(MAX_INVENTORY)].map((_, idx) => {
               const item = inventory[idx];
               const isSelected = selectedSlot === idx;
@@ -3866,30 +3905,32 @@ const LogosGame = () => {
                 <div
                   key={idx}
                   onClick={() => item && setSelectedSlot(isSelected ? null : idx)}
-                  className={`w-16 h-16 rounded-md border flex items-center justify-center relative cursor-pointer transition-all overflow-hidden ${
+                  className={`w-16 h-16 rounded-xl border-2 flex items-center justify-center relative cursor-pointer transition-all duration-200 overflow-hidden ${
                     isSelected
-                      ? 'border-purple-500 bg-purple-900/20 shadow-[0_0_10px_rgba(168,85,247,0.5)] scale-105'
-                      : 'border-slate-700 bg-slate-800 hover:border-slate-500'
-                  } ${!item ? 'opacity-30' : 'opacity-100'} group`}
+                      ? 'border-amber-400 bg-amber-500/20 shadow-[0_0_15px_rgba(251,191,36,0.4)] scale-110'
+                      : item
+                        ? 'border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/15'
+                        : 'border-white/5 bg-white/5'
+                  } group`}
                 >
                   {item ? (
                     <>
                       <div className="w-full h-full flex items-center justify-center p-1">
                         <InventoryIcon item={item} />
                       </div>
-                      <div className="absolute bottom-0 w-full text-[9px] bg-black/60 text-center text-white truncate px-1">
+                      <div className="absolute bottom-0 w-full text-[9px] bg-black/70 text-center text-white truncate px-1 py-0.5 font-medium">
                         {item.name}
                       </div>
                       <button
                         onClick={(e) => handleDeleteItem(idx, e)}
-                        className="absolute top-0 right-0 p-0.5 bg-red-900/80 hover:bg-red-600 text-white rounded-bl-md opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-0.5 right-0.5 p-1 bg-red-500/80 hover:bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                         title="버리기"
                       >
                         <X size={10} />
                       </button>
                     </>
                   ) : (
-                    <div className="text-slate-600 text-[10px] font-mono">{idx + 1}</div>
+                    <div className="text-white/20 text-sm font-bold">{idx + 1}</div>
                   )}
                 </div>
               );
@@ -3899,26 +3940,27 @@ const LogosGame = () => {
       </div>
 
       {/* 채팅 패널 */}
-      <div className="w-full md:w-80 bg-slate-950 border-l border-slate-800 flex flex-col shadow-2xl relative z-30 min-h-0 max-h-full">
-        <div className="p-4 border-b border-slate-800 bg-slate-900 flex justify-between items-center">
+      <div className="w-full md:w-80 bg-gradient-to-b from-slate-900 to-slate-950 border-l border-white/5 flex flex-col shadow-2xl relative z-30 min-h-0 max-h-full">
+        {/* 헤더 */}
+        <div className="p-4 border-b border-white/10 bg-black/40 backdrop-blur-sm flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-lg ${
                 isAIMode
-                  ? 'bg-gradient-to-br from-purple-600 to-blue-600'
-                  : 'bg-gradient-to-br from-yellow-600 to-orange-600'
+                  ? 'bg-gradient-to-br from-purple-500 to-blue-600'
+                  : 'bg-gradient-to-br from-amber-400 to-orange-500'
               }`}>
-                <PenTool size={20} className="text-white" />
+                <MessageSquare size={22} className="text-white" />
               </div>
-              <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-slate-900 ${
-                isAIMode ? 'bg-green-500' : 'bg-yellow-500'
+              <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-slate-900 ${
+                isAIMode ? 'bg-green-400' : 'bg-amber-400'
               }`} />
             </div>
             <div>
               <div className="font-bold text-sm text-white">
                 {isAIMode ? 'AI Generator' : 'Basic Generator'}
               </div>
-              <div className={`text-xs font-mono ${isAIMode ? 'text-purple-400' : 'text-yellow-400'}`}>
+              <div className={`text-xs font-medium ${isAIMode ? 'text-purple-400' : 'text-amber-400'}`}>
                 {isAIMode ? 'Gemini Powered' : 'Preset Mode'}
               </div>
             </div>
@@ -3926,14 +3968,14 @@ const LogosGame = () => {
           <div className="flex gap-1">
             <button
               onClick={() => { setTempApiKey(apiKey); setShowSettings(true); }}
-              className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 transition-colors"
+              className="p-2 hover:bg-white/10 rounded-lg text-white/50 hover:text-white/90 transition-all"
               title="설정"
             >
               <Settings size={18} />
             </button>
             <button
               onClick={resetGame}
-              className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 transition-colors"
+              className="p-2 hover:bg-white/10 rounded-lg text-white/50 hover:text-white/90 transition-all"
               title="리셋"
             >
               <RotateCcw size={18} />
@@ -3941,13 +3983,14 @@ const LogosGame = () => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-slate-950/50">
+        {/* 메시지 영역 */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-black/20">
           {messages.map((msg) => (
             <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-              <div className={`max-w-[85%] rounded-xl px-3 py-2 text-sm shadow-md border ${
+              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm shadow-lg ${
                 msg.role === 'user'
-                  ? 'bg-purple-600/20 border-purple-500/50 text-purple-100 rounded-br-none'
-                  : 'bg-slate-800 border-slate-700 text-slate-300 rounded-tl-none'
+                  ? 'bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-br-sm'
+                  : 'bg-white/10 backdrop-blur-sm border border-white/10 text-white/90 rounded-tl-sm'
               }`}>
                 {msg.text}
               </div>
@@ -3955,28 +3998,29 @@ const LogosGame = () => {
           ))}
           {isTyping && (
             <div className="flex items-start">
-              <div className="bg-slate-800 rounded-xl px-4 py-3 border border-slate-700">
-                <span className="animate-pulse">생성 중...</span>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3 border border-white/10">
+                <span className="animate-pulse text-white/70">생성 중...</span>
               </div>
             </div>
           )}
           <div ref={chatEndRef} />
         </div>
 
-        <div className="p-3 bg-slate-900 border-t border-slate-800">
+        {/* 입력 영역 */}
+        <div className="p-4 bg-black/40 backdrop-blur-sm border-t border-white/10">
           <form onSubmit={handleSendMessage} className="relative">
             <input
               type="text"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder={isAIMode ? "무엇이든 만들어보세요!" : "자동차, 상자, 다리 등..."}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-4 pr-12 py-6 focus:outline-none focus:border-purple-500 text-base text-white"
+              className="w-full bg-white/10 border border-white/10 rounded-xl pl-4 pr-12 py-4 focus:outline-none focus:border-purple-500/50 focus:bg-white/15 text-base text-white placeholder-white/40 transition-all"
               disabled={gameState !== 'planning' || isTyping}
             />
             <button
               type="submit"
               disabled={gameState !== 'planning' || isTyping}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-md disabled:opacity-50"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2.5 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white rounded-lg disabled:opacity-50 shadow-lg transition-all"
             >
               <Send size={18} />
             </button>
