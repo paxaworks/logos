@@ -3609,6 +3609,62 @@ const LogosGame = () => {
   if (screen === 'menu') {
     return (
       <div className="w-screen h-screen overflow-hidden relative" style={{ maxHeight: '100dvh' }}>
+        {/* 설정 모달 */}
+        {showSettings && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
+            <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-96 max-w-[90vw]">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2 text-white">
+                  <Settings size={20} className="text-amber-400" />
+                  설정
+                </h2>
+                <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-slate-800 rounded text-white">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* 효과음 */}
+                <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {soundEnabled ? <Volume2 size={20} className="text-amber-400" /> : <VolumeX size={20} className="text-slate-500" />}
+                    <span className="text-sm font-medium text-white">효과음</span>
+                  </div>
+                  <button
+                    onClick={() => setSoundEnabled(!soundEnabled)}
+                    className={`w-12 h-6 rounded-full transition-colors ${soundEnabled ? 'bg-amber-500' : 'bg-slate-600'}`}
+                  >
+                    <div className={`w-5 h-5 bg-white rounded-full transition-transform ${soundEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                  </button>
+                </div>
+
+                {/* 배경음악 */}
+                <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {musicEnabled ? <Music size={20} className="text-amber-400" /> : <Music2 size={20} className="text-slate-500" />}
+                    <span className="text-sm font-medium text-white">배경음악</span>
+                  </div>
+                  <button
+                    onClick={() => setMusicEnabled(!musicEnabled)}
+                    className={`w-12 h-6 rounded-full transition-colors ${musicEnabled ? 'bg-amber-500' : 'bg-slate-600'}`}
+                  >
+                    <div className={`w-5 h-5 bg-white rounded-full transition-transform ${musicEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                  </button>
+                </div>
+
+                {/* 저장 버튼 */}
+                <button
+                  onClick={saveSettings}
+                  className="w-full py-3 bg-amber-500 hover:bg-amber-400 rounded-lg text-sm font-bold text-black flex items-center justify-center gap-2 transition-colors"
+                >
+                  <Check size={16} />
+                  저장
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 배경 이미지 */}
         <div
           className="absolute inset-0 bg-cover bg-center"
