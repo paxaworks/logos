@@ -77,6 +77,16 @@ const LogosGame = () => {
   const cloudsRef = useRef([]);
   const backgroundInitializedRef = useRef(false);
 
+  // 배경 이미지 refs
+  const bgMorningRef = useRef(null);
+  const bgNoonRef = useRef(null);
+  const bgEveningRef = useRef(null);
+  const bgNightRef = useRef(null);
+  const bgImagesLoadedRef = useRef(false);
+
+  // 현재 월드 (1: 아침, 2: 점심, 3: 저녁, 4: 새벽)
+  const [currentWorld, setCurrentWorld] = useState(1);
+
   // 스프라이트 이미지 로딩
   useEffect(() => {
     const img = new Image();
@@ -115,6 +125,29 @@ const LogosGame = () => {
     spiderwebImg.src = '/spiderweb.png';
     spiderwebImg.onload = () => {
       objectImagesRef.current['/spiderweb.png'] = spiderwebImg;
+    };
+
+    // 배경 이미지 로딩
+    const bgMorning = new Image();
+    bgMorning.src = '/bg_morning.png';
+    bgMorning.onload = () => { bgMorningRef.current = bgMorning; checkBgLoaded(); };
+
+    const bgNoon = new Image();
+    bgNoon.src = '/bg_noon.png';
+    bgNoon.onload = () => { bgNoonRef.current = bgNoon; checkBgLoaded(); };
+
+    const bgEvening = new Image();
+    bgEvening.src = '/bg_evening.png';
+    bgEvening.onload = () => { bgEveningRef.current = bgEvening; checkBgLoaded(); };
+
+    const bgNight = new Image();
+    bgNight.src = '/bg_night.png';
+    bgNight.onload = () => { bgNightRef.current = bgNight; checkBgLoaded(); };
+
+    const checkBgLoaded = () => {
+      if (bgMorningRef.current && bgNoonRef.current && bgEveningRef.current && bgNightRef.current) {
+        bgImagesLoadedRef.current = true;
+      }
     };
   }, []);
 
@@ -3249,66 +3282,32 @@ const LogosGame = () => {
     ctx.restore();
   };
 
-  // 배경 그리기 (그라데이션 하늘 + 구름)
+  // 배경 그리기 (이미지 배경 사용)
   const drawBackground = (ctx, canvas) => {
     const w = canvas.width;
     const h = canvas.height;
 
-    // 그라데이션 하늘
-    const gradient = ctx.createLinearGradient(0, 0, 0, h);
-    gradient.addColorStop(0, '#87CEEB');    // 위쪽: 밝은 하늘색
-    gradient.addColorStop(0.4, '#5DADE2');  // 중간: 하늘색
-    gradient.addColorStop(0.7, '#3498DB');  // 아래쪽: 진한 파란색
-    gradient.addColorStop(1, '#2471A3');    // 맨 아래: 더 진한 파란색
+    // 현재 월드에 따른 배경 이미지 선택
+    let bgImage = null;
+    switch (currentWorld) {
+      case 1: bgImage = bgMorningRef.current; break;
+      case 2: bgImage = bgNoonRef.current; break;
+      case 3: bgImage = bgEveningRef.current; break;
+      case 4: bgImage = bgNightRef.current; break;
+      default: bgImage = bgMorningRef.current;
+    }
 
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, w, h);
-
-    // 배경 초기화 (구름 생성)
-    initializeBackground(w);
-
-    // 구름 그리기 & 이동
-    cloudsRef.current.forEach(cloud => {
-      drawCloud(ctx, cloud.x, cloud.y, cloud.width, cloud.height, cloud.opacity);
-
-      // 구름 이동
-      cloud.x -= cloud.speed;
-
-      // 화면 왼쪽을 벗어나면 오른쪽으로 이동
-      if (cloud.x + cloud.width < 0) {
-        cloud.x = w + Math.random() * 100;
-        cloud.y = 30 + Math.random() * 200;
-      }
-    });
-
-    // 태양 그리기
-    ctx.save();
-    const sunX = w - 120;
-    const sunY = 80;
-    const sunRadius = 40;
-
-    // 태양 빛 효과 (글로우)
-    const sunGlow = ctx.createRadialGradient(sunX, sunY, sunRadius * 0.5, sunX, sunY, sunRadius * 2);
-    sunGlow.addColorStop(0, 'rgba(255, 236, 139, 0.8)');
-    sunGlow.addColorStop(0.5, 'rgba(255, 236, 139, 0.3)');
-    sunGlow.addColorStop(1, 'rgba(255, 236, 139, 0)');
-    ctx.fillStyle = sunGlow;
-    ctx.beginPath();
-    ctx.arc(sunX, sunY, sunRadius * 2, 0, Math.PI * 2);
-    ctx.fill();
-
-    // 태양 본체
-    ctx.fillStyle = '#FFEC8B';
-    ctx.beginPath();
-    ctx.arc(sunX, sunY, sunRadius, 0, Math.PI * 2);
-    ctx.fill();
-
-    // 태양 중심 (더 밝게)
-    ctx.fillStyle = '#FFF8DC';
-    ctx.beginPath();
-    ctx.arc(sunX, sunY, sunRadius * 0.6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+    if (bgImage && bgImagesLoadedRef.current) {
+      // 이미지 배경 그리기 (캔버스 크기에 맞게 늘리기)
+      ctx.drawImage(bgImage, 0, 0, w, h);
+    } else {
+      // 이미지 로딩 전 폴백 배경
+      const gradient = ctx.createLinearGradient(0, 0, 0, h);
+      gradient.addColorStop(0, '#87CEEB');
+      gradient.addColorStop(1, '#2471A3');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, w, h);
+    }
   };
 
   const draw = () => {
@@ -3316,52 +3315,28 @@ const LogosGame = () => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    // 배경 그리기 (그라데이션 하늘 + 구름 + 태양)
+    // 배경 그리기 (이미지 배경)
     drawBackground(ctx, canvas);
 
-    // 그리드 (planning 모드에서만)
-    if (gameState === 'planning') {
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < canvas.width; i += 50) {
-        ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, canvas.height);
-        ctx.stroke();
-      }
-      for (let j = 0; j < canvas.height; j += 50) {
-        ctx.beginPath();
-        ctx.moveTo(0, j);
-        ctx.lineTo(canvas.width, j);
-        ctx.stroke();
-      }
-    }
-
-    // 바닥 (인벤토리 위쪽에 위치)
+    // 바닥 (인벤토리 위쪽에 위치) - 반투명으로 배경과 어울리게
     const FLOOR_OFFSET = 130;
     const floorY = canvas.height - FLOOR_OFFSET;
 
-    // 왼쪽 바닥 - 잔디
-    ctx.fillStyle = '#4A7C3F';
+    // 왼쪽 바닥 - 반투명 플랫폼
+    ctx.save();
+    ctx.fillStyle = 'rgba(60, 60, 60, 0.7)';
     ctx.fillRect(0, floorY, 150, 50);
-    // 잔디 위쪽 밝은 부분
-    ctx.fillStyle = '#5B9A4A';
-    ctx.fillRect(0, floorY, 150, 8);
-    // 잔디 디테일
-    ctx.fillStyle = '#3D6B35';
-    for (let i = 0; i < 15; i++) {
-      ctx.fillRect(i * 10 + 2, floorY + 8, 2, 5);
-    }
+    ctx.fillStyle = 'rgba(80, 80, 80, 0.8)';
+    ctx.fillRect(0, floorY, 150, 5);
+    ctx.restore();
 
-    // 오른쪽 바닥 - 잔디 (집 이미지와 동일)
-    ctx.fillStyle = '#4A7C3F';
+    // 오른쪽 바닥 - 반투명 플랫폼
+    ctx.save();
+    ctx.fillStyle = 'rgba(60, 60, 60, 0.7)';
     ctx.fillRect(canvas.width - 150, floorY, 150, 50);
-    ctx.fillStyle = '#5B9A4A';
-    ctx.fillRect(canvas.width - 150, floorY, 150, 8);
-    ctx.fillStyle = '#3D6B35';
-    for (let i = 0; i < 15; i++) {
-      ctx.fillRect(canvas.width - 150 + i * 10 + 2, floorY + 8, 2, 5);
-    }
+    ctx.fillStyle = 'rgba(80, 80, 80, 0.8)';
+    ctx.fillRect(canvas.width - 150, floorY, 150, 5);
+    ctx.restore();
 
     // 골인 지점
     const goalX = canvas.width - 110;
