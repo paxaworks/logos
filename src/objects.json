@@ -1,0 +1,1979 @@
+{
+  "자동차": {
+    "keywords": ["자동차", "차", "카"],
+    "priority": 50,
+    "size": [120, 60],
+    "color": "#3B82F6",
+    "message": "멋진 자동차가 만들어졌어요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 30, "w": 100, "h": 40 },
+      { "type": "rect", "x": 20, "y": 10, "w": 50, "h": 25 },
+      { "type": "rect", "x": 25, "y": 15, "w": 18, "h": 15, "color": "#87CEEB" },
+      { "type": "rect", "x": 47, "y": 15, "w": 18, "h": 15, "color": "#87CEEB" },
+      { "type": "circle", "x": 15, "y": 60, "w": 20, "h": 20, "color": "#1F2937" },
+      { "type": "circle", "x": 65, "y": 60, "w": 20, "h": 20, "color": "#1F2937" }
+    ]
+  },
+  "트럭": {
+    "keywords": ["트럭"],
+    "priority": 50,
+    "size": [160, 80],
+    "color": "#DC2626",
+    "message": "큰 트럭이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 20, "w": 60, "h": 60 },
+      { "type": "rect", "x": 10, "y": 30, "w": 35, "h": 25, "color": "#87CEEB" },
+      { "type": "rect", "x": 55, "y": 35, "w": 45, "h": 45, "color": "#6B7280" },
+      { "type": "circle", "x": 10, "y": 70, "w": 18, "h": 18, "color": "#1F2937" },
+      { "type": "circle", "x": 70, "y": 70, "w": 18, "h": 18, "color": "#1F2937" }
+    ]
+  },
+  "버스": {
+    "keywords": ["버스"],
+    "priority": 50,
+    "size": [180, 90],
+    "color": "#FBBF24",
+    "message": "큰 버스에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 20, "w": 100, "h": 60 },
+      { "type": "rect", "x": 5, "y": 30, "w": 18, "h": 20, "color": "#87CEEB" },
+      { "type": "rect", "x": 28, "y": 30, "w": 18, "h": 20, "color": "#87CEEB" },
+      { "type": "rect", "x": 51, "y": 30, "w": 18, "h": 20, "color": "#87CEEB" },
+      { "type": "rect", "x": 74, "y": 30, "w": 18, "h": 20, "color": "#87CEEB" },
+      { "type": "circle", "x": 15, "y": 75, "w": 16, "h": 16, "color": "#1F2937" },
+      { "type": "circle", "x": 75, "y": 75, "w": 16, "h": 16, "color": "#1F2937" }
+    ]
+  },
+  "상자": {
+    "keywords": ["상자", "박스", "블럭", "블록"],
+    "priority": 50,
+    "size": [80, 80],
+    "color": "#92400E",
+    "message": "상자를 만들었어요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 10, "y": 10, "w": 80, "h": 5, "color": "#78350F" },
+      { "type": "rect", "x": 10, "y": 85, "w": 80, "h": 5, "color": "#78350F" },
+      { "type": "rect", "x": 45, "y": 40, "w": 10, "h": 20, "color": "#78350F" }
+    ]
+  },
+  "계단": {
+    "keywords": ["계단"],
+    "priority": 50,
+    "size": [100, 100],
+    "color": "#6B7280",
+    "message": "계단이에요! 올라갈 수 있어요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 75, "w": 100, "h": 25 },
+      { "type": "rect", "x": 0, "y": 50, "w": 75, "h": 25 },
+      { "type": "rect", "x": 0, "y": 25, "w": 50, "h": 25 },
+      { "type": "rect", "x": 0, "y": 0, "w": 25, "h": 25 }
+    ]
+  },
+  "사다리": {
+    "keywords": ["사다리", "래더"],
+    "priority": 100,
+    "size": [40, 120],
+    "color": "#92400E",
+    "message": "사다리를 오를 수 있어요!",
+    "physics": "ladder",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 15, "h": 100 },
+      { "type": "rect", "x": 85, "y": 0, "w": 15, "h": 100 },
+      { "type": "rect", "x": 15, "y": 10, "w": 70, "h": 8 },
+      { "type": "rect", "x": 15, "y": 30, "w": 70, "h": 8 },
+      { "type": "rect", "x": 15, "y": 50, "w": 70, "h": 8 },
+      { "type": "rect", "x": 15, "y": 70, "w": 70, "h": 8 },
+      { "type": "rect", "x": 15, "y": 90, "w": 70, "h": 8 }
+    ]
+  },
+  "다리": {
+    "keywords": ["다리", "브릿지"],
+    "priority": 30,
+    "size": [200, 40],
+    "color": "#92400E",
+    "message": "다리를 건너갈 수 있어요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 30 },
+      { "type": "rect", "x": 0, "y": 30, "w": 10, "h": 70 },
+      { "type": "rect", "x": 90, "y": 30, "w": 10, "h": 70 }
+    ]
+  },
+  "집": {
+    "keywords": ["집", "건물", "하우스"],
+    "priority": 50,
+    "size": [120, 120],
+    "color": "#FEF3C7",
+    "message": "아늑한 집이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 10, "y": 40, "w": 80, "h": 60 },
+      { "type": "triangle", "x": 0, "y": 0, "w": 100, "h": 45, "color": "#DC2626" },
+      { "type": "rect", "x": 40, "y": 60, "w": 20, "h": 40, "color": "#92400E" },
+      { "type": "rect", "x": 20, "y": 50, "w": 15, "h": 15, "color": "#87CEEB" },
+      { "type": "rect", "x": 65, "y": 50, "w": 15, "h": 15, "color": "#87CEEB" }
+    ]
+  },
+  "나무": {
+    "keywords": ["나무", "트리"],
+    "priority": 50,
+    "size": [80, 120],
+    "color": "#22C55E",
+    "message": "나무가 자라났어요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 40, "y": 60, "w": 20, "h": 40, "color": "#92400E" },
+      { "type": "circle", "x": 15, "y": 5, "w": 70, "h": 60 },
+      { "type": "circle", "x": 5, "y": 25, "w": 40, "h": 40 },
+      { "type": "circle", "x": 55, "y": 25, "w": 40, "h": 40 }
+    ]
+  },
+  "바위": {
+    "keywords": ["바위", "돌"],
+    "priority": 50,
+    "size": [100, 70],
+    "color": "#6B7280",
+    "message": "단단한 바위에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 10, "y": 20, "w": 80, "h": 60 },
+      { "type": "circle", "x": 0, "y": 40, "w": 40, "h": 40 },
+      { "type": "circle", "x": 60, "y": 35, "w": 40, "h": 45 }
+    ]
+  },
+  "공": {
+    "keywords": ["공", "볼"],
+    "priority": 50,
+    "size": [60, 60],
+    "color": "#EF4444",
+    "message": "통통 튀는 공이에요!",
+    "physics": "bounce",
+    "shape": "circle",
+    "parts": [
+      { "type": "circle", "x": 0, "y": 0, "w": 100, "h": 100 }
+    ]
+  },
+  "탱크": {
+    "keywords": ["탱크", "전차"],
+    "priority": 50,
+    "size": [140, 70],
+    "color": "#4B5563",
+    "message": "강력한 탱크에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 5, "y": 50, "w": 90, "h": 35 },
+      { "type": "rect", "x": 25, "y": 25, "w": 50, "h": 30 },
+      { "type": "rect", "x": 60, "y": 35, "w": 45, "h": 8 },
+      { "type": "circle", "x": 10, "y": 65, "w": 18, "h": 18, "color": "#374151" },
+      { "type": "circle", "x": 35, "y": 65, "w": 18, "h": 18, "color": "#374151" },
+      { "type": "circle", "x": 60, "y": 65, "w": 18, "h": 18, "color": "#374151" }
+    ]
+  },
+  "비행기": {
+    "keywords": ["비행기", "항공기", "플레인"],
+    "priority": 50,
+    "size": [150, 50],
+    "color": "#F3F4F6",
+    "message": "비행기가 날아가요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 10, "y": 35, "w": 80, "h": 25 },
+      { "type": "rect", "x": 0, "y": 30, "w": 15, "h": 35 },
+      { "type": "rect", "x": 85, "y": 40, "w": 15, "h": 15 },
+      { "type": "rect", "x": 30, "y": 25, "w": 30, "h": 15, "color": "#87CEEB" },
+      { "type": "rect", "x": 35, "y": 55, "w": 30, "h": 8 }
+    ]
+  },
+  "배": {
+    "keywords": ["배", "보트", "선박"],
+    "priority": 50,
+    "size": [140, 60],
+    "color": "#92400E",
+    "message": "배가 떠있어요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 10, "y": 50, "w": 80, "h": 30 },
+      { "type": "rect", "x": 5, "y": 70, "w": 90, "h": 15 },
+      { "type": "rect", "x": 45, "y": 20, "w": 5, "h": 35, "color": "#78350F" },
+      { "type": "rect", "x": 48, "y": 25, "w": 30, "h": 20, "color": "#FFFFFF" }
+    ]
+  },
+  "로봇": {
+    "keywords": ["로봇", "기계"],
+    "priority": 50,
+    "size": [80, 100],
+    "color": "#9CA3AF",
+    "message": "로봇이에요! 삐빅!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 20, "y": 0, "w": 60, "h": 35 },
+      { "type": "rect", "x": 10, "y": 35, "w": 80, "h": 45 },
+      { "type": "rect", "x": 0, "y": 40, "w": 15, "h": 30, "color": "#6B7280" },
+      { "type": "rect", "x": 85, "y": 40, "w": 15, "h": 30, "color": "#6B7280" },
+      { "type": "rect", "x": 25, "y": 80, "w": 20, "h": 20, "color": "#6B7280" },
+      { "type": "rect", "x": 55, "y": 80, "w": 20, "h": 20, "color": "#6B7280" },
+      { "type": "circle", "x": 30, "y": 10, "w": 12, "h": 12, "color": "#3B82F6" },
+      { "type": "circle", "x": 55, "y": 10, "w": 12, "h": 12, "color": "#3B82F6" },
+      { "type": "rect", "x": 35, "y": 50, "w": 30, "h": 15, "color": "#374151" }
+    ]
+  },
+  "별": {
+    "keywords": ["별", "스타"],
+    "priority": 50,
+    "size": [80, 80],
+    "color": "#FBBF24",
+    "message": "반짝이는 별이에요!",
+    "physics": "solid",
+    "shape": "star",
+    "parts": []
+  },
+  "하트": {
+    "keywords": ["하트", "사랑"],
+    "priority": 50,
+    "size": [70, 65],
+    "color": "#EF4444",
+    "message": "사랑스러운 하트!",
+    "physics": "solid",
+    "shape": "heart",
+    "parts": []
+  },
+  "구름": {
+    "keywords": ["구름"],
+    "priority": 50,
+    "size": [120, 60],
+    "color": "#F3F4F6",
+    "message": "구름이 떠다녀요!",
+    "physics": "ghost",
+    "parts": [
+      { "type": "circle", "x": 20, "y": 30, "w": 40, "h": 40 },
+      { "type": "circle", "x": 35, "y": 15, "w": 50, "h": 50 },
+      { "type": "circle", "x": 55, "y": 25, "w": 45, "h": 45 }
+    ]
+  },
+  "눈사람": {
+    "keywords": ["눈사람"],
+    "priority": 60,
+    "size": [70, 100],
+    "color": "#FFFFFF",
+    "message": "귀여운 눈사람이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 15, "y": 55, "w": 70, "h": 45 },
+      { "type": "circle", "x": 25, "y": 25, "w": 50, "h": 40 },
+      { "type": "circle", "x": 35, "y": 5, "w": 30, "h": 25 },
+      { "type": "circle", "x": 40, "y": 12, "w": 5, "h": 5, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 55, "y": 12, "w": 5, "h": 5, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 48, "y": 20, "w": 6, "h": 6, "color": "#F97316", "decorative": true }
+    ]
+  },
+  "슬라임": {
+    "keywords": ["슬라임", "젤리"],
+    "priority": 50,
+    "size": [80, 50],
+    "color": "#22C55E",
+    "message": "말랑말랑 슬라임!",
+    "physics": "bounce",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 65, "rx": 45, "ry": 32, "color": "#22C55E" },
+      { "type": "ellipse", "cx": 35, "cy": 45, "rx": 10, "ry": 15, "color": "#4ADE80", "decorative": true },
+      { "type": "circle", "x": 25, "y": 35, "w": 18, "h": 18, "color": "#FFFFFF", "decorative": true },
+      { "type": "circle", "x": 55, "y": 35, "w": 18, "h": 18, "color": "#FFFFFF", "decorative": true },
+      { "type": "circle", "x": 30, "y": 40, "w": 8, "h": 8, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 60, "y": 40, "w": 8, "h": 8, "color": "#1F2937", "decorative": true }
+    ]
+  },
+  "선인장": {
+    "keywords": ["선인장"],
+    "priority": 50,
+    "size": [50, 90],
+    "color": "#22C55E",
+    "message": "따끔따끔 선인장!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 30, "y": 20, "w": 40, "h": 80 },
+      { "type": "rect", "x": 0, "y": 40, "w": 35, "h": 25 },
+      { "type": "rect", "x": 0, "y": 30, "w": 15, "h": 20 },
+      { "type": "rect", "x": 65, "y": 50, "w": 35, "h": 25 },
+      { "type": "rect", "x": 85, "y": 40, "w": 15, "h": 20 },
+      { "type": "ellipse", "cx": 50, "cy": 15, "rx": 18, "ry": 12 }
+    ]
+  },
+  "아이스크림": {
+    "keywords": ["아이스크림", "젤라또"],
+    "priority": 60,
+    "size": [50, 90],
+    "color": "#F472B6",
+    "message": "맛있는 아이스크림!",
+    "physics": "solid",
+    "parts": [
+      { "type": "triangle", "x": 25, "y": 45, "w": 50, "h": 55, "color": "#D2691E" },
+      { "type": "circle", "x": 15, "y": 15, "w": 70, "h": 50, "color": "#F472B6" },
+      { "type": "circle", "x": 22, "y": 5, "w": 56, "h": 38, "color": "#EC4899" },
+      { "type": "circle", "x": 28, "y": 0, "w": 44, "h": 28, "color": "#FDE047" }
+    ]
+  },
+  "얼음": {
+    "keywords": ["얼음", "아이스"],
+    "priority": 50,
+    "size": [80, 40],
+    "color": "#93C5FD",
+    "message": "미끄러운 얼음이에요!",
+    "physics": "ice",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 10, "y": 20, "w": 20, "h": 30, "color": "#BFDBFE" },
+      { "type": "rect", "x": 60, "y": 40, "w": 25, "h": 20, "color": "#BFDBFE" }
+    ]
+  },
+  "버섯": {
+    "keywords": ["버섯"],
+    "priority": 50,
+    "size": [60, 70],
+    "color": "#EF4444",
+    "message": "귀여운 버섯이에요!",
+    "physics": "bounce",
+    "parts": [
+      { "type": "rect", "x": 35, "y": 50, "w": 30, "h": 50, "color": "#FEF3C7" },
+      { "type": "circle", "x": 10, "y": 0, "w": 80, "h": 60 },
+      { "type": "circle", "x": 25, "y": 15, "w": 15, "h": 15, "color": "#FFFFFF" },
+      { "type": "circle", "x": 50, "y": 25, "w": 12, "h": 12, "color": "#FFFFFF" },
+      { "type": "circle", "x": 60, "y": 10, "w": 10, "h": 10, "color": "#FFFFFF" }
+    ]
+  },
+  "계산기": {
+    "keywords": ["계산기"],
+    "priority": 100,
+    "size": [50, 70],
+    "color": "#374151",
+    "message": "똑똒한 계산기!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 10, "y": 8, "w": 80, "h": 20, "color": "#86EFAC" },
+      { "type": "rect", "x": 10, "y": 35, "w": 18, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 32, "y": 35, "w": 18, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 54, "y": 35, "w": 18, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 76, "y": 35, "w": 18, "h": 12, "color": "#F97316" },
+      { "type": "rect", "x": 10, "y": 52, "w": 18, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 32, "y": 52, "w": 18, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 54, "y": 52, "w": 18, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 76, "y": 52, "w": 18, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 10, "y": 69, "w": 18, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 32, "y": 69, "w": 18, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 54, "y": 69, "w": 18, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 76, "y": 69, "w": 18, "h": 25, "color": "#3B82F6" },
+      { "type": "rect", "x": 10, "y": 86, "w": 40, "h": 12, "color": "#9CA3AF" },
+      { "type": "rect", "x": 54, "y": 86, "w": 18, "h": 12, "color": "#9CA3AF" }
+    ]
+  },
+  "우산": {
+    "keywords": ["우산", "양산"],
+    "priority": 100,
+    "size": [90, 100],
+    "color": "#1F2937",
+    "message": "비를 막아주는 우산!",
+    "physics": "solid",
+    "parts": [
+      { "type": "triangle", "x": 0, "y": 0, "w": 100, "h": 40, "color": "#1F2937" },
+      { "type": "rect", "x": 47, "y": 35, "w": 6, "h": 34, "color": "#D4A574" },
+      { "type": "rect", "x": 35, "y": 63, "w": 18, "h": 6, "color": "#D4A574" },
+      { "type": "rect", "x": 35, "y": 63, "w": 6, "h": 18, "color": "#D4A574" },
+      { "type": "rect", "x": 35, "y": 75, "w": 18, "h": 6, "color": "#D4A574" }
+    ]
+  },
+  "화산": {
+    "keywords": ["화산"],
+    "priority": 100,
+    "size": [100, 100],
+    "color": "#78716C",
+    "message": "뜨거운 화산!",
+    "physics": "hazard",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 60, "w": 100, "h": 40, "color": "#57534E" },
+      { "type": "rect", "x": 10, "y": 40, "w": 80, "h": 30 },
+      { "type": "rect", "x": 20, "y": 20, "w": 60, "h": 30, "color": "#A8A29E" },
+      { "type": "rect", "x": 35, "y": 0, "w": 30, "h": 25, "color": "#DC2626" },
+      { "type": "ellipse", "cx": 50, "cy": 5, "rx": 18, "ry": 12, "color": "#F97316" },
+      { "type": "ellipse", "cx": 45, "cy": 0, "rx": 8, "ry": 15, "color": "#FBBF24" },
+      { "type": "ellipse", "cx": 55, "cy": 0, "rx": 8, "ry": 15, "color": "#FBBF24" }
+    ]
+  },
+  "세모": {
+    "keywords": ["세모", "삼각"],
+    "priority": 40,
+    "size": [100, 80],
+    "color": "#6B7280",
+    "message": "삼각형이에요!",
+    "physics": "solid",
+    "shape": "triangle",
+    "parts": [
+      { "type": "triangle", "x": 0, "y": 0, "w": 100, "h": 100 }
+    ]
+  },
+  "산": {
+    "keywords": ["산"],
+    "priority": 20,
+    "size": [100, 80],
+    "color": "#228B22",
+    "message": "높은 산이에요!",
+    "physics": "solid",
+    "shape": "triangle",
+    "parts": [
+      { "type": "triangle", "x": 0, "y": 0, "w": 100, "h": 100 }
+    ]
+  },
+  "무지개": {
+    "keywords": ["무지개", "레인보우"],
+    "priority": 50,
+    "size": [200, 80],
+    "color": "#FF0000",
+    "message": "아름다운 무지개!",
+    "physics": "ghost",
+    "shape": "rainbow",
+    "parts": []
+  },
+  "아치": {
+    "keywords": ["아치"],
+    "priority": 50,
+    "size": [180, 50],
+    "color": "#8B4513",
+    "message": "아치형 다리에요!",
+    "physics": "solid",
+    "shape": "arch",
+    "parts": []
+  },
+  "원": {
+    "keywords": ["원", "동그라미"],
+    "priority": 50,
+    "size": [60, 60],
+    "color": "#6B7280",
+    "message": "동그란 원이에요!",
+    "physics": "solid",
+    "shape": "circle",
+    "parts": [
+      { "type": "circle", "x": 0, "y": 0, "w": 100, "h": 100 }
+    ]
+  },
+  "네모": {
+    "keywords": ["네모", "사각"],
+    "priority": 50,
+    "size": [80, 80],
+    "color": "#6B7280",
+    "message": "네모난 사각형이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 }
+    ]
+  },
+  "플랫폼": {
+    "keywords": ["플랫폼", "발판"],
+    "priority": 50,
+    "size": [150, 30],
+    "color": "#6B7280",
+    "message": "발판이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 }
+    ]
+  },
+  "엘리베이터": {
+    "keywords": ["엘리베이터", "리프트", "승강기"],
+    "priority": 50,
+    "size": [100, 30],
+    "color": "#4B5563",
+    "message": "위아래로 움직여요!",
+    "physics": "elevator",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 45, "y": 30, "w": 10, "h": 40, "color": "#9CA3AF" },
+      { "type": "triangle", "x": 40, "y": 15, "w": 20, "h": 15, "color": "#22C55E" },
+      { "type": "triangle", "x": 40, "y": 70, "w": 20, "h": 15, "color": "#EF4444", "flip": true }
+    ]
+  },
+  "물고기": {
+    "keywords": ["물고기", "생선", "피쉬", "잉어", "붕어", "금붕어", "연어", "참치", "고등어", "광어", "우럭", "도미"],
+    "priority": 50,
+    "size": [80, 50],
+    "color": "#3B82F6",
+    "message": "물고기가 헤엄쳐요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 45, "cy": 50, "rx": 35, "ry": 28, "color": "#3B82F6" },
+      { "type": "triangle", "x": 70, "y": 30, "w": 30, "h": 40, "color": "#3B82F6" },
+      { "type": "ellipse", "cx": 45, "cy": 35, "rx": 8, "ry": 12, "color": "#60A5FA", "decorative": true },
+      { "type": "circle", "x": 15, "y": 40, "w": 12, "h": 12, "color": "#FFFFFF", "decorative": true },
+      { "type": "circle", "x": 18, "y": 43, "w": 6, "h": 6, "color": "#1F2937", "decorative": true }
+    ]
+  },
+  "핸드폰": {
+    "keywords": ["핸드폰", "스마트폰", "폰", "휴대폰"],
+    "priority": 50,
+    "size": [50, 90],
+    "color": "#1F2937",
+    "message": "스마트폰이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 8, "y": 12, "w": 84, "h": 72, "color": "#3B82F6" },
+      { "type": "circle", "x": 42, "y": 88, "w": 16, "h": 10, "color": "#374151" }
+    ]
+  },
+  "컴퓨터": {
+    "keywords": ["컴퓨터", "모니터", "PC"],
+    "priority": 50,
+    "size": [100, 90],
+    "color": "#374151",
+    "message": "컴퓨터에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 5, "y": 0, "w": 90, "h": 65 },
+      { "type": "rect", "x": 10, "y": 5, "w": 80, "h": 50, "color": "#3B82F6" },
+      { "type": "rect", "x": 40, "y": 65, "w": 20, "h": 15, "color": "#6B7280" },
+      { "type": "rect", "x": 25, "y": 80, "w": 50, "h": 8, "color": "#6B7280" }
+    ]
+  },
+  "헤드셋": {
+    "keywords": ["헤드셋", "헤드폰", "이어폰"],
+    "priority": 50,
+    "size": [80, 80],
+    "color": "#1F2937",
+    "message": "음악을 들어요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 20, "y": 0, "w": 60, "h": 15 },
+      { "type": "rect", "x": 15, "y": 10, "w": 15, "h": 50 },
+      { "type": "rect", "x": 70, "y": 10, "w": 15, "h": 50 },
+      { "type": "circle", "x": 5, "y": 45, "w": 30, "h": 40 },
+      { "type": "circle", "x": 65, "y": 45, "w": 30, "h": 40 }
+    ]
+  },
+  "튜브": {
+    "keywords": ["유튜브", "유투브", "youtube", "튜브"],
+    "priority": 50,
+    "size": [100, 100],
+    "color": "#EC4899",
+    "message": "튜브에요! 가운데로 빠질 수 있어요!",
+    "physics": "tube",
+    "shape": "tube",
+    "parts": []
+  },
+  "재생버튼": {
+    "keywords": ["재생", "플레이"],
+    "priority": 50,
+    "size": [80, 80],
+    "color": "#6B7280",
+    "message": "재생 버튼이에요!",
+    "physics": "solid",
+    "shape": "playbutton",
+    "parts": []
+  },
+  "방망이": {
+    "keywords": ["야구", "방망이", "배트"],
+    "priority": 50,
+    "size": [30, 120],
+    "color": "#92400E",
+    "message": "야구 방망이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 30, "y": 0, "w": 40, "h": 60 },
+      { "type": "rect", "x": 35, "y": 60, "w": 30, "h": 35, "color": "#78350F" },
+      { "type": "rect", "x": 40, "y": 85, "w": 20, "h": 15, "color": "#1F2937" }
+    ]
+  },
+  "머리카락": {
+    "keywords": ["머리카락", "가발"],
+    "priority": 100,
+    "size": [80, 50],
+    "color": "#1F2937",
+    "message": "머리카락이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 5, "y": 30, "w": 90, "h": 70 },
+      { "type": "rect", "x": 10, "y": 0, "w": 80, "h": 50 },
+      { "type": "rect", "x": 0, "y": 20, "w": 20, "h": 60 },
+      { "type": "rect", "x": 80, "y": 20, "w": 20, "h": 60 }
+    ]
+  },
+  "토끼": {
+    "keywords": ["토끼", "래빗"],
+    "priority": 50,
+    "size": [60, 90],
+    "color": "#FFFFFF",
+    "message": "귀여운 토끼에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 72, "rx": 32, "ry": 26, "color": "#FFFFFF" },
+      { "type": "circle", "x": 22, "y": 28, "w": 55, "h": 50, "color": "#FFFFFF" },
+      { "type": "ellipse", "cx": 35, "cy": 8, "rx": 8, "ry": 22, "color": "#FFFFFF" },
+      { "type": "ellipse", "cx": 65, "cy": 8, "rx": 8, "ry": 22, "color": "#FFFFFF" },
+      { "type": "ellipse", "cx": 35, "cy": 10, "rx": 4, "ry": 15, "color": "#FECACA", "decorative": true },
+      { "type": "ellipse", "cx": 65, "cy": 10, "rx": 4, "ry": 15, "color": "#FECACA", "decorative": true },
+      { "type": "circle", "x": 32, "y": 40, "w": 10, "h": 10, "color": "#FFFFFF", "decorative": true },
+      { "type": "circle", "x": 55, "y": 40, "w": 10, "h": 10, "color": "#FFFFFF", "decorative": true },
+      { "type": "circle", "x": 35, "y": 43, "w": 5, "h": 5, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 58, "y": 43, "w": 5, "h": 5, "color": "#1F2937", "decorative": true },
+      { "type": "ellipse", "cx": 50, "cy": 58, "rx": 6, "ry": 4, "color": "#FECACA", "decorative": true }
+    ]
+  },
+  "번개": {
+    "keywords": ["번개", "천둥", "벼락"],
+    "priority": 50,
+    "size": [60, 100],
+    "color": "#FBBF24",
+    "message": "번개를 조심하세요!",
+    "physics": "hazard",
+    "shape": "lightning",
+    "parts": []
+  },
+  "강아지": {
+    "keywords": ["강아지", "멍멍이", "퍼피", "개"],
+    "priority": 50,
+    "size": [90, 70],
+    "color": "#D97706",
+    "message": "귀여운 강아지에요! 멍멍!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 55, "cy": 55, "rx": 38, "ry": 28, "color": "#D97706" },
+      { "type": "circle", "x": 5, "y": 20, "w": 45, "h": 42, "color": "#D97706" },
+      { "type": "ellipse", "cx": 5, "cy": 22, "rx": 10, "ry": 18, "color": "#92400E" },
+      { "type": "ellipse", "cx": 50, "cy": 22, "rx": 10, "ry": 18, "color": "#92400E" },
+      { "type": "circle", "x": 15, "y": 32, "w": 10, "h": 10, "color": "#FFFFFF", "decorative": true },
+      { "type": "circle", "x": 35, "y": 32, "w": 10, "h": 10, "color": "#FFFFFF", "decorative": true },
+      { "type": "circle", "x": 18, "y": 35, "w": 5, "h": 5, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 38, "y": 35, "w": 5, "h": 5, "color": "#1F2937", "decorative": true },
+      { "type": "ellipse", "cx": 30, "cy": 50, "rx": 8, "ry": 5, "color": "#1F2937", "decorative": true },
+      { "type": "rect", "x": 20, "y": 75, "w": 12, "h": 25, "color": "#B45309" },
+      { "type": "rect", "x": 55, "y": 75, "w": 12, "h": 25, "color": "#B45309" },
+      { "type": "rect", "x": 85, "y": 45, "w": 15, "h": 8, "color": "#D97706" }
+    ]
+  },
+  "고양이": {
+    "keywords": ["고양이", "냥이", "캣"],
+    "priority": 50,
+    "size": [80, 80],
+    "color": "#F97316",
+    "message": "귀여운 고양이에요! 야옹!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 65, "rx": 35, "ry": 28 },
+      { "type": "circle", "x": 20, "y": 15, "w": 55, "h": 50 },
+      { "type": "triangle", "x": 18, "y": 5, "w": 20, "h": 25 },
+      { "type": "triangle", "x": 58, "y": 5, "w": 20, "h": 25 },
+      { "type": "ellipse", "cx": 38, "cy": 38, "rx": 8, "ry": 10, "color": "#22C55E", "decorative": true },
+      { "type": "ellipse", "cx": 62, "cy": 38, "rx": 8, "ry": 10, "color": "#22C55E", "decorative": true },
+      { "type": "circle", "x": 36, "y": 36, "w": 4, "h": 8, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 60, "y": 36, "w": 4, "h": 8, "color": "#1F2937", "decorative": true },
+      { "type": "ellipse", "cx": 50, "cy": 52, "rx": 5, "ry": 3, "color": "#EC4899", "decorative": true }
+    ]
+  },
+  "코알라": {
+    "keywords": ["코알라"],
+    "priority": 50,
+    "size": [80, 90],
+    "color": "#9CA3AF",
+    "message": "졸린 코알라에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 65, "rx": 35, "ry": 35 },
+      { "type": "circle", "x": 25, "y": 10, "w": 50, "h": 50 },
+      { "type": "circle", "x": 5, "y": 15, "w": 25, "h": 25 },
+      { "type": "circle", "x": 70, "y": 15, "w": 25, "h": 25 },
+      { "type": "ellipse", "cx": 50, "cy": 45, "rx": 15, "ry": 12, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 35, "y": 30, "w": 8, "h": 8, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 55, "y": 30, "w": 8, "h": 8, "color": "#1F2937", "decorative": true }
+    ]
+  },
+  "판다": {
+    "keywords": ["판다", "팬더"],
+    "priority": 50,
+    "size": [90, 100],
+    "color": "#FFFFFF",
+    "message": "귀여운 판다에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 65, "rx": 40, "ry": 35 },
+      { "type": "circle", "x": 20, "y": 5, "w": 55, "h": 50 },
+      { "type": "circle", "x": 8, "y": 8, "w": 22, "h": 22, "color": "#1F2937" },
+      { "type": "circle", "x": 68, "y": 8, "w": 22, "h": 22, "color": "#1F2937" },
+      { "type": "circle", "x": 25, "y": 25, "w": 20, "h": 20, "color": "#1F2937" },
+      { "type": "circle", "x": 55, "y": 25, "w": 20, "h": 20, "color": "#1F2937" },
+      { "type": "circle", "x": 30, "y": 30, "w": 8, "h": 8, "color": "#FFFFFF", "decorative": true },
+      { "type": "circle", "x": 60, "y": 30, "w": 8, "h": 8, "color": "#FFFFFF", "decorative": true },
+      { "type": "ellipse", "cx": 50, "cy": 48, "rx": 8, "ry": 6, "color": "#1F2937", "decorative": true }
+    ]
+  },
+  "창문": {
+    "keywords": ["창문", "윈도우"],
+    "priority": 100,
+    "size": [70, 80],
+    "color": "#92400E",
+    "message": "밖이 보이는 창문!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 8, "y": 8, "w": 38, "h": 38, "color": "#7DD3FC" },
+      { "type": "rect", "x": 54, "y": 8, "w": 38, "h": 38, "color": "#7DD3FC" },
+      { "type": "rect", "x": 8, "y": 54, "w": 38, "h": 38, "color": "#7DD3FC" },
+      { "type": "rect", "x": 54, "y": 54, "w": 38, "h": 38, "color": "#7DD3FC" },
+      { "type": "rect", "x": 46, "y": 0, "w": 8, "h": 100 },
+      { "type": "rect", "x": 0, "y": 46, "w": 100, "h": 8 }
+    ]
+  },
+  "문": {
+    "keywords": ["문"],
+    "priority": 30,
+    "size": [60, 120],
+    "color": "#92400E",
+    "message": "문을 만들었어요!",
+    "physics": "solid",
+    "excludeKeywords": ["문제", "문서"],
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "circle", "x": 70, "y": 45, "w": 15, "h": 15, "color": "#FBBF24", "decorative": true }
+    ]
+  },
+  "종이": {
+    "keywords": ["종이", "페이퍼", "문서"],
+    "priority": 50,
+    "size": [70, 90],
+    "color": "#FFFFFF",
+    "message": "종이를 만들었어요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 15, "y": 20, "w": 70, "h": 5, "color": "#D1D5DB" },
+      { "type": "rect", "x": 15, "y": 35, "w": 70, "h": 5, "color": "#D1D5DB" },
+      { "type": "rect", "x": 15, "y": 50, "w": 50, "h": 5, "color": "#D1D5DB" },
+      { "type": "rect", "x": 15, "y": 65, "w": 70, "h": 5, "color": "#D1D5DB" },
+      { "type": "rect", "x": 15, "y": 80, "w": 40, "h": 5, "color": "#D1D5DB" }
+    ]
+  },
+  "비디오": {
+    "keywords": ["비디오", "테이프", "VHS"],
+    "priority": 50,
+    "size": [100, 60],
+    "color": "#1F2937",
+    "message": "비디오 테이프에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 10, "y": 15, "w": 35, "h": 50, "color": "#374151" },
+      { "type": "rect", "x": 55, "y": 15, "w": 35, "h": 50, "color": "#374151" },
+      { "type": "circle", "x": 15, "y": 25, "w": 25, "h": 30, "color": "#FFFFFF" },
+      { "type": "circle", "x": 60, "y": 25, "w": 25, "h": 30, "color": "#FFFFFF" },
+      { "type": "rect", "x": 10, "y": 75, "w": 80, "h": 15, "color": "#F3F4F6" }
+    ]
+  },
+  "전등": {
+    "keywords": ["전등", "램프", "조명"],
+    "priority": 50,
+    "size": [80, 100],
+    "color": "#FBBF24",
+    "message": "밝은 전등이에요!",
+    "physics": "ghost",
+    "parts": [
+      { "type": "rect", "x": 45, "y": 0, "w": 10, "h": 10, "color": "#1F2937" },
+      { "type": "rect", "x": 35, "y": 10, "w": 30, "h": 15, "color": "#374151" },
+      { "type": "rect", "x": 25, "y": 25, "w": 50, "h": 10, "color": "#FBBF24" },
+      { "type": "rect", "x": 15, "y": 35, "w": 70, "h": 15, "color": "#FEF3C7" },
+      { "type": "rect", "x": 5, "y": 50, "w": 90, "h": 20, "color": "#FEF9C4" },
+      { "type": "rect", "x": 0, "y": 70, "w": 100, "h": 30, "color": "#FFFEF0" }
+    ]
+  },
+  "빛": {
+    "keywords": ["빛", "광선", "라이트"],
+    "priority": 50,
+    "size": [60, 80],
+    "color": "#FEF3C7",
+    "message": "빛이 나요!",
+    "physics": "ghost",
+    "shape": "light",
+    "parts": []
+  },
+  "의자": {
+    "keywords": ["의자", "체어"],
+    "priority": 50,
+    "size": [60, 80],
+    "color": "#92400E",
+    "message": "편한 의자에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 80, "y": 0, "w": 15, "h": 65 },
+      { "type": "rect", "x": 5, "y": 35, "w": 90, "h": 15 },
+      { "type": "rect", "x": 5, "y": 50, "w": 15, "h": 50 },
+      { "type": "rect", "x": 80, "y": 50, "w": 15, "h": 50 }
+    ]
+  },
+  "케이크": {
+    "keywords": ["케이크", "케익", "생일"],
+    "priority": 50,
+    "size": [80, 70],
+    "color": "#FEF3C7",
+    "message": "맛있는 케이크!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 10, "y": 30, "w": 80, "h": 50 },
+      { "type": "rect", "x": 5, "y": 50, "w": 90, "h": 30 },
+      { "type": "rect", "x": 10, "y": 30, "w": 80, "h": 15, "color": "#EC4899" },
+      { "type": "rect", "x": 45, "y": 10, "w": 10, "h": 25, "color": "#FBBF24" },
+      { "type": "circle", "x": 43, "y": 0, "w": 14, "h": 15, "color": "#F97316" }
+    ]
+  },
+  "책상": {
+    "keywords": ["책상", "데스크", "테이블"],
+    "priority": 50,
+    "size": [120, 70],
+    "color": "#92400E",
+    "message": "책상이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 25 },
+      { "type": "rect", "x": 5, "y": 25, "w": 15, "h": 75 },
+      { "type": "rect", "x": 80, "y": 25, "w": 15, "h": 75 }
+    ]
+  },
+  "책": {
+    "keywords": ["책", "북", "도서"],
+    "priority": 50,
+    "size": [60, 80],
+    "color": "#DC2626",
+    "message": "재미있는 책이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 10, "y": 5, "w": 85, "h": 90 },
+      { "type": "rect", "x": 5, "y": 5, "w": 10, "h": 90, "color": "#991B1B" },
+      { "type": "rect", "x": 20, "y": 15, "w": 60, "h": 5, "color": "#FEF3C7" },
+      { "type": "rect", "x": 20, "y": 25, "w": 50, "h": 5, "color": "#FEF3C7" }
+    ]
+  },
+  "항아리": {
+    "keywords": ["항아리", "도자기", "단지"],
+    "priority": 50,
+    "size": [70, 90],
+    "color": "#B45309",
+    "message": "전통 항아리에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 65, "rx": 45, "ry": 35 },
+      { "type": "ellipse", "cx": 50, "cy": 35, "rx": 35, "ry": 25 },
+      { "type": "rect", "x": 35, "y": 10, "w": 30, "h": 15 },
+      { "type": "ellipse", "cx": 50, "cy": 10, "rx": 20, "ry": 8, "color": "#92400E" }
+    ]
+  },
+  "피아노": {
+    "keywords": ["피아노"],
+    "priority": 50,
+    "size": [120, 80],
+    "color": "#1F2937",
+    "message": "피아노에요! 도레미~",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 20, "w": 100, "h": 60 },
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 25 },
+      { "type": "rect", "x": 5, "y": 50, "w": 12, "h": 25, "color": "#FFFFFF" },
+      { "type": "rect", "x": 18, "y": 50, "w": 12, "h": 25, "color": "#FFFFFF" },
+      { "type": "rect", "x": 31, "y": 50, "w": 12, "h": 25, "color": "#FFFFFF" },
+      { "type": "rect", "x": 44, "y": 50, "w": 12, "h": 25, "color": "#FFFFFF" },
+      { "type": "rect", "x": 57, "y": 50, "w": 12, "h": 25, "color": "#FFFFFF" },
+      { "type": "rect", "x": 70, "y": 50, "w": 12, "h": 25, "color": "#FFFFFF" },
+      { "type": "rect", "x": 83, "y": 50, "w": 12, "h": 25, "color": "#FFFFFF" },
+      { "type": "rect", "x": 14, "y": 50, "w": 8, "h": 15, "color": "#1F2937" },
+      { "type": "rect", "x": 27, "y": 50, "w": 8, "h": 15, "color": "#1F2937" },
+      { "type": "rect", "x": 53, "y": 50, "w": 8, "h": 15, "color": "#1F2937" },
+      { "type": "rect", "x": 66, "y": 50, "w": 8, "h": 15, "color": "#1F2937" },
+      { "type": "rect", "x": 79, "y": 50, "w": 8, "h": 15, "color": "#1F2937" }
+    ]
+  },
+  "키보드": {
+    "keywords": ["키보드"],
+    "priority": 50,
+    "size": [120, 40],
+    "color": "#1F2937",
+    "message": "키보드에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 5, "y": 15, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 16, "y": 15, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 27, "y": 15, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 38, "y": 15, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 49, "y": 15, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 60, "y": 15, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 71, "y": 15, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 82, "y": 15, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 5, "y": 50, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 16, "y": 50, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 27, "y": 50, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 38, "y": 50, "w": 25, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 66, "y": 50, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 77, "y": 50, "w": 8, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 88, "y": 50, "w": 8, "h": 25, "color": "#374151" }
+    ]
+  },
+  "열쇠": {
+    "keywords": ["열쇠", "자물쇠"],
+    "priority": 50,
+    "size": [50, 30],
+    "color": "#FBBF24",
+    "message": "열쇠에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 0, "y": 10, "w": 55, "h": 80 },
+      { "type": "circle", "x": 15, "y": 30, "w": 25, "h": 40, "color": "#F59E0B" },
+      { "type": "rect", "x": 50, "y": 35, "w": 50, "h": 30 },
+      { "type": "rect", "x": 75, "y": 55, "w": 15, "h": 25 },
+      { "type": "rect", "x": 90, "y": 55, "w": 10, "h": 20 }
+    ]
+  },
+  "시계": {
+    "keywords": ["시계", "클락", "워치"],
+    "priority": 50,
+    "size": [70, 70],
+    "color": "#F3F4F6",
+    "message": "째깍째깍 시계에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 5, "y": 5, "w": 90, "h": 90 },
+      { "type": "circle", "x": 10, "y": 10, "w": 80, "h": 80, "color": "#FFFFFF" },
+      { "type": "rect", "x": 48, "y": 20, "w": 4, "h": 32, "color": "#1F2937" },
+      { "type": "rect", "x": 48, "y": 48, "w": 25, "h": 3, "color": "#1F2937" },
+      { "type": "circle", "x": 46, "y": 46, "w": 8, "h": 8, "color": "#EF4444" }
+    ]
+  },
+  "술병": {
+    "keywords": ["술병", "와인", "소주", "맥주"],
+    "priority": 50,
+    "size": [40, 100],
+    "color": "#22C55E",
+    "message": "술병이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 20, "y": 30, "w": 60, "h": 70 },
+      { "type": "rect", "x": 35, "y": 0, "w": 30, "h": 35 },
+      { "type": "rect", "x": 40, "y": 0, "w": 20, "h": 10, "color": "#92400E" },
+      { "type": "rect", "x": 30, "y": 45, "w": 40, "h": 40, "color": "#FFFFFF" }
+    ]
+  },
+  "기둥": {
+    "keywords": ["기둥", "필러", "폴"],
+    "priority": 50,
+    "size": [40, 150],
+    "color": "#9CA3AF",
+    "message": "튼튼한 기둥이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 15, "y": 8, "w": 70, "h": 84 },
+      { "type": "rect", "x": 5, "y": 0, "w": 90, "h": 10 },
+      { "type": "rect", "x": 5, "y": 90, "w": 90, "h": 10 }
+    ]
+  },
+  "해골": {
+    "keywords": ["해골", "스컬", "두개골"],
+    "priority": 50,
+    "size": [60, 70],
+    "color": "#F3F4F6",
+    "message": "으스스한 해골이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 10, "y": 0, "w": 80, "h": 70 },
+      { "type": "rect", "x": 30, "y": 60, "w": 40, "h": 40 },
+      { "type": "circle", "x": 20, "y": 25, "w": 25, "h": 25, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 55, "y": 25, "w": 25, "h": 25, "color": "#1F2937", "decorative": true },
+      { "type": "triangle", "x": 42, "y": 45, "w": 16, "h": 15, "color": "#1F2937", "decorative": true },
+      { "type": "rect", "x": 35, "y": 70, "w": 6, "h": 15, "color": "#1F2937", "decorative": true },
+      { "type": "rect", "x": 47, "y": 70, "w": 6, "h": 15, "color": "#1F2937", "decorative": true },
+      { "type": "rect", "x": 59, "y": 70, "w": 6, "h": 15, "color": "#1F2937", "decorative": true }
+    ]
+  },
+  "펭귄": {
+    "keywords": ["펭귄"],
+    "priority": 50,
+    "size": [60, 80],
+    "color": "#1F2937",
+    "message": "귀여운 펭귄이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 60, "rx": 40, "ry": 40 },
+      { "type": "circle", "x": 20, "y": 5, "w": 60, "h": 50 },
+      { "type": "ellipse", "cx": 50, "cy": 60, "rx": 25, "ry": 30, "color": "#FFFFFF" },
+      { "type": "circle", "x": 30, "y": 25, "w": 12, "h": 12, "color": "#FFFFFF", "decorative": true },
+      { "type": "circle", "x": 55, "y": 25, "w": 12, "h": 12, "color": "#FFFFFF", "decorative": true },
+      { "type": "circle", "x": 33, "y": 28, "w": 6, "h": 6, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 58, "y": 28, "w": 6, "h": 6, "color": "#1F2937", "decorative": true },
+      { "type": "triangle", "x": 42, "y": 38, "w": 16, "h": 12, "color": "#F97316", "decorative": true }
+    ]
+  },
+  "거미": {
+    "keywords": ["거미", "스파이더"],
+    "priority": 50,
+    "size": [70, 50],
+    "color": "#1F2937",
+    "message": "거미가 나타났어요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 55, "rx": 25, "ry": 20 },
+      { "type": "circle", "x": 30, "y": 20, "w": 40, "h": 35 },
+      { "type": "rect", "x": 5, "y": 30, "w": 25, "h": 5, "color": "#374151" },
+      { "type": "rect", "x": 70, "y": 30, "w": 25, "h": 5, "color": "#374151" },
+      { "type": "rect", "x": 0, "y": 45, "w": 28, "h": 5, "color": "#374151" },
+      { "type": "rect", "x": 72, "y": 45, "w": 28, "h": 5, "color": "#374151" },
+      { "type": "rect", "x": 5, "y": 60, "w": 25, "h": 5, "color": "#374151" },
+      { "type": "rect", "x": 70, "y": 60, "w": 25, "h": 5, "color": "#374151" },
+      { "type": "rect", "x": 10, "y": 75, "w": 22, "h": 5, "color": "#374151" },
+      { "type": "rect", "x": 68, "y": 75, "w": 22, "h": 5, "color": "#374151" },
+      { "type": "circle", "x": 35, "y": 28, "w": 10, "h": 10, "color": "#EF4444", "decorative": true },
+      { "type": "circle", "x": 55, "y": 28, "w": 10, "h": 10, "color": "#EF4444", "decorative": true }
+    ]
+  },
+  "닭": {
+    "keywords": ["닭", "치킨", "수탉"],
+    "priority": 50,
+    "size": [70, 70],
+    "color": "#FFFFFF",
+    "message": "꼬끼오! 닭이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 45, "cy": 60, "rx": 35, "ry": 30 },
+      { "type": "circle", "x": 30, "y": 15, "w": 40, "h": 40 },
+      { "type": "rect", "x": 45, "y": 5, "w": 15, "h": 20, "color": "#EF4444" },
+      { "type": "triangle", "x": 60, "y": 30, "w": 25, "h": 15, "color": "#F97316" },
+      { "type": "circle", "x": 42, "y": 28, "w": 8, "h": 8, "color": "#1F2937", "decorative": true },
+      { "type": "ellipse", "cx": 50, "cy": 50, "rx": 8, "ry": 5, "color": "#EF4444", "decorative": true },
+      { "type": "rect", "x": 30, "y": 85, "w": 8, "h": 15, "color": "#F97316" },
+      { "type": "rect", "x": 55, "y": 85, "w": 8, "h": 15, "color": "#F97316" }
+    ]
+  },
+  "병아리": {
+    "keywords": ["병아리", "삐약"],
+    "priority": 50,
+    "size": [50, 50],
+    "color": "#FDE047",
+    "message": "삐약삐약! 병아리에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 65, "rx": 40, "ry": 35 },
+      { "type": "circle", "x": 20, "y": 10, "w": 55, "h": 50 },
+      { "type": "circle", "x": 30, "y": 30, "w": 12, "h": 12, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 55, "y": 30, "w": 12, "h": 12, "color": "#1F2937", "decorative": true },
+      { "type": "triangle", "x": 42, "y": 45, "w": 16, "h": 12, "color": "#F97316", "decorative": true }
+    ]
+  },
+  "선풍기": {
+    "keywords": ["선풍기", "팬", "환풍기"],
+    "priority": 100,
+    "size": [80, 100],
+    "color": "#60A5FA",
+    "message": "시원한 선풍기!",
+    "physics": "wind",
+    "parts": [
+      { "type": "rect", "x": 60, "y": 20, "w": 15, "h": 50, "color": "#6B7280" },
+      { "type": "rect", "x": 55, "y": 70, "w": 25, "h": 10, "color": "#6B7280" },
+      { "type": "rect", "x": 45, "y": 80, "w": 45, "h": 20, "color": "#374151" },
+      { "type": "circle", "x": 5, "y": 10, "w": 70, "h": 70, "color": "#60A5FA" },
+      { "type": "circle", "x": 25, "y": 30, "w": 30, "h": 30, "color": "#1E40AF" },
+      { "type": "ellipse", "cx": 15, "cy": 45, "rx": 15, "ry": 8, "color": "#93C5FD" },
+      { "type": "ellipse", "cx": 40, "cy": 20, "rx": 8, "ry": 18, "color": "#93C5FD" },
+      { "type": "ellipse", "cx": 40, "cy": 70, "rx": 8, "ry": 18, "color": "#93C5FD" }
+    ]
+  },
+  "깃발": {
+    "keywords": ["깃발", "플래그", "기"],
+    "priority": 40,
+    "size": [80, 100],
+    "color": "#EF4444",
+    "message": "깃발이 펄럭여요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 10, "h": 100, "color": "#78350F" },
+      { "type": "rect", "x": 10, "y": 5, "w": 70, "h": 45, "color": "#EF4444" }
+    ]
+  },
+  "드럼통": {
+    "keywords": ["드럼통", "배럴", "통"],
+    "priority": 50,
+    "size": [60, 80],
+    "color": "#3B82F6",
+    "message": "드럼통이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 5, "y": 5, "w": 90, "h": 90, "color": "#3B82F6" },
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 10, "color": "#1D4ED8" },
+      { "type": "rect", "x": 0, "y": 20, "w": 100, "h": 8, "color": "#1D4ED8" },
+      { "type": "rect", "x": 0, "y": 72, "w": 100, "h": 8, "color": "#1D4ED8" },
+      { "type": "rect", "x": 0, "y": 90, "w": 100, "h": 10, "color": "#1D4ED8" }
+    ]
+  },
+  "거울": {
+    "keywords": ["거울", "미러"],
+    "priority": 50,
+    "size": [60, 100],
+    "color": "#92400E",
+    "message": "거울이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100, "color": "#92400E" },
+      { "type": "rect", "x": 10, "y": 5, "w": 80, "h": 90, "color": "#BFDBFE" },
+      { "type": "rect", "x": 15, "y": 10, "w": 25, "h": 35, "color": "#FFFFFF" }
+    ]
+  },
+  "버튼": {
+    "keywords": ["버튼"],
+    "priority": 50,
+    "size": [80, 50],
+    "color": "#DC2626",
+    "message": "버튼이에요!",
+    "physics": "button",
+    "parts": [
+      { "type": "rect", "x": 5, "y": 30, "w": 90, "h": 70, "color": "#1F2937" },
+      { "type": "rect", "x": 10, "y": 0, "w": 80, "h": 50, "color": "#EF4444" }
+    ]
+  },
+  "침대": {
+    "keywords": ["침대", "베드"],
+    "priority": 50,
+    "size": [120, 60],
+    "color": "#92400E",
+    "message": "푹신한 침대에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 40, "w": 100, "h": 45 },
+      { "type": "rect", "x": 0, "y": 0, "w": 15, "h": 45 },
+      { "type": "rect", "x": 10, "y": 30, "w": 85, "h": 25, "color": "#FFFFFF" },
+      { "type": "rect", "x": 12, "y": 32, "w": 25, "h": 20, "color": "#FEF3C7" },
+      { "type": "rect", "x": 5, "y": 85, "w": 10, "h": 15 },
+      { "type": "rect", "x": 85, "y": 85, "w": 10, "h": 15 }
+    ]
+  },
+  "모자": {
+    "keywords": ["모자", "캡", "햇"],
+    "priority": 50,
+    "size": [90, 60],
+    "color": "#EF4444",
+    "message": "멋진 모자에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 90, "rx": 50, "ry": 12, "color": "#EF4444" },
+      { "type": "rect", "x": 20, "y": 40, "w": 60, "h": 50, "color": "#EF4444" },
+      { "type": "ellipse", "cx": 50, "cy": 40, "rx": 30, "ry": 15, "color": "#EF4444" },
+      { "type": "rect", "x": 22, "y": 70, "w": 56, "h": 5, "color": "#1F2937" }
+    ]
+  },
+  "사람": {
+    "keywords": ["사람", "인간", "휴먼"],
+    "priority": 50,
+    "size": [60, 100],
+    "color": "#FCD34D",
+    "message": "사람이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 25, "y": 0, "w": 50, "h": 30 },
+      { "type": "rect", "x": 25, "y": 28, "w": 50, "h": 45, "color": "#3B82F6" },
+      { "type": "rect", "x": 10, "y": 30, "w": 18, "h": 35, "color": "#3B82F6" },
+      { "type": "rect", "x": 72, "y": 30, "w": 18, "h": 35, "color": "#3B82F6" },
+      { "type": "rect", "x": 28, "y": 73, "w": 18, "h": 27, "color": "#1F2937" },
+      { "type": "rect", "x": 54, "y": 73, "w": 18, "h": 27, "color": "#1F2937" },
+      { "type": "circle", "x": 35, "y": 8, "w": 8, "h": 8, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 55, "y": 8, "w": 8, "h": 8, "color": "#1F2937", "decorative": true },
+      { "type": "rect", "x": 40, "y": 18, "w": 20, "h": 3, "color": "#1F2937", "decorative": true }
+    ]
+  },
+  "기쁨": {
+    "keywords": ["기쁨", "행복", "웃음", "스마일"],
+    "priority": 50,
+    "size": [70, 70],
+    "color": "#FBBF24",
+    "message": "행복해요!",
+    "physics": "solid",
+    "shape": "happy",
+    "parts": []
+  },
+  "슬픔": {
+    "keywords": ["슬픔", "슬플", "울음", "눈물"],
+    "priority": 50,
+    "size": [70, 70],
+    "color": "#3B82F6",
+    "message": "슬퍼요...",
+    "physics": "solid",
+    "shape": "sad",
+    "parts": []
+  },
+  "휴지": {
+    "keywords": ["휴지", "티슈", "화장지"],
+    "priority": 50,
+    "size": [50, 70],
+    "color": "#FFFFFF",
+    "message": "휴지에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 15, "y": 0, "w": 70, "h": 100 },
+      { "type": "ellipse", "cx": 50, "cy": 0, "rx": 35, "ry": 8, "color": "#3B82F6" },
+      { "type": "ellipse", "cx": 50, "cy": 100, "rx": 35, "ry": 8, "color": "#3B82F6" },
+      { "type": "rect", "x": 20, "y": 20, "w": 60, "h": 3, "color": "#E5E7EB" },
+      { "type": "rect", "x": 20, "y": 35, "w": 60, "h": 3, "color": "#E5E7EB" },
+      { "type": "rect", "x": 20, "y": 50, "w": 60, "h": 3, "color": "#E5E7EB" },
+      { "type": "rect", "x": 20, "y": 65, "w": 60, "h": 3, "color": "#E5E7EB" },
+      { "type": "rect", "x": 20, "y": 80, "w": 60, "h": 3, "color": "#E5E7EB" }
+    ]
+  },
+  "지갑": {
+    "keywords": ["지갑", "월렛", "돈지갑"],
+    "priority": 50,
+    "size": [70, 50],
+    "color": "#92400E",
+    "message": "지갑이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 10, "w": 100, "h": 80 },
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 15, "color": "#78350F" },
+      { "type": "rect", "x": 40, "y": 40, "w": 20, "h": 30, "color": "#78350F" },
+      { "type": "circle", "x": 43, "y": 55, "w": 14, "h": 14, "color": "#FBBF24" }
+    ]
+  },
+  "알약": {
+    "keywords": ["알약", "약", "캡슐", "비타민"],
+    "priority": 50,
+    "size": [60, 30],
+    "color": "#EF4444",
+    "message": "알약이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 25, "cy": 50, "rx": 25, "ry": 45 },
+      { "type": "ellipse", "cx": 75, "cy": 50, "rx": 25, "ry": 45, "color": "#FFFFFF" },
+      { "type": "rect", "x": 25, "y": 5, "w": 50, "h": 90 },
+      { "type": "rect", "x": 50, "y": 5, "w": 25, "h": 90, "color": "#FFFFFF" }
+    ]
+  },
+  "인형": {
+    "keywords": ["인형", "곰인형", "봉제", "테디", "테디베어"],
+    "priority": 50,
+    "size": [70, 90],
+    "color": "#92400E",
+    "message": "귀여운 인형이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 65, "rx": 35, "ry": 35 },
+      { "type": "circle", "x": 25, "y": 5, "w": 50, "h": 45 },
+      { "type": "circle", "x": 10, "y": 0, "w": 25, "h": 25 },
+      { "type": "circle", "x": 65, "y": 0, "w": 25, "h": 25 },
+      { "type": "circle", "x": 35, "y": 20, "w": 10, "h": 10, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 55, "y": 20, "w": 10, "h": 10, "color": "#1F2937", "decorative": true },
+      { "type": "ellipse", "cx": 50, "cy": 35, "rx": 8, "ry": 5, "color": "#1F2937", "decorative": true },
+      { "type": "circle", "x": 5, "y": 50, "w": 20, "h": 25 },
+      { "type": "circle", "x": 75, "y": 50, "w": 20, "h": 25 },
+      { "type": "ellipse", "cx": 35, "cy": 95, "rx": 12, "ry": 8 },
+      { "type": "ellipse", "cx": 65, "cy": 95, "rx": 12, "ry": 8 }
+    ]
+  },
+  "스프링": {
+    "keywords": ["스프링", "용수철", "튕기개"],
+    "priority": 50,
+    "size": [60, 80],
+    "color": "#6B7280",
+    "message": "통통 튕겨요!",
+    "physics": "bounce",
+    "parts": [
+      { "type": "rect", "x": 15, "y": 85, "w": 70, "h": 15, "color": "#374151" },
+      { "type": "rect", "x": 10, "y": 72, "w": 80, "h": 8, "color": "#6B7280" },
+      { "type": "rect", "x": 20, "y": 60, "w": 60, "h": 8, "color": "#9CA3AF" },
+      { "type": "rect", "x": 10, "y": 48, "w": 80, "h": 8, "color": "#6B7280" },
+      { "type": "rect", "x": 20, "y": 36, "w": 60, "h": 8, "color": "#9CA3AF" },
+      { "type": "rect", "x": 10, "y": 24, "w": 80, "h": 8, "color": "#6B7280" },
+      { "type": "rect", "x": 20, "y": 12, "w": 60, "h": 8, "color": "#9CA3AF" },
+      { "type": "rect", "x": 25, "y": 0, "w": 50, "h": 15, "color": "#EF4444" }
+    ]
+  },
+  "용암": {
+    "keywords": ["용암", "마그마", "라바"],
+    "priority": 50,
+    "size": [100, 40],
+    "color": "#DC2626",
+    "message": "뜨거운 용암이에요! 조심하세요!",
+    "physics": "hazard",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 30, "w": 100, "h": 70, "color": "#7F1D1D" },
+      { "type": "rect", "x": 0, "y": 20, "w": 100, "h": 40 },
+      { "type": "ellipse", "cx": 20, "cy": 15, "rx": 15, "ry": 20, "color": "#F97316" },
+      { "type": "ellipse", "cx": 50, "cy": 10, "rx": 20, "ry": 25, "color": "#F97316" },
+      { "type": "ellipse", "cx": 80, "cy": 18, "rx": 15, "ry": 18, "color": "#F97316" },
+      { "type": "ellipse", "cx": 35, "cy": 25, "rx": 12, "ry": 15, "color": "#FBBF24" },
+      { "type": "ellipse", "cx": 65, "cy": 20, "rx": 10, "ry": 18, "color": "#FBBF24" }
+    ]
+  },
+  "물": {
+    "keywords": ["물", "워터", "물웅덩이"],
+    "priority": 50,
+    "size": [120, 50],
+    "color": "#3B82F6",
+    "message": "물이에요! 수영할 수 있어요!",
+    "physics": "ghost",
+    "waterEffect": true,
+    "parts": [
+      { "type": "rect", "x": 0, "y": 20, "w": 100, "h": 80 },
+      { "type": "ellipse", "cx": 20, "cy": 25, "rx": 15, "ry": 10, "color": "#60A5FA" },
+      { "type": "ellipse", "cx": 50, "cy": 20, "rx": 20, "ry": 12, "color": "#60A5FA" },
+      { "type": "ellipse", "cx": 80, "cy": 28, "rx": 15, "ry": 10, "color": "#60A5FA" },
+      { "type": "rect", "x": 10, "y": 50, "w": 25, "h": 8, "color": "#93C5FD" },
+      { "type": "rect", "x": 50, "y": 65, "w": 30, "h": 8, "color": "#93C5FD" }
+    ]
+  },
+  "밧줄": {
+    "keywords": ["밧줄", "로프", "줄"],
+    "priority": 50,
+    "size": [20, 150],
+    "color": "#92400E",
+    "message": "밧줄을 타고 올라갈 수 있어요!",
+    "physics": "ladder",
+    "parts": [
+      { "type": "rect", "x": 35, "y": 0, "w": 30, "h": 100 },
+      { "type": "rect", "x": 20, "y": 5, "w": 60, "h": 8, "color": "#78350F" },
+      { "type": "rect", "x": 20, "y": 25, "w": 60, "h": 8, "color": "#78350F" },
+      { "type": "rect", "x": 20, "y": 45, "w": 60, "h": 8, "color": "#78350F" },
+      { "type": "rect", "x": 20, "y": 65, "w": 60, "h": 8, "color": "#78350F" },
+      { "type": "rect", "x": 20, "y": 85, "w": 60, "h": 8, "color": "#78350F" }
+    ]
+  },
+  "풍선": {
+    "keywords": ["풍선", "벌룬"],
+    "priority": 50,
+    "size": [55, 88],
+    "color": "#EF4444",
+    "message": "둥둥 떠오르는 풍선!",
+    "physics": "floating",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 38, "rx": 45, "ry": 40 },
+      { "type": "triangle", "x": 40, "y": 73, "w": 20, "h": 12, "color": "#DC2626" },
+      { "type": "rect", "x": 48, "y": 83, "w": 4, "h": 17, "color": "#9CA3AF" }
+    ]
+  },
+  "자석": {
+    "keywords": ["자석", "마그넷"],
+    "priority": 50,
+    "size": [80, 60],
+    "color": "#DC2626",
+    "message": "자석이에요! 끌어당겨요!",
+    "physics": "magnet",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 30, "w": 30, "h": 70 },
+      { "type": "rect", "x": 70, "y": 30, "w": 30, "h": 70, "color": "#3B82F6" },
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 35, "color": "#9CA3AF" },
+      { "type": "rect", "x": 30, "y": 30, "w": 40, "h": 20, "color": "#9CA3AF" }
+    ]
+  },
+  "냉장고": {
+    "keywords": ["냉장고"],
+    "priority": 50,
+    "size": [70, 120],
+    "color": "#E5E7EB",
+    "message": "시원한 냉장고!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 5, "y": 5, "w": 90, "h": 35, "color": "#BFDBFE" },
+      { "type": "rect", "x": 5, "y": 45, "w": 90, "h": 50, "color": "#F3F4F6" },
+      { "type": "rect", "x": 80, "y": 15, "w": 8, "h": 15, "color": "#9CA3AF" },
+      { "type": "rect", "x": 80, "y": 60, "w": 8, "h": 25, "color": "#9CA3AF" },
+      { "type": "rect", "x": 0, "y": 40, "w": 100, "h": 5, "color": "#6B7280" }
+    ]
+  },
+  "세탁기": {
+    "keywords": ["세탁기"],
+    "priority": 50,
+    "size": [80, 90],
+    "color": "#F3F4F6",
+    "message": "세탁기에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "circle", "x": 20, "y": 30, "w": 60, "h": 55 },
+      { "type": "circle", "x": 28, "y": 38, "w": 44, "h": 40, "color": "#BFDBFE" },
+      { "type": "rect", "x": 10, "y": 8, "w": 15, "h": 10, "color": "#6B7280" },
+      { "type": "rect", "x": 30, "y": 8, "w": 15, "h": 10, "color": "#6B7280" },
+      { "type": "circle", "x": 75, "y": 8, "w": 12, "h": 12, "color": "#22C55E" }
+    ]
+  },
+  "텔레비전": {
+    "keywords": ["텔레비전", "티비"],
+    "keywordsLower": ["tv"],
+    "priority": 50,
+    "size": [100, 70],
+    "color": "#1F2937",
+    "message": "재미있는 TV!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 10, "w": 100, "h": 80 },
+      { "type": "rect", "x": 5, "y": 15, "w": 90, "h": 65, "color": "#3B82F6" },
+      { "type": "rect", "x": 40, "y": 90, "w": 20, "h": 10, "color": "#374151" },
+      { "type": "rect", "x": 30, "y": 95, "w": 40, "h": 5, "color": "#374151" }
+    ]
+  },
+  "소파": {
+    "keywords": ["소파", "쇼파", "카우치"],
+    "priority": 50,
+    "size": [120, 60],
+    "color": "#7C3AED",
+    "message": "푹신한 소파!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 30, "w": 100, "h": 70 },
+      { "type": "rect", "x": 0, "y": 0, "w": 15, "h": 100 },
+      { "type": "rect", "x": 85, "y": 0, "w": 15, "h": 100 },
+      { "type": "rect", "x": 15, "y": 40, "w": 70, "h": 30, "color": "#8B5CF6" },
+      { "type": "rect", "x": 5, "y": 85, "w": 15, "h": 15, "color": "#4C1D95" },
+      { "type": "rect", "x": 80, "y": 85, "w": 15, "h": 15, "color": "#4C1D95" }
+    ]
+  },
+  "가방": {
+    "keywords": ["가방", "백팩", "배낭"],
+    "priority": 50,
+    "size": [50, 60],
+    "color": "#DC2626",
+    "message": "멋진 가방!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 10, "y": 15, "w": 80, "h": 85 },
+      { "type": "rect", "x": 20, "y": 0, "w": 60, "h": 25 },
+      { "type": "rect", "x": 25, "y": 40, "w": 50, "h": 30, "color": "#991B1B" },
+      { "type": "rect", "x": 40, "y": 35, "w": 20, "h": 8, "color": "#FCD34D" },
+      { "type": "rect", "x": 0, "y": 30, "w": 12, "h": 40 },
+      { "type": "rect", "x": 88, "y": 30, "w": 12, "h": 40 }
+    ]
+  },
+  "꽃": {
+    "keywords": ["꽃", "플라워"],
+    "priority": 50,
+    "size": [50, 60],
+    "color": "#F472B6",
+    "message": "예쁜 꽃이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 45, "y": 50, "w": 10, "h": 50, "color": "#22C55E" },
+      { "type": "ellipse", "cx": 30, "cy": 30, "rx": 15, "ry": 15 },
+      { "type": "ellipse", "cx": 70, "cy": 30, "rx": 15, "ry": 15 },
+      { "type": "ellipse", "cx": 50, "cy": 15, "rx": 15, "ry": 15 },
+      { "type": "ellipse", "cx": 35, "cy": 50, "rx": 15, "ry": 15 },
+      { "type": "ellipse", "cx": 65, "cy": 50, "rx": 15, "ry": 15 },
+      { "type": "circle", "x": 38, "y": 25, "w": 24, "h": 24, "color": "#FBBF24" },
+      { "type": "ellipse", "cx": 35, "cy": 75, "rx": 12, "ry": 8, "color": "#22C55E" },
+      { "type": "ellipse", "cx": 65, "cy": 80, "rx": 12, "ry": 8, "color": "#22C55E" }
+    ]
+  },
+  "잔디": {
+    "keywords": ["잔디", "풀밭"],
+    "priority": 50,
+    "size": [100, 40],
+    "color": "#22C55E",
+    "message": "푸른 잔디!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 40, "w": 100, "h": 60 },
+      { "type": "triangle", "x": 5, "y": 10, "w": 10, "h": 35, "color": "#16A34A" },
+      { "type": "triangle", "x": 18, "y": 0, "w": 12, "h": 45, "color": "#22C55E" },
+      { "type": "triangle", "x": 32, "y": 15, "w": 10, "h": 30, "color": "#16A34A" },
+      { "type": "triangle", "x": 45, "y": 5, "w": 12, "h": 40, "color": "#22C55E" },
+      { "type": "triangle", "x": 58, "y": 12, "w": 10, "h": 33, "color": "#16A34A" },
+      { "type": "triangle", "x": 70, "y": 0, "w": 14, "h": 45, "color": "#22C55E" },
+      { "type": "triangle", "x": 85, "y": 18, "w": 10, "h": 27, "color": "#16A34A" }
+    ]
+  },
+  "태양": {
+    "keywords": ["태양", "해", "썬"],
+    "priority": 50,
+    "size": [80, 80],
+    "color": "#FBBF24",
+    "message": "밝은 태양!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 20, "y": 20, "w": 60, "h": 60 },
+      { "type": "rect", "x": 45, "y": 0, "w": 10, "h": 20, "color": "#F59E0B" },
+      { "type": "rect", "x": 45, "y": 80, "w": 10, "h": 20, "color": "#F59E0B" },
+      { "type": "rect", "x": 0, "y": 45, "w": 20, "h": 10, "color": "#F59E0B" },
+      { "type": "rect", "x": 80, "y": 45, "w": 20, "h": 10, "color": "#F59E0B" },
+      { "type": "rect", "x": 12, "y": 12, "w": 15, "h": 8, "color": "#F59E0B" },
+      { "type": "rect", "x": 73, "y": 12, "w": 15, "h": 8, "color": "#F59E0B" },
+      { "type": "rect", "x": 12, "y": 80, "w": 15, "h": 8, "color": "#F59E0B" },
+      { "type": "rect", "x": 73, "y": 80, "w": 15, "h": 8, "color": "#F59E0B" }
+    ]
+  },
+  "달": {
+    "keywords": ["달", "초승달", "보름달"],
+    "keywordsLower": ["moon"],
+    "priority": 50,
+    "size": [60, 60],
+    "color": "#FEF3C7",
+    "message": "밝은 달!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 50, "rx": 40, "ry": 40 },
+      { "type": "ellipse", "cx": 35, "cy": 35, "rx": 8, "ry": 8, "color": "#D4D4D8" },
+      { "type": "ellipse", "cx": 60, "cy": 45, "rx": 12, "ry": 12, "color": "#D4D4D8" },
+      { "type": "ellipse", "cx": 45, "cy": 65, "rx": 10, "ry": 10, "color": "#D4D4D8" },
+      { "type": "ellipse", "cx": 70, "cy": 70, "rx": 6, "ry": 6, "color": "#D4D4D8" }
+    ]
+  },
+  "폭포": {
+    "keywords": ["폭포", "워터폴"],
+    "priority": 50,
+    "size": [60, 120],
+    "color": "#3B82F6",
+    "message": "시원한 폭포!",
+    "physics": "ghost",
+    "waterEffect": true,
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 30, "h": 100, "color": "#78716C" },
+      { "type": "rect", "x": 70, "y": 0, "w": 30, "h": 100, "color": "#78716C" },
+      { "type": "rect", "x": 25, "y": 0, "w": 50, "h": 100, "color": "#60A5FA" },
+      { "type": "rect", "x": 30, "y": 10, "w": 15, "h": 90, "color": "#93C5FD" },
+      { "type": "rect", "x": 50, "y": 5, "w": 10, "h": 95, "color": "#BFDBFE" },
+      { "type": "ellipse", "cx": 50, "cy": 95, "rx": 35, "ry": 10, "color": "#60A5FA" }
+    ]
+  },
+  "사진": {
+    "keywords": ["사진", "포토", "셀카", "셀피"],
+    "priority": 50,
+    "size": [70, 55],
+    "color": "#FFFFFF",
+    "message": "사진이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 5, "y": 5, "w": 90, "h": 75, "color": "#87CEEB" },
+      { "type": "circle", "x": 65, "y": 15, "w": 20, "h": 25, "color": "#FBBF24" },
+      { "type": "triangle", "x": 10, "y": 50, "w": 35, "h": 30, "color": "#22C55E" },
+      { "type": "triangle", "x": 35, "y": 40, "w": 45, "h": 40, "color": "#16A34A" },
+      { "type": "rect", "x": 5, "y": 82, "w": 90, "h": 13, "color": "#F3F4F6" }
+    ]
+  },
+  "액자": {
+    "keywords": ["액자", "프레임", "그림", "그림액자"],
+    "priority": 50,
+    "size": [80, 60],
+    "color": "#92400E",
+    "message": "멋진 액자에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
+      { "type": "rect", "x": 8, "y": 10, "w": 84, "h": 80, "color": "#78350F" },
+      { "type": "rect", "x": 12, "y": 15, "w": 76, "h": 70, "color": "#FEF3C7" },
+      { "type": "circle", "x": 60, "y": 25, "w": 18, "h": 22, "color": "#FBBF24" },
+      { "type": "triangle", "x": 18, "y": 55, "w": 30, "h": 28, "color": "#22C55E" },
+      { "type": "triangle", "x": 40, "y": 45, "w": 40, "h": 38, "color": "#16A34A" },
+      { "type": "rect", "x": 3, "y": 3, "w": 94, "h": 6, "color": "#B45309" },
+      { "type": "rect", "x": 3, "y": 91, "w": 94, "h": 6, "color": "#B45309" },
+      { "type": "rect", "x": 3, "y": 3, "w": 6, "h": 94, "color": "#B45309" },
+      { "type": "rect", "x": 91, "y": 3, "w": 6, "h": 94, "color": "#B45309" }
+    ]
+  },
+  "숲": {
+    "keywords": ["숲", "포레스트", "산림", "나무숲"],
+    "priority": 50,
+    "size": [150, 120],
+    "color": "#22C55E",
+    "message": "울창한 숲이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 8, "y": 75, "w": 10, "h": 25, "color": "#92400E" },
+      { "type": "rect", "x": 28, "y": 65, "w": 12, "h": 35, "color": "#78350F" },
+      { "type": "rect", "x": 52, "y": 70, "w": 10, "h": 30, "color": "#92400E" },
+      { "type": "rect", "x": 72, "y": 60, "w": 14, "h": 40, "color": "#78350F" },
+      { "type": "rect", "x": 92, "y": 72, "w": 10, "h": 28, "color": "#92400E" },
+      { "type": "triangle", "x": 0, "y": 35, "w": 26, "h": 45, "color": "#22C55E" },
+      { "type": "triangle", "x": 0, "y": 50, "w": 26, "h": 30, "color": "#16A34A" },
+      { "type": "triangle", "x": 18, "y": 20, "w": 32, "h": 50, "color": "#15803D" },
+      { "type": "triangle", "x": 18, "y": 40, "w": 32, "h": 30, "color": "#166534" },
+      { "type": "triangle", "x": 42, "y": 30, "w": 28, "h": 45, "color": "#22C55E" },
+      { "type": "triangle", "x": 42, "y": 48, "w": 28, "h": 27, "color": "#16A34A" },
+      { "type": "triangle", "x": 60, "y": 10, "w": 38, "h": 55, "color": "#15803D" },
+      { "type": "triangle", "x": 60, "y": 35, "w": 38, "h": 30, "color": "#166534" },
+      { "type": "triangle", "x": 82, "y": 35, "w": 26, "h": 42, "color": "#22C55E" },
+      { "type": "triangle", "x": 82, "y": 52, "w": 26, "h": 25, "color": "#16A34A" }
+    ]
+  },
+  "돈": {
+    "keywords": ["돈", "지폐", "현금", "머니", "money"],
+    "priority": 50,
+    "size": [50, 30],
+    "color": "#22C55E",
+    "message": "돈이에요! 부자가 되세요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100, "color": "#22C55E" },
+      { "type": "rect", "x": 5, "y": 5, "w": 90, "h": 90, "color": "#16A34A" },
+      { "type": "rect", "x": 10, "y": 10, "w": 80, "h": 80, "color": "#22C55E" },
+      { "type": "circle", "x": 35, "y": 35, "w": 30, "h": 30, "color": "#15803D" },
+      { "type": "rect", "x": 46, "y": 25, "w": 8, "h": 50, "color": "#166534" },
+      { "type": "rect", "x": 38, "y": 30, "w": 24, "h": 8, "color": "#166534" },
+      { "type": "rect", "x": 38, "y": 62, "w": 24, "h": 8, "color": "#166534" }
+    ]
+  },
+  "바이올린": {
+    "keywords": ["바이올린", "violin", "현악기", "악기"],
+    "priority": 50,
+    "size": [60, 120],
+    "color": "#92400E",
+    "message": "아름다운 바이올린이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 40, "y": 0, "w": 20, "h": 100, "color": "#78350F" },
+      { "type": "rect", "x": 35, "y": 0, "w": 30, "h": 8, "color": "#1F2937" },
+      { "type": "circle", "x": 25, "y": 3, "w": 12, "h": 12, "color": "#D4AF37" },
+      { "type": "circle", "x": 63, "y": 3, "w": 12, "h": 12, "color": "#D4AF37" },
+      { "type": "circle", "x": 15, "y": 25, "w": 70, "h": 35, "color": "#92400E" },
+      { "type": "circle", "x": 20, "y": 30, "w": 60, "h": 25, "color": "#B45309" },
+      { "type": "rect", "x": 30, "y": 55, "w": 40, "h": 15, "color": "#78350F" },
+      { "type": "circle", "x": 10, "y": 60, "w": 80, "h": 40, "color": "#92400E" },
+      { "type": "circle", "x": 15, "y": 65, "w": 70, "h": 30, "color": "#B45309" },
+      { "type": "circle", "x": 25, "y": 45, "w": 15, "h": 10, "color": "#1F2937" },
+      { "type": "circle", "x": 60, "y": 45, "w": 15, "h": 10, "color": "#1F2937" },
+      { "type": "circle", "x": 25, "y": 75, "w": 15, "h": 10, "color": "#1F2937" },
+      { "type": "circle", "x": 60, "y": 75, "w": 15, "h": 10, "color": "#1F2937" },
+      { "type": "rect", "x": 45, "y": 35, "w": 10, "h": 50, "color": "#D4AF37" },
+      { "type": "rect", "x": 42, "y": 15, "w": 4, "h": 75, "color": "#E5E7EB" },
+      { "type": "rect", "x": 48, "y": 15, "w": 4, "h": 75, "color": "#E5E7EB" },
+      { "type": "rect", "x": 54, "y": 15, "w": 4, "h": 75, "color": "#E5E7EB" }
+    ]
+  },
+  "새": {
+    "keywords": ["새", "bird", "참새", "비둘기", "조류"],
+    "priority": 50,
+    "size": [60, 45],
+    "color": "#FFFFFF",
+    "message": "귀여운 새에요! 짹짹!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 55, "y": 20, "w": 35, "h": 35, "color": "#FFFFFF" },
+      { "type": "circle", "x": 10, "y": 25, "w": 60, "h": 50, "color": "#F3F4F6" },
+      { "type": "triangle", "x": 75, "y": 30, "w": 25, "h": 15, "color": "#F59E0B" },
+      { "type": "circle", "x": 68, "y": 25, "w": 10, "h": 10, "color": "#1F2937" },
+      { "type": "triangle", "x": -5, "y": 30, "w": 30, "h": 25, "color": "#E5E7EB" },
+      { "type": "triangle", "x": 0, "y": 20, "w": 25, "h": 20, "color": "#F3F4F6" },
+      { "type": "rect", "x": 30, "y": 70, "w": 6, "h": 20, "color": "#F59E0B" },
+      { "type": "rect", "x": 50, "y": 70, "w": 6, "h": 20, "color": "#F59E0B" },
+      { "type": "rect", "x": 25, "y": 85, "w": 15, "h": 5, "color": "#F59E0B" },
+      { "type": "rect", "x": 45, "y": 85, "w": 15, "h": 5, "color": "#F59E0B" }
+    ]
+  },
+  "쓰레기봉투": {
+    "keywords": ["쓰레기봉투", "쓰레기", "봉투", "비닐봉투", "검정봉투"],
+    "priority": 50,
+    "size": [70, 80],
+    "color": "#1F2937",
+    "message": "쓰레기 봉투에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 10, "y": 20, "w": 80, "h": 80, "color": "#1F2937" },
+      { "type": "circle", "x": 15, "y": 25, "w": 70, "h": 70, "color": "#374151" },
+      { "type": "rect", "x": 30, "y": 0, "w": 40, "h": 25, "color": "#1F2937" },
+      { "type": "rect", "x": 35, "y": 5, "w": 12, "h": 15, "color": "#374151" },
+      { "type": "rect", "x": 53, "y": 5, "w": 12, "h": 15, "color": "#374151" },
+      { "type": "circle", "x": 25, "y": 40, "w": 15, "h": 15, "color": "#4B5563" },
+      { "type": "circle", "x": 55, "y": 55, "w": 12, "h": 12, "color": "#4B5563" }
+    ]
+  },
+  "옷": {
+    "keywords": ["옷", "티셔츠", "셔츠", "의류", "상의"],
+    "priority": 50,
+    "size": [80, 70],
+    "color": "#3B82F6",
+    "message": "깔끔한 옷이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 20, "y": 20, "w": 60, "h": 80, "color": "#3B82F6" },
+      { "type": "rect", "x": 35, "y": 0, "w": 30, "h": 25, "color": "#3B82F6" },
+      { "type": "circle", "x": 40, "y": 5, "w": 20, "h": 20, "color": "#1E3A5F" },
+      { "type": "rect", "x": 0, "y": 20, "w": 25, "h": 50, "color": "#3B82F6" },
+      { "type": "rect", "x": 75, "y": 20, "w": 25, "h": 50, "color": "#3B82F6" },
+      { "type": "rect", "x": 25, "y": 25, "w": 50, "h": 70, "color": "#60A5FA" }
+    ]
+  },
+  "거미줄": {
+    "keywords": ["거미줄", "스파이더웹", "cobweb"],
+    "priority": 60,
+    "size": [100, 100],
+    "color": "#E5E7EB",
+    "message": "거미줄이에요! 끈적끈적!",
+    "physics": "ghost",
+    "slowEffect": true,
+    "renderType": "image",
+    "imageUrl": "/spiderweb.png"
+  },
+  "콘센트": {
+    "keywords": ["콘센트", "플러그", "전기", "소켓"],
+    "priority": 50,
+    "size": [50, 70],
+    "color": "#F3F4F6",
+    "message": "콘센트에요! 감전 주의!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 5, "y": 5, "w": 90, "h": 90, "color": "#F3F4F6" },
+      { "type": "rect", "x": 10, "y": 10, "w": 80, "h": 80, "color": "#E5E7EB" },
+      { "type": "rect", "x": 25, "y": 25, "w": 15, "h": 25, "color": "#1F2937" },
+      { "type": "rect", "x": 60, "y": 25, "w": 15, "h": 25, "color": "#1F2937" },
+      { "type": "circle", "x": 40, "y": 60, "w": 20, "h": 20, "color": "#1F2937" }
+    ]
+  },
+  "편의점": {
+    "keywords": ["편의점", "마트", "가게", "상점", "슈퍼"],
+    "priority": 50,
+    "size": [150, 120],
+    "color": "#22C55E",
+    "message": "편의점이에요! 24시간 영업중!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 5, "y": 25, "w": 90, "h": 75, "color": "#F3F4F6" },
+      { "type": "rect", "x": 0, "y": 10, "w": 100, "h": 20, "color": "#22C55E" },
+      { "type": "triangle", "x": 0, "y": 0, "w": 100, "h": 15, "color": "#16A34A" },
+      { "type": "rect", "x": 10, "y": 35, "w": 35, "h": 50, "color": "#87CEEB" },
+      { "type": "rect", "x": 55, "y": 35, "w": 35, "h": 50, "color": "#87CEEB" },
+      { "type": "rect", "x": 40, "y": 55, "w": 20, "h": 45, "color": "#92400E" },
+      { "type": "circle", "x": 52, "y": 75, "w": 6, "h": 6, "color": "#FBBF24" },
+      { "type": "rect", "x": 15, "y": 40, "w": 10, "h": 15, "color": "#EF4444" },
+      { "type": "rect", "x": 30, "y": 40, "w": 10, "h": 15, "color": "#3B82F6" },
+      { "type": "rect", "x": 60, "y": 40, "w": 10, "h": 15, "color": "#FBBF24" },
+      { "type": "rect", "x": 75, "y": 40, "w": 10, "h": 15, "color": "#A855F7" }
+    ]
+  },
+  "담배": {
+    "keywords": ["담배", "시가렛", "흡연"],
+    "priority": 60,
+    "size": [60, 20],
+    "color": "#F3F4F6",
+    "message": "담배에요! 건강에 해로워요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 20, "w": 80, "h": 60, "color": "#F3F4F6" },
+      { "type": "rect", "x": 80, "y": 20, "w": 20, "h": 60, "color": "#F97316" },
+      { "type": "rect", "x": 5, "y": 30, "w": 70, "h": 5, "color": "#D1D5DB" },
+      { "type": "rect", "x": 5, "y": 45, "w": 70, "h": 5, "color": "#D1D5DB" },
+      { "type": "rect", "x": 5, "y": 60, "w": 70, "h": 5, "color": "#D1D5DB" }
+    ]
+  },
+  "가로등": {
+    "keywords": ["가로등", "램프", "전등", "스트리트램프"],
+    "priority": 55,
+    "size": [40, 150],
+    "color": "#374151",
+    "message": "밤길을 밝혀주는 가로등이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 40, "y": 85, "w": 20, "h": 15, "color": "#374151" },
+      { "type": "rect", "x": 45, "y": 15, "w": 10, "h": 70, "color": "#4B5563" },
+      { "type": "rect", "x": 25, "y": 5, "w": 50, "h": 15, "color": "#4B5563" },
+      { "type": "rect", "x": 30, "y": 0, "w": 40, "h": 8, "color": "#FDE047" },
+      { "type": "circle", "x": 35, "y": 0, "w": 30, "h": 15, "color": "#FEF9C3", "decorative": true }
+    ]
+  },
+  "쓰레기통": {
+    "keywords": ["쓰레기통", "휴지통", "트래시"],
+    "priority": 55,
+    "size": [50, 70],
+    "color": "#6B7280",
+    "message": "깨끗한 환경을 위한 쓰레기통!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 10, "y": 20, "w": 80, "h": 80, "color": "#4B5563" },
+      { "type": "rect", "x": 5, "y": 15, "w": 90, "h": 10, "color": "#374151" },
+      { "type": "rect", "x": 35, "y": 0, "w": 30, "h": 20, "color": "#374151" },
+      { "type": "rect", "x": 20, "y": 40, "w": 20, "h": 5, "color": "#6B7280" },
+      { "type": "rect", "x": 20, "y": 55, "w": 20, "h": 5, "color": "#6B7280" },
+      { "type": "rect", "x": 20, "y": 70, "w": 20, "h": 5, "color": "#6B7280" }
+    ]
+  },
+  "나비": {
+    "keywords": ["나비", "버터플라이", "호랑나비"],
+    "priority": 50,
+    "size": [60, 45],
+    "color": "#EC4899",
+    "message": "예쁜 나비가 날아왔어요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 25, "cy": 40, "rx": 22, "ry": 30, "color": "#EC4899" },
+      { "type": "ellipse", "cx": 75, "cy": 40, "rx": 22, "ry": 30, "color": "#EC4899" },
+      { "type": "ellipse", "cx": 30, "cy": 70, "rx": 15, "ry": 20, "color": "#F472B6" },
+      { "type": "ellipse", "cx": 70, "cy": 70, "rx": 15, "ry": 20, "color": "#F472B6" },
+      { "type": "rect", "x": 47, "y": 25, "w": 6, "h": 60, "color": "#1F2937" },
+      { "type": "circle", "x": 20, "y": 35, "w": 10, "h": 10, "color": "#FBBF24", "decorative": true },
+      { "type": "circle", "x": 70, "y": 35, "w": 10, "h": 10, "color": "#FBBF24", "decorative": true }
+    ]
+  },
+  "안내판": {
+    "keywords": ["안내판", "표지판", "사인", "이정표"],
+    "priority": 55,
+    "size": [70, 100],
+    "color": "#92400E",
+    "message": "어디로 가야 할지 알려주는 안내판!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 42, "y": 35, "w": 16, "h": 65, "color": "#78350F" },
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 40, "color": "#A16207" },
+      { "type": "rect", "x": 5, "y": 5, "w": 90, "h": 30, "color": "#FBBF24" },
+      { "type": "rect", "x": 10, "y": 12, "w": 30, "h": 5, "color": "#78350F", "decorative": true },
+      { "type": "rect", "x": 10, "y": 22, "w": 50, "h": 5, "color": "#78350F", "decorative": true }
+    ]
+  },
+  "총": {
+    "keywords": ["총", "권총", "피스톨", "건"],
+    "priority": 55,
+    "size": [70, 45],
+    "color": "#374151",
+    "message": "위험해요! 총은 장난감이 아니에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 30, "w": 80, "h": 25, "color": "#374151" },
+      { "type": "rect", "x": 70, "y": 25, "w": 30, "h": 35, "color": "#4B5563" },
+      { "type": "rect", "x": 30, "y": 55, "w": 25, "h": 45, "color": "#78350F" },
+      { "type": "rect", "x": 55, "y": 35, "w": 15, "h": 8, "color": "#1F2937" },
+      { "type": "circle", "x": 85, "y": 35, "w": 15, "h": 15, "color": "#1F2937" }
+    ]
+  },
+  "물방울": {
+    "keywords": ["물방울", "드롭", "빗방울"],
+    "priority": 60,
+    "size": [25, 35],
+    "color": "#60A5FA",
+    "message": "똑똑! 물방울이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 65, "rx": 35, "ry": 30, "color": "#60A5FA" },
+      { "type": "triangle", "x": 20, "y": 0, "w": 60, "h": 50, "color": "#60A5FA" },
+      { "type": "ellipse", "cx": 35, "cy": 55, "rx": 10, "ry": 8, "color": "#93C5FD", "decorative": true }
+    ]
+  },
+  "리본": {
+    "keywords": ["리본", "나비넥타이", "보타이"],
+    "priority": 50,
+    "size": [70, 50],
+    "color": "#DC2626",
+    "message": "예쁜 빨간 리본이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 22, "cy": 50, "rx": 22, "ry": 28, "color": "#DC2626" },
+      { "type": "ellipse", "cx": 78, "cy": 50, "rx": 22, "ry": 28, "color": "#DC2626" },
+      { "type": "ellipse", "cx": 22, "cy": 50, "rx": 10, "ry": 14, "color": "#EF4444", "decorative": true },
+      { "type": "ellipse", "cx": 78, "cy": 50, "rx": 10, "ry": 14, "color": "#EF4444", "decorative": true },
+      { "type": "ellipse", "cx": 50, "cy": 50, "rx": 12, "ry": 16, "color": "#B91C1C" },
+      { "type": "rect", "x": 42, "y": 70, "w": 6, "h": 25, "color": "#DC2626" },
+      { "type": "rect", "x": 52, "y": 70, "w": 6, "h": 25, "color": "#DC2626" }
+    ]
+  },
+  "말": {
+    "keywords": ["말", "호스", "조랑말", "경주마"],
+    "priority": 60,
+    "size": [120, 100],
+    "color": "#92400E",
+    "message": "힘찬 말이에요! 히힝~",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 55, "rx": 35, "ry": 25, "color": "#A16207" },
+      { "type": "ellipse", "cx": 85, "cy": 35, "rx": 15, "ry": 20, "color": "#A16207" },
+      { "type": "rect", "x": 85, "y": 15, "w": 8, "h": 20, "color": "#78350F" },
+      { "type": "rect", "x": 93, "y": 10, "w": 7, "h": 18, "color": "#78350F" },
+      { "type": "rect", "x": 25, "y": 70, "w": 10, "h": 30, "color": "#92400E" },
+      { "type": "rect", "x": 40, "y": 70, "w": 10, "h": 30, "color": "#92400E" },
+      { "type": "rect", "x": 55, "y": 70, "w": 10, "h": 30, "color": "#92400E" },
+      { "type": "rect", "x": 70, "y": 70, "w": 10, "h": 30, "color": "#92400E" },
+      { "type": "rect", "x": 5, "y": 45, "w": 20, "h": 8, "color": "#78350F" },
+      { "type": "circle", "x": 88, "y": 30, "w": 6, "h": 6, "color": "#1F2937", "decorative": true }
+    ]
+  },
+  "음료수": {
+    "keywords": ["음료수", "음료", "드링크", "소다", "콜라", "사이다"],
+    "priority": 55,
+    "size": [35, 70],
+    "color": "#EF4444",
+    "message": "시원한 음료수에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 15, "y": 15, "w": 70, "h": 85, "color": "#DC2626" },
+      { "type": "rect", "x": 20, "y": 0, "w": 60, "h": 20, "color": "#B91C1C" },
+      { "type": "rect", "x": 35, "y": 0, "w": 30, "h": 8, "color": "#6B7280" },
+      { "type": "rect", "x": 25, "y": 35, "w": 50, "h": 40, "color": "#FBBF24" },
+      { "type": "rect", "x": 30, "y": 45, "w": 40, "h": 8, "color": "#F3F4F6", "decorative": true },
+      { "type": "ellipse", "cx": 50, "cy": 25, "rx": 25, "ry": 5, "color": "#9CA3AF" }
+    ]
+  },
+  "토마토": {
+    "keywords": ["토마토", "방울토마토"],
+    "priority": 50,
+    "size": [70, 70],
+    "color": "#EF4444",
+    "shape": "circle",
+    "message": "빨간 토마토에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 5, "y": 15, "w": 90, "h": 85, "color": "#EF4444" },
+      { "type": "rect", "x": 45, "y": 0, "w": 10, "h": 20, "color": "#22C55E" },
+      { "type": "ellipse", "cx": 35, "cy": 12, "rx": 15, "ry": 8, "color": "#22C55E" },
+      { "type": "ellipse", "cx": 65, "cy": 12, "rx": 15, "ry": 8, "color": "#22C55E" },
+      { "type": "ellipse", "cx": 50, "cy": 8, "rx": 12, "ry": 6, "color": "#16A34A" },
+      { "type": "ellipse", "cx": 30, "cy": 40, "rx": 8, "ry": 12, "color": "#F87171" }
+    ]
+  },
+  "사과": {
+    "keywords": ["사과", "애플"],
+    "priority": 50,
+    "size": [65, 70],
+    "color": "#DC2626",
+    "shape": "circle",
+    "message": "빨간 사과에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "circle", "x": 5, "y": 20, "w": 90, "h": 80, "color": "#DC2626" },
+      { "type": "rect", "x": 45, "y": 5, "w": 8, "h": 18, "color": "#78350F" },
+      { "type": "ellipse", "cx": 60, "cy": 10, "rx": 12, "ry": 8, "color": "#22C55E" },
+      { "type": "ellipse", "cx": 25, "cy": 35, "rx": 6, "ry": 10, "color": "#F87171" }
+    ]
+  },
+  "수박": {
+    "keywords": ["수박", "워터멜론"],
+    "priority": 50,
+    "size": [100, 80],
+    "color": "#22C55E",
+    "shape": "circle",
+    "message": "시원한 수박이에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "ellipse", "cx": 50, "cy": 50, "rx": 48, "ry": 45, "color": "#22C55E" },
+      { "type": "rect", "x": 8, "y": 20, "w": 6, "h": 60, "color": "#16A34A" },
+      { "type": "rect", "x": 22, "y": 10, "w": 6, "h": 80, "color": "#16A34A" },
+      { "type": "rect", "x": 36, "y": 8, "w": 6, "h": 84, "color": "#16A34A" },
+      { "type": "rect", "x": 50, "y": 6, "w": 6, "h": 88, "color": "#16A34A" },
+      { "type": "rect", "x": 64, "y": 8, "w": 6, "h": 84, "color": "#16A34A" },
+      { "type": "rect", "x": 78, "y": 15, "w": 6, "h": 70, "color": "#16A34A" }
+    ]
+  },
+  "심장": {
+    "keywords": ["심장"],
+    "priority": 60,
+    "size": [70, 65],
+    "color": "#EF4444",
+    "shape": "heart",
+    "message": "두근두근 심장이에요!",
+    "physics": "solid",
+    "parts": []
+  },
+  "스피커": {
+    "keywords": ["스피커", "speaker", "음향기기", "확성기"],
+    "priority": 50,
+    "size": [70, 90],
+    "color": "#1F2937",
+    "message": "빵빵! 스피커에요!",
+    "physics": "solid",
+    "parts": [
+      { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100, "color": "#1F2937" },
+      { "type": "rect", "x": 5, "y": 5, "w": 90, "h": 90, "color": "#374151" },
+      { "type": "circle", "x": 20, "y": 55, "w": 60, "h": 40, "color": "#1F2937" },
+      { "type": "circle", "x": 25, "y": 58, "w": 50, "h": 34, "color": "#4B5563" },
+      { "type": "circle", "x": 35, "y": 65, "w": 30, "h": 20, "color": "#1F2937" },
+      { "type": "circle", "x": 30, "y": 10, "w": 40, "h": 30, "color": "#1F2937" },
+      { "type": "circle", "x": 35, "y": 14, "w": 30, "h": 22, "color": "#4B5563" },
+      { "type": "circle", "x": 42, "y": 19, "w": 16, "h": 12, "color": "#1F2937" },
+      { "type": "rect", "x": 8, "y": 45, "w": 84, "h": 4, "color": "#6B7280" }
+    ]
+  }
+}
