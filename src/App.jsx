@@ -83,6 +83,18 @@ const LogosGame = () => {
   const bgNightRef = useRef(null);
   const bgImagesLoadedRef = useRef(false);
 
+  // 자연 타일맵 에셋 refs
+  const grassTopRef = useRef(null);
+  const dirtFillRef = useRef(null);
+  const tree1Ref = useRef(null);
+  const tree2Ref = useRef(null);
+  const tree3Ref = useRef(null);
+  const cloudImgRef = useRef(null);
+  const natureTilesLoadedRef = useRef(false);
+  const bgTreesRef = useRef([]);
+  const bgCloudsRef = useRef([]);
+  const cameraOffsetRef = useRef(0);
+
   // 현재 월드 (1: 아침, 2: 점심, 3: 저녁, 4: 새벽)
   const [currentWorld, setCurrentWorld] = useState(1);
 
@@ -146,6 +158,37 @@ const LogosGame = () => {
     const checkBgLoaded = () => {
       if (bgMorningRef.current && bgNoonRef.current && bgEveningRef.current && bgNightRef.current) {
         bgImagesLoadedRef.current = true;
+      }
+    };
+
+    // 자연 타일맵 에셋 로딩
+    const grassTop = new Image();
+    grassTop.src = '/nature/grass_top.png';
+    grassTop.onload = () => { grassTopRef.current = grassTop; checkNatureTilesLoaded(); };
+
+    const dirtFill = new Image();
+    dirtFill.src = '/nature/dirt_fill.png';
+    dirtFill.onload = () => { dirtFillRef.current = dirtFill; checkNatureTilesLoaded(); };
+
+    const tree1 = new Image();
+    tree1.src = '/nature/tree1.png';
+    tree1.onload = () => { tree1Ref.current = tree1; checkNatureTilesLoaded(); };
+
+    const tree2 = new Image();
+    tree2.src = '/nature/tree2.png';
+    tree2.onload = () => { tree2Ref.current = tree2; checkNatureTilesLoaded(); };
+
+    const tree3 = new Image();
+    tree3.src = '/nature/tree3.png';
+    tree3.onload = () => { tree3Ref.current = tree3; checkNatureTilesLoaded(); };
+
+    const cloudImg = new Image();
+    cloudImg.src = '/nature/cloud1.png';
+    cloudImg.onload = () => { cloudImgRef.current = cloudImg; checkNatureTilesLoaded(); };
+
+    const checkNatureTilesLoaded = () => {
+      if (grassTopRef.current && dirtFillRef.current && tree1Ref.current && tree2Ref.current && tree3Ref.current && cloudImgRef.current) {
+        natureTilesLoadedRef.current = true;
       }
     };
   }, []);
@@ -3164,75 +3207,146 @@ const LogosGame = () => {
     ctx.restore();
   };
 
-  // 배경 초기화 (구름 생성)
-  const initializeBackground = (canvasWidth) => {
+  // 배경 초기화 (나무, 구름 생성)
+  const initializeBackground = (canvasWidth, canvasHeight) => {
     if (backgroundInitializedRef.current) return;
 
-    // 구름 생성 (다양한 크기와 위치)
-    const clouds = [];
-    for (let i = 0; i < 8; i++) {
-      clouds.push({
-        x: Math.random() * canvasWidth,
-        y: 30 + Math.random() * 200,
-        width: 80 + Math.random() * 120,
-        height: 40 + Math.random() * 40,
-        speed: 0.2 + Math.random() * 0.3,
-        opacity: 0.6 + Math.random() * 0.4
+    // 배경 나무 생성 (랜덤 위치)
+    const trees = [];
+    for (let i = 0; i < 12; i++) {
+      trees.push({
+        x: Math.random() * canvasWidth * 2,
+        treeType: Math.floor(Math.random() * 3) + 1,
+        scale: 0.8 + Math.random() * 0.6,
+        layer: Math.floor(Math.random() * 3) // 0: 멀리, 1: 중간, 2: 가까이
       });
     }
-    cloudsRef.current = clouds;
+    bgTreesRef.current = trees;
+
+    // 구름 생성
+    const clouds = [];
+    for (let i = 0; i < 6; i++) {
+      clouds.push({
+        x: Math.random() * canvasWidth * 2,
+        y: 30 + Math.random() * 150,
+        scale: 0.5 + Math.random() * 1,
+        speed: 0.1 + Math.random() * 0.2
+      });
+    }
+    bgCloudsRef.current = clouds;
+
     backgroundInitializedRef.current = true;
   };
 
-  // 구름 그리기
-  const drawCloud = (ctx, x, y, w, h, opacity) => {
-    ctx.save();
-    ctx.globalAlpha = opacity;
-    ctx.fillStyle = '#FFFFFF';
-
-    // 여러 원으로 구름 모양 만들기
-    const circles = [
-      { cx: 0.25, cy: 0.6, r: 0.3 },
-      { cx: 0.5, cy: 0.4, r: 0.4 },
-      { cx: 0.75, cy: 0.6, r: 0.3 },
-      { cx: 0.35, cy: 0.5, r: 0.35 },
-      { cx: 0.65, cy: 0.5, r: 0.35 },
-    ];
-
-    circles.forEach(c => {
-      ctx.beginPath();
-      ctx.arc(x + w * c.cx, y + h * c.cy, Math.min(w, h) * c.r, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    ctx.restore();
-  };
-
-  // 배경 그리기 (이미지 배경 사용)
+  // 배경 그리기 (새로운 타일맵 방식)
   const drawBackground = (ctx, canvas) => {
     const w = canvas.width;
     const h = canvas.height;
 
-    // 현재 월드에 따른 배경 이미지 선택
-    let bgImage = null;
+    // 하늘 그라데이션 (시간대별)
+    const gradient = ctx.createLinearGradient(0, 0, 0, h * 0.7);
     switch (currentWorld) {
-      case 1: bgImage = bgMorningRef.current; break;
-      case 2: bgImage = bgNoonRef.current; break;
-      case 3: bgImage = bgEveningRef.current; break;
-      case 4: bgImage = bgNightRef.current; break;
-      default: bgImage = bgMorningRef.current;
+      case 1: // 아침
+        gradient.addColorStop(0, '#87CEEB');
+        gradient.addColorStop(1, '#B0E0E6');
+        break;
+      case 2: // 점심
+        gradient.addColorStop(0, '#4A90D9');
+        gradient.addColorStop(1, '#87CEEB');
+        break;
+      case 3: // 저녁
+        gradient.addColorStop(0, '#FF7F50');
+        gradient.addColorStop(1, '#FFB347');
+        break;
+      case 4: // 새벽
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(1, '#4a4e69');
+        break;
+      default:
+        gradient.addColorStop(0, '#87CEEB');
+        gradient.addColorStop(1, '#B0E0E6');
+    }
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, w, h);
+
+    // 구름 그리기 (패럴랙스: 매우 느리게)
+    if (cloudImgRef.current && natureTilesLoadedRef.current) {
+      bgCloudsRef.current.forEach(cloud => {
+        const parallaxX = (cloud.x - cameraOffsetRef.current * 0.05) % (w * 2);
+        const drawX = parallaxX < -100 ? parallaxX + w * 2 : parallaxX;
+        const cloudW = 100 * cloud.scale;
+        const cloudH = 60 * cloud.scale;
+        ctx.globalAlpha = 0.8;
+        ctx.drawImage(cloudImgRef.current, drawX, cloud.y, cloudW, cloudH);
+        ctx.globalAlpha = 1;
+      });
     }
 
-    if (bgImage && bgImagesLoadedRef.current) {
-      // 이미지 배경 그리기 (캔버스 크기에 맞게 늘리기)
-      ctx.drawImage(bgImage, 0, 0, w, h);
-    } else {
-      // 이미지 로딩 전 폴백 배경
-      const gradient = ctx.createLinearGradient(0, 0, 0, h);
-      gradient.addColorStop(0, '#87CEEB');
-      gradient.addColorStop(1, '#2471A3');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, w, h);
+    // 배경 나무 그리기 (패럴랙스: 레이어별 다른 속도)
+    if (natureTilesLoadedRef.current) {
+      const FLOOR_OFFSET = 130;
+      const floorY = h - FLOOR_OFFSET;
+
+      // 레이어별로 정렬해서 그리기 (멀리 있는 것 먼저)
+      const sortedTrees = [...bgTreesRef.current].sort((a, b) => a.layer - b.layer);
+
+      sortedTrees.forEach(tree => {
+        const parallaxSpeed = [0.1, 0.3, 0.5][tree.layer];
+        const parallaxX = (tree.x - cameraOffsetRef.current * parallaxSpeed) % (w * 2);
+        const drawX = parallaxX < -150 ? parallaxX + w * 2 : parallaxX;
+
+        let treeImg = null;
+        switch (tree.treeType) {
+          case 1: treeImg = tree1Ref.current; break;
+          case 2: treeImg = tree2Ref.current; break;
+          case 3: treeImg = tree3Ref.current; break;
+        }
+
+        if (treeImg) {
+          const treeH = 120 * tree.scale;
+          const treeW = (treeImg.width / treeImg.height) * treeH;
+          const opacity = [0.4, 0.6, 0.9][tree.layer];
+          ctx.globalAlpha = opacity;
+          ctx.drawImage(treeImg, drawX, floorY - treeH + 10, treeW, treeH);
+          ctx.globalAlpha = 1;
+        }
+      });
+    }
+  };
+
+  // 바닥 타일 그리기 함수
+  const drawGroundTiles = (ctx, canvas, startX, endX, floorY) => {
+    if (!natureTilesLoadedRef.current || !grassTopRef.current || !dirtFillRef.current) {
+      // 폴백: 기존 방식
+      ctx.save();
+      ctx.fillStyle = 'rgba(60, 60, 60, 0.7)';
+      ctx.fillRect(startX, floorY, endX - startX, 50);
+      ctx.fillStyle = 'rgba(80, 80, 80, 0.8)';
+      ctx.fillRect(startX, floorY, endX - startX, 5);
+      ctx.restore();
+      return;
+    }
+
+    const tileSize = 32;
+    const tilesNeeded = Math.ceil((endX - startX) / tileSize) + 1;
+
+    // 잔디 상단 타일 그리기
+    for (let i = 0; i < tilesNeeded; i++) {
+      const x = startX + i * tileSize;
+      if (x < endX) {
+        ctx.drawImage(grassTopRef.current, x, floorY, tileSize, tileSize);
+      }
+    }
+
+    // 흙 채우기 (아래쪽)
+    const dirtRows = 2;
+    for (let row = 1; row <= dirtRows; row++) {
+      for (let i = 0; i < tilesNeeded; i++) {
+        const x = startX + i * tileSize;
+        if (x < endX) {
+          ctx.drawImage(dirtFillRef.current, x, floorY + row * tileSize, tileSize, tileSize);
+        }
+      }
     }
   };
 
@@ -3241,28 +3355,21 @@ const LogosGame = () => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    // 배경 그리기 (이미지 배경)
+    // 배경 초기화 (처음 한 번만)
+    initializeBackground(canvas.width, canvas.height);
+
+    // 배경 그리기
     drawBackground(ctx, canvas);
 
-    // 바닥 (인벤토리 위쪽에 위치) - 반투명으로 배경과 어울리게
+    // 바닥 (인벤토리 위쪽에 위치)
     const FLOOR_OFFSET = 130;
     const floorY = canvas.height - FLOOR_OFFSET;
 
-    // 왼쪽 바닥 - 반투명 플랫폼
-    ctx.save();
-    ctx.fillStyle = 'rgba(60, 60, 60, 0.7)';
-    ctx.fillRect(0, floorY, 150, 50);
-    ctx.fillStyle = 'rgba(80, 80, 80, 0.8)';
-    ctx.fillRect(0, floorY, 150, 5);
-    ctx.restore();
+    // 왼쪽 바닥 - 타일맵 방식
+    drawGroundTiles(ctx, canvas, 0, 150, floorY);
 
-    // 오른쪽 바닥 - 반투명 플랫폼
-    ctx.save();
-    ctx.fillStyle = 'rgba(60, 60, 60, 0.7)';
-    ctx.fillRect(canvas.width - 150, floorY, 150, 50);
-    ctx.fillStyle = 'rgba(80, 80, 80, 0.8)';
-    ctx.fillRect(canvas.width - 150, floorY, 150, 5);
-    ctx.restore();
+    // 오른쪽 바닥 - 타일맵 방식
+    drawGroundTiles(ctx, canvas, canvas.width - 150, canvas.width, floorY);
 
     // 골인 지점
     const goalX = canvas.width - 110;
@@ -3491,6 +3598,8 @@ const LogosGame = () => {
     draw();
     if (gameState === 'playing') {
       playerRef.current.cycle += 0.08;
+      // 패럴랙스 효과를 위한 카메라 오프셋 업데이트
+      cameraOffsetRef.current = playerRef.current.x;
     }
     requestRef.current = requestAnimationFrame(loop);
   }, [gameState, selectedSlot, mousePos, inventory]);
