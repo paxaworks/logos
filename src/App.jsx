@@ -3310,7 +3310,7 @@ const LogosGame = () => {
       const goalWidth = goalHeight * aspectRatio;
       // 바닥에 붙도록 위치 조정 (전체가 보이게 왼쪽으로)
       const drawX = canvas.width - goalWidth - 20;
-      const drawY = floorY - goalHeight + 60;
+      const drawY = floorY - goalHeight + 35;
       ctx.drawImage(
         img,
         drawX, drawY,
