@@ -3306,11 +3306,11 @@ const LogosGame = () => {
       // 이미지로 골 그리기 (원본 비율 유지)
       const img = goalImageRef.current;
       const aspectRatio = img.width / img.height;
-      const goalHeight = 120;
+      const goalHeight = 250;
       const goalWidth = goalHeight * aspectRatio;
       // 바닥에 붙도록 위치 조정 (판정은 그대로)
       const drawX = goalX + 40 - goalWidth / 2;
-      const drawY = canvas.height - FLOOR_OFFSET - goalHeight + 15;
+      const drawY = canvas.height - FLOOR_OFFSET - goalHeight + 20;
       ctx.drawImage(
         img,
         drawX, drawY,
