@@ -3310,12 +3310,17 @@ const LogosGame = () => {
       const goalWidth = goalHeight * aspectRatio;
       // 바닥에 붙도록 위치 조정 (전체가 보이게 왼쪽으로)
       const drawX = canvas.width - goalWidth - 20;
-      const drawY = floorY - goalHeight + 40;
+      const drawY = floorY - goalHeight + 20;
       ctx.drawImage(
         img,
         drawX, drawY,
         goalWidth, goalHeight
       );
+
+      // 도착 판정 구역 빨간선으로 표시 (디버그용)
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(goalX, goalY, 80, 80);
     } else {
       // 이미지 로딩 전 기본 도형
       ctx.fillStyle = '#fbbf24';
