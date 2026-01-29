@@ -84,14 +84,9 @@ const LogosGame = () => {
   const bgImagesLoadedRef = useRef(false);
 
   // 자연 타일맵 에셋 refs
-  const grassTopRef = useRef(null);
-  const dirtFillRef = useRef(null);
-  const tree1Ref = useRef(null);
-  const tree2Ref = useRef(null);
-  const tree3Ref = useRef(null);
+  const groundTileRef = useRef(null);
   const cloudImgRef = useRef(null);
   const natureTilesLoadedRef = useRef(false);
-  const bgTreesRef = useRef([]);
   const bgCloudsRef = useRef([]);
   const cameraOffsetRef = useRef(0);
 
@@ -162,32 +157,16 @@ const LogosGame = () => {
     };
 
     // 자연 타일맵 에셋 로딩
-    const grassTop = new Image();
-    grassTop.src = '/nature/grass_top.png';
-    grassTop.onload = () => { grassTopRef.current = grassTop; checkNatureTilesLoaded(); };
-
-    const dirtFill = new Image();
-    dirtFill.src = '/nature/dirt_fill.png';
-    dirtFill.onload = () => { dirtFillRef.current = dirtFill; checkNatureTilesLoaded(); };
-
-    const tree1 = new Image();
-    tree1.src = '/nature/tree1.png';
-    tree1.onload = () => { tree1Ref.current = tree1; checkNatureTilesLoaded(); };
-
-    const tree2 = new Image();
-    tree2.src = '/nature/tree2.png';
-    tree2.onload = () => { tree2Ref.current = tree2; checkNatureTilesLoaded(); };
-
-    const tree3 = new Image();
-    tree3.src = '/nature/tree3.png';
-    tree3.onload = () => { tree3Ref.current = tree3; checkNatureTilesLoaded(); };
+    const groundTile = new Image();
+    groundTile.src = '/nature/ground_tile.png';
+    groundTile.onload = () => { groundTileRef.current = groundTile; checkNatureTilesLoaded(); };
 
     const cloudImg = new Image();
     cloudImg.src = '/nature/cloud1.png';
     cloudImg.onload = () => { cloudImgRef.current = cloudImg; checkNatureTilesLoaded(); };
 
     const checkNatureTilesLoaded = () => {
-      if (grassTopRef.current && dirtFillRef.current && tree1Ref.current && tree2Ref.current && tree3Ref.current && cloudImgRef.current) {
+      if (groundTileRef.current && cloudImgRef.current) {
         natureTilesLoadedRef.current = true;
       }
     };
@@ -3207,29 +3186,17 @@ const LogosGame = () => {
     ctx.restore();
   };
 
-  // 배경 초기화 (나무, 구름 생성)
+  // 배경 초기화 (구름 생성)
   const initializeBackground = (canvasWidth, canvasHeight) => {
     if (backgroundInitializedRef.current) return;
 
-    // 배경 나무 생성 (랜덤 위치)
-    const trees = [];
-    for (let i = 0; i < 12; i++) {
-      trees.push({
-        x: Math.random() * canvasWidth * 2,
-        treeType: Math.floor(Math.random() * 3) + 1,
-        scale: 0.8 + Math.random() * 0.6,
-        layer: Math.floor(Math.random() * 3) // 0: 멀리, 1: 중간, 2: 가까이
-      });
-    }
-    bgTreesRef.current = trees;
-
     // 구름 생성
     const clouds = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 5; i++) {
       clouds.push({
         x: Math.random() * canvasWidth * 2,
-        y: 30 + Math.random() * 150,
-        scale: 0.5 + Math.random() * 1,
+        y: 50 + Math.random() * 120,
+        scale: 0.8 + Math.random() * 0.8,
         speed: 0.1 + Math.random() * 0.2
       });
     }
@@ -3274,49 +3241,18 @@ const LogosGame = () => {
       bgCloudsRef.current.forEach(cloud => {
         const parallaxX = (cloud.x - cameraOffsetRef.current * 0.05) % (w * 2);
         const drawX = parallaxX < -100 ? parallaxX + w * 2 : parallaxX;
-        const cloudW = 100 * cloud.scale;
-        const cloudH = 60 * cloud.scale;
-        ctx.globalAlpha = 0.8;
+        const cloudW = 80 * cloud.scale;
+        const cloudH = 50 * cloud.scale;
+        ctx.globalAlpha = 0.9;
         ctx.drawImage(cloudImgRef.current, drawX, cloud.y, cloudW, cloudH);
         ctx.globalAlpha = 1;
-      });
-    }
-
-    // 배경 나무 그리기 (패럴랙스: 레이어별 다른 속도)
-    if (natureTilesLoadedRef.current) {
-      const FLOOR_OFFSET = 130;
-      const floorY = h - FLOOR_OFFSET;
-
-      // 레이어별로 정렬해서 그리기 (멀리 있는 것 먼저)
-      const sortedTrees = [...bgTreesRef.current].sort((a, b) => a.layer - b.layer);
-
-      sortedTrees.forEach(tree => {
-        const parallaxSpeed = [0.1, 0.3, 0.5][tree.layer];
-        const parallaxX = (tree.x - cameraOffsetRef.current * parallaxSpeed) % (w * 2);
-        const drawX = parallaxX < -150 ? parallaxX + w * 2 : parallaxX;
-
-        let treeImg = null;
-        switch (tree.treeType) {
-          case 1: treeImg = tree1Ref.current; break;
-          case 2: treeImg = tree2Ref.current; break;
-          case 3: treeImg = tree3Ref.current; break;
-        }
-
-        if (treeImg) {
-          const treeH = 120 * tree.scale;
-          const treeW = (treeImg.width / treeImg.height) * treeH;
-          const opacity = [0.4, 0.6, 0.9][tree.layer];
-          ctx.globalAlpha = opacity;
-          ctx.drawImage(treeImg, drawX, floorY - treeH + 10, treeW, treeH);
-          ctx.globalAlpha = 1;
-        }
       });
     }
   };
 
   // 바닥 타일 그리기 함수
   const drawGroundTiles = (ctx, canvas, startX, endX, floorY) => {
-    if (!natureTilesLoadedRef.current || !grassTopRef.current || !dirtFillRef.current) {
+    if (!natureTilesLoadedRef.current || !groundTileRef.current) {
       // 폴백: 기존 방식
       ctx.save();
       ctx.fillStyle = 'rgba(60, 60, 60, 0.7)';
@@ -3327,25 +3263,14 @@ const LogosGame = () => {
       return;
     }
 
-    const tileSize = 32;
+    const tileSize = 64; // 타일 크기
     const tilesNeeded = Math.ceil((endX - startX) / tileSize) + 1;
 
-    // 잔디 상단 타일 그리기
+    // 잔디+흙 타일 반복 그리기
     for (let i = 0; i < tilesNeeded; i++) {
       const x = startX + i * tileSize;
       if (x < endX) {
-        ctx.drawImage(grassTopRef.current, x, floorY, tileSize, tileSize);
-      }
-    }
-
-    // 흙 채우기 (아래쪽)
-    const dirtRows = 2;
-    for (let row = 1; row <= dirtRows; row++) {
-      for (let i = 0; i < tilesNeeded; i++) {
-        const x = startX + i * tileSize;
-        if (x < endX) {
-          ctx.drawImage(dirtFillRef.current, x, floorY + row * tileSize, tileSize, tileSize);
-        }
+        ctx.drawImage(groundTileRef.current, x, floorY, tileSize, tileSize);
       }
     }
   };
