@@ -1426,8 +1426,10 @@ const LogosGame = () => {
 
       const FLOOR_OFFSET = 130; // 인벤토리 공간 확보
       const floorY = canvas.height - FLOOR_OFFSET;
-      if (p.x < 150 && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
-      if (p.x > canvas.width - 150 && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
+      // 바닥 충돌 (타일 크기 64px * 3개 = 192px)
+      const groundWidth = 192;
+      if (p.x < groundWidth && p.x + p.width > 0 && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
+      if (p.x + p.width > canvas.width - groundWidth && p.x < canvas.width && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
 
       let onIce = false;
       let inWater = false;
@@ -3290,11 +3292,11 @@ const LogosGame = () => {
     const FLOOR_OFFSET = 130;
     const floorY = canvas.height - FLOOR_OFFSET;
 
-    // 왼쪽 바닥 - 타일맵 방식
-    drawGroundTiles(ctx, canvas, 0, 150, floorY);
+    // 왼쪽 바닥 - 타일맵 방식 (64px * 3 = 192px)
+    drawGroundTiles(ctx, canvas, 0, 192, floorY);
 
-    // 오른쪽 바닥 - 타일맵 방식
-    drawGroundTiles(ctx, canvas, canvas.width - 150, canvas.width, floorY);
+    // 오른쪽 바닥 - 타일맵 방식 (64px * 3 = 192px)
+    drawGroundTiles(ctx, canvas, canvas.width - 192, canvas.width, floorY);
 
     // 골인 지점
     const goalX = canvas.width - 110;
