@@ -72,6 +72,11 @@ const LogosGame = () => {
   const walkSpriteRef = useRef(null);
   const walkSpriteLoadedRef = useRef(false);
 
+  // 픽셀아트 캐릭터 이미지 ref
+  const charIdleRef = useRef(null);
+  const charRunRef = useRef(null);
+  const charImagesLoadedRef = useRef(false);
+
   // 배경 구름 데이터
   const cloudsRef = useRef([]);
   const backgroundInitializedRef = useRef(false);
@@ -116,6 +121,21 @@ const LogosGame = () => {
     walkImg.onload = () => {
       walkSpriteRef.current = walkImg;
       walkSpriteLoadedRef.current = true;
+    };
+
+    // 픽셀아트 캐릭터 이미지 로딩
+    const charIdle = new Image();
+    charIdle.src = '/char_idle.png';
+    charIdle.onload = () => { charIdleRef.current = charIdle; checkCharLoaded(); };
+
+    const charRun = new Image();
+    charRun.src = '/char_run.png';
+    charRun.onload = () => { charRunRef.current = charRun; checkCharLoaded(); };
+
+    const checkCharLoaded = () => {
+      if (charIdleRef.current && charRunRef.current) {
+        charImagesLoadedRef.current = true;
+      }
     };
 
     // 골 이미지 로딩
@@ -3468,63 +3488,37 @@ const LogosGame = () => {
       }
     }
 
-    // 플레이어 (스프라이트 이미지)
+    // 플레이어 (픽셀아트 캐릭터)
     const p = playerRef.current;
-    const { x, y, cycle } = p;
+    const { x, y } = p;
 
-    if (spriteLoadedRef.current && spriteRef.current) {
-      // 현재 상태에 따라 프레임 선택
-      let frames = SPRITE_FRAMES.idle;
-      let useLadderSprite = false;
-      let useWalkSprite = false;
+    if (charImagesLoadedRef.current) {
+      // 상태에 따라 이미지 선택: 움직이면 run, 아니면 idle
+      const isMoving = p.vx !== 0 || p.ladderDirection;
+      const charImg = isMoving ? charRunRef.current : charIdleRef.current;
 
-      if (p.ladderDirection) {
-        frames = SPRITE_FRAMES.ladder;
-        useLadderSprite = true;
-      } else if (!p.grounded && p.vy < 0) {
-        frames = SPRITE_FRAMES.jump;
-      } else if (!p.grounded && p.vy > 0) {
-        frames = SPRITE_FRAMES.fall;
-      } else if (p.vx !== 0) {
-        frames = SPRITE_FRAMES.walk;
-        useWalkSprite = true;
-      }
+      // 이미지 크롭 영역 (여백 제거)
+      const cropIdle = { x: 200, y: 30, w: 290, h: 320 };
+      const cropRun = { x: 175, y: 30, w: 340, h: 320 };
+      const crop = isMoving ? cropRun : cropIdle;
 
-      // 프레임 인덱스 계산
-      const frameIndex = Math.floor(cycle) % frames.length;
-      const frame = frames[frameIndex];
-
-      // 캐릭터 그리기 크기 (보이는 크기만, 판정은 그대로)
+      // 캐릭터 그리기 크기
       const drawHeight = 100;
-      const drawWidth = (frame.w / frame.h) * drawHeight;
-      // 스프라이트 그리기 위치 (충돌 판정 X, 화면 표시용)
-      const charCenterX = x + 10;
-      const drawX = charCenterX - drawWidth / 2;
-      // 스프라이트 Y 그리기 위치 (충돌 판정 X, 화면 표시용)
-      const drawY = y + 100 - drawHeight + 10;
+      const drawWidth = (crop.w / crop.h) * drawHeight;
 
-      // 사다리 모션은 ladder.png 사용
-      if (useLadderSprite && ladderSpriteLoadedRef.current && ladderSpriteRef.current) {
-        ctx.drawImage(
-          ladderSpriteRef.current,
-          frame.x, frame.y, frame.w, frame.h,
-          drawX, drawY, drawWidth, drawHeight
-        );
-      } else if (useWalkSprite && walkSpriteLoadedRef.current && walkSpriteRef.current) {
-        // 걷기 모션은 walk.png 사용
-        ctx.drawImage(
-          walkSpriteRef.current,
-          frame.x, frame.y, frame.w, frame.h,
-          drawX, drawY, drawWidth, drawHeight
-        );
-      } else {
-        // idle, jump, fall은 character.png 사용
-        ctx.drawImage(
-          spriteRef.current,
-          frame.x, frame.y, frame.w, frame.h,
-          drawX, drawY, drawWidth, drawHeight
-        );
-      }
+      // 충돌 박스 중심에 맞춰서 그리기
+      const charCenterX = x + p.width / 2;
+      const drawX = charCenterX - drawWidth / 2;
+      const drawY = y + p.height - drawHeight;
+
+      // 픽셀아트 선명하게 유지
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(
+        charImg,
+        crop.x, crop.y, crop.w, crop.h,
+        drawX, drawY, drawWidth, drawHeight
+      );
+      ctx.imageSmoothingEnabled = true;
 
     } else {
       // 로딩 중 - 간단한 플레이스홀더
