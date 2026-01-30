@@ -3497,9 +3497,9 @@ const LogosGame = () => {
       const isMoving = p.vx !== 0 || p.ladderDirection;
       const charImg = isMoving ? charRunRef.current : charIdleRef.current;
 
-      // 이미지 크롭 영역 (여백 제거)
-      const cropIdle = { x: 200, y: 30, w: 290, h: 320 };
-      const cropRun = { x: 175, y: 30, w: 340, h: 320 };
+      // 이미지 크롭 영역 (여백 제거, 발 바닥까지)
+      const cropIdle = { x: 200, y: 10, w: 290, h: 350 };
+      const cropRun = { x: 175, y: 10, w: 340, h: 350 };
       const crop = isMoving ? cropRun : cropIdle;
 
       // 캐릭터 그리기 크기 (100px 고정)
