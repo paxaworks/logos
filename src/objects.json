@@ -108,17 +108,12 @@
   "집": {
     "keywords": ["집", "건물", "하우스"],
     "priority": 50,
-    "size": [120, 120],
+    "size": [160, 120],
     "color": "#FEF3C7",
     "message": "아늑한 집이에요!",
     "physics": "solid",
-    "parts": [
-      { "type": "rect", "x": 10, "y": 40, "w": 80, "h": 60 },
-      { "type": "triangle", "x": 0, "y": 0, "w": 100, "h": 45, "color": "#DC2626" },
-      { "type": "rect", "x": 40, "y": 60, "w": 20, "h": 40, "color": "#92400E" },
-      { "type": "rect", "x": 20, "y": 50, "w": 15, "h": 15, "color": "#87CEEB" },
-      { "type": "rect", "x": 65, "y": 50, "w": 15, "h": 15, "color": "#87CEEB" }
-    ]
+    "renderType": "image",
+    "imageUrl": "/house.png"
   },
   "나무": {
     "keywords": ["나무", "트리"],
