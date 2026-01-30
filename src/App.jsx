@@ -3502,14 +3502,14 @@ const LogosGame = () => {
       const cropRun = { x: 175, y: 30, w: 340, h: 320 };
       const crop = isMoving ? cropRun : cropIdle;
 
-      // 캐릭터 그리기 크기
-      const drawHeight = 100;
+      // 캐릭터 그리기 크기 - 충돌 박스 높이에 맞춤
+      const drawHeight = p.height;
       const drawWidth = (crop.w / crop.h) * drawHeight;
 
-      // 충돌 박스 중심에 맞춰서 그리기
+      // 충돌 박스에 맞춰서 그리기 (바닥 기준)
       const charCenterX = x + p.width / 2;
       const drawX = charCenterX - drawWidth / 2;
-      const drawY = y + p.height - drawHeight;
+      const drawY = y;
 
       // 픽셀아트 선명하게 유지
       ctx.imageSmoothingEnabled = false;
