@@ -48,8 +48,8 @@ const LogosGame = () => {
     y: 500,
     vx: 0,
     vy: 0,
-    width: 30,
-    height: 70,
+    width: 40,
+    height: 100,
     grounded: true,
     color: '#ffffff',
     state: 'idle',
@@ -3502,14 +3502,14 @@ const LogosGame = () => {
       const cropRun = { x: 175, y: 30, w: 340, h: 320 };
       const crop = isMoving ? cropRun : cropIdle;
 
-      // 캐릭터 그리기 크기 - 충돌 박스 높이에 맞춤
-      const drawHeight = p.height;
+      // 캐릭터 그리기 크기 (100px 고정)
+      const drawHeight = 100;
       const drawWidth = (crop.w / crop.h) * drawHeight;
 
-      // 충돌 박스에 맞춰서 그리기 (바닥 기준)
+      // 충돌 박스 바닥에 맞춰서 그리기
       const charCenterX = x + p.width / 2;
       const drawX = charCenterX - drawWidth / 2;
-      const drawY = y;
+      const drawY = y + p.height - drawHeight;
 
       // 픽셀아트 선명하게 유지
       ctx.imageSmoothingEnabled = false;
