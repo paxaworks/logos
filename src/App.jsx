@@ -3341,6 +3341,11 @@ const LogosGame = () => {
       ctx.fill();
     }
 
+    // 디버그: 도착지점 실제 영역 표시 (빨간색)
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(goalX, goalY, goalWidth, goalHeight);
+
     // 오브젝트 그리기
     objectsRef.current.forEach(obj => {
       // 선풍기 바람 효과 시각화 (게임 실행 중일 때)
@@ -3527,6 +3532,11 @@ const LogosGame = () => {
       ctx.fill();
       ctx.fillRect(x, y + 30, 20, 20);
     }
+
+    // 디버그: 캐릭터 실제 충돌 영역 표시 (빨간색)
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(p.x, p.y, p.width, p.height);
   };
 
   const loop = useCallback(() => {
