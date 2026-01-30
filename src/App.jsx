@@ -2870,7 +2870,13 @@ const LogosGame = () => {
       const cachedImg = objectImagesRef.current[obj.imageUrl];
       if (cachedImg && cachedImg !== 'loading') {
         ctx.shadowColor = 'transparent';
-        ctx.drawImage(cachedImg, x, y, w, h);
+        // 이미지 크롭 영역이 지정된 경우 해당 영역만 그리기
+        if (obj.imageCrop) {
+          const crop = obj.imageCrop;
+          ctx.drawImage(cachedImg, crop.x, crop.y, crop.w, crop.h, x, y, w, h);
+        } else {
+          ctx.drawImage(cachedImg, x, y, w, h);
+        }
         ctx.restore();
         return;
       }

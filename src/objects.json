@@ -108,12 +108,13 @@
   "집": {
     "keywords": ["집", "건물", "하우스"],
     "priority": 50,
-    "size": [160, 120],
+    "size": [200, 160],
     "color": "#FEF3C7",
     "message": "아늑한 집이에요!",
     "physics": "solid",
     "renderType": "image",
-    "imageUrl": "/house.png"
+    "imageUrl": "/house.png",
+    "imageCrop": { "x": 168, "y": 75, "w": 410, "h": 340 }
   },
   "나무": {
     "keywords": ["나무", "트리"],
