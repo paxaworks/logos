@@ -3506,10 +3506,10 @@ const LogosGame = () => {
       const drawHeight = 100;
       const drawWidth = (crop.w / crop.h) * drawHeight;
 
-      // 충돌 박스 바닥에 맞춰서 그리기
+      // 충돌 박스 바닥에 맞춰서 그리기 (캐릭터 발이 땅에 닿도록)
       const charCenterX = x + p.width / 2;
       const drawX = charCenterX - drawWidth / 2;
-      const drawY = y + p.height - drawHeight;
+      const drawY = y + p.height - drawHeight + 15;
 
       // 픽셀아트 선명하게 유지
       ctx.imageSmoothingEnabled = false;
