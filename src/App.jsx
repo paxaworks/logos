@@ -1611,8 +1611,14 @@ const LogosGame = () => {
         setGameState('lost');
         setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 떨어졌어요..." }]);
       }
-      const goalX = canvas.width - 100;
-      if (p.x > goalX && p.y + p.height > floorY - 10 && p.y < floorY + 10) {
+      // 도착 판정 - 집 영역과 일치
+      const goalWidth = 160;
+      const goalHeight = 130;
+      const goalX = canvas.width - goalWidth - 30;
+      const goalY = floorY - goalHeight;
+      // 플레이어가 집 영역 안에 들어왔는지 확인
+      if (p.x + p.width > goalX + 20 && p.x < goalX + goalWidth - 20 &&
+          p.y + p.height > goalY + goalHeight * 0.5 && p.y + p.height <= floorY + 5) {
         setGameState('won');
         p.vx = 0;
         setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "축하해요! 목표에 도착했어요!" }]);
@@ -3304,43 +3310,35 @@ const LogosGame = () => {
     // 오른쪽 바닥 - 타일맵 방식 (64px * 3 = 192px)
     drawGroundTiles(ctx, canvas, canvas.width - 192, canvas.width, floorY);
 
-    // 골인 지점
-    const goalX = canvas.width - 110;
-    const goalY = canvas.height - FLOOR_OFFSET - 80;
+    // 골인 지점 (집) - 이미지와 충돌 영역 일치
+    const goalWidth = 160;
+    const goalHeight = 130;
+    const goalX = canvas.width - goalWidth - 30;
+    const goalY = floorY - goalHeight;
 
     if (goalImageLoadedRef.current && goalImageRef.current) {
-      // 이미지로 골 그리기 (원본 비율 유지)
       const img = goalImageRef.current;
-      const aspectRatio = img.width / img.height;
-      const goalHeight = 200;
-      const goalWidth = goalHeight * aspectRatio;
-      // 바닥에 붙도록 위치 조정 (전체가 보이게 왼쪽으로)
-      const drawX = canvas.width - goalWidth - 20;
-      const drawY = floorY - goalHeight + 20;
+      // goal.png 크롭 영역 (여백 제거) - 집 부분만
+      const cropX = 125;
+      const cropY = 90;
+      const cropW = 380;
+      const cropH = 310;
+
       ctx.drawImage(
         img,
-        drawX, drawY,
-        goalWidth, goalHeight
+        cropX, cropY, cropW, cropH,  // 소스 이미지에서 크롭할 영역
+        goalX, goalY, goalWidth, goalHeight  // 캔버스에 그릴 위치와 크기
       );
-
-      // 도착 판정 구역 빨간선으로 표시 (디버그용)
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(goalX, goalY, 80, 80);
     } else {
       // 이미지 로딩 전 기본 도형
       ctx.fillStyle = '#fbbf24';
-      ctx.fillRect(goalX + 20, goalY + 30, 40, 40);
+      ctx.fillRect(goalX, goalY + goalHeight * 0.3, goalWidth, goalHeight * 0.7);
       ctx.beginPath();
-      ctx.moveTo(goalX + 10, goalY + 30);
-      ctx.lineTo(goalX + 40, goalY);
-      ctx.lineTo(goalX + 70, goalY + 30);
+      ctx.moveTo(goalX, goalY + goalHeight * 0.3);
+      ctx.lineTo(goalX + goalWidth / 2, goalY);
+      ctx.lineTo(goalX + goalWidth, goalY + goalHeight * 0.3);
       ctx.fillStyle = '#ef4444';
       ctx.fill();
-      ctx.fillStyle = '#fbbf24';
-      ctx.font = '12px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText("GOAL", goalX + 40, goalY - 10);
     }
 
     // 오브젝트 그리기
