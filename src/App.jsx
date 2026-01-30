@@ -1614,7 +1614,10 @@ const LogosGame = () => {
       // 도착 판정 - 집 영역과 일치
       const goalWidth = 160;
       const goalHeight = 130;
-      const goalX = (canvas.width - goalWidth) / 2;  // 가운데
+      // 오른쪽 땅 가운데에 배치
+      const rightGroundStart = canvas.width - 192;
+      const rightGroundCenter = rightGroundStart + 192 / 2;
+      const goalX = rightGroundCenter - goalWidth / 2;
       const goalY = floorY - goalHeight;
       // 플레이어가 집 영역 안에 들어왔는지 확인
       if (p.x + p.width > goalX + 20 && p.x < goalX + goalWidth - 20 &&
@@ -3313,7 +3316,10 @@ const LogosGame = () => {
     // 골인 지점 (집) - 이미지와 충돌 영역 일치
     const goalWidth = 160;
     const goalHeight = 130;
-    const goalX = (canvas.width - goalWidth) / 2;  // 가운데
+    // 오른쪽 땅 (canvas.width - 192 ~ canvas.width) 의 가운데에 배치
+    const rightGroundStart = canvas.width - 192;
+    const rightGroundCenter = rightGroundStart + 192 / 2;
+    const goalX = rightGroundCenter - goalWidth / 2;
     const goalY = floorY - goalHeight;
 
     if (goalImageLoadedRef.current && goalImageRef.current) {
