@@ -18,8 +18,8 @@ const LogosGame = () => {
   const [stageObstacles, setStageObstacles] = useState([]);
 
   // --- 맵 에디터 ---
-  const [editorStart, setEditorStart] = useState({ x: 100, y: 350 });
-  const [editorGoal, setEditorGoal] = useState({ x: 1000, y: 350 });
+  const [editorStart, setEditorStart] = useState(null);
+  const [editorGoal, setEditorGoal] = useState(null);
   const [editorObstacles, setEditorObstacles] = useState([]);
   const [editorGrounds, setEditorGrounds] = useState([]);
   const [editorTokens, setEditorTokens] = useState(8);
@@ -4036,8 +4036,8 @@ const LogosGame = () => {
       }
     });
 
-    // 캐릭터 (시작 위치) - 자유 배치
-    if (charImagesLoadedRef.current && charIdleRef.current) {
+    // 캐릭터 (시작 위치) - 자유 배치 (배치된 경우에만)
+    if (editorStart && charImagesLoadedRef.current && charIdleRef.current) {
       const charImg = charIdleRef.current;
       const crop = { x: 200, y: 10, w: 290, h: 350 };
       const drawHeight = 90;
@@ -4058,8 +4058,8 @@ const LogosGame = () => {
       ctx.fillText('시작', editorStart.x, editorStart.y - drawHeight - 7);
     }
 
-    // 집 (도착 위치) - 자유 배치
-    if (goalImageLoadedRef.current && goalImageRef.current) {
+    // 집 (도착 위치) - 자유 배치 (배치된 경우에만)
+    if (editorGoal && goalImageLoadedRef.current && goalImageRef.current) {
       const goalWidth = 160;
       const goalHeight = 130;
       const goalX = editorGoal.x - goalWidth / 2;
@@ -4195,6 +4195,12 @@ const LogosGame = () => {
 
   // 커스텀 맵 플레이
   const playEditorMap = () => {
+    // 시작/도착 위치 필수 체크
+    if (!editorStart || !editorGoal) {
+      alert('시작 지점과 도착 지점을 모두 배치해주세요!');
+      return;
+    }
+
     const editorCanvas = editorCanvasRef.current;
     if (!editorCanvas) return;
 
@@ -4307,7 +4313,7 @@ const LogosGame = () => {
                   editorSelectedTool === 'start' ? 'bg-blue-600 ring-2 ring-blue-400' : 'bg-white/10 hover:bg-white/20'
                 }`}
               >
-                <span className="text-2xl">🧑</span>
+                <img src="/char_idle.png" alt="캐릭터" className="w-8 h-10 object-contain" />
                 <div className="text-left">
                   <div className="text-white font-bold">시작 지점</div>
                   <div className="text-white/50 text-xs">캐릭터 시작 위치</div>
@@ -4321,7 +4327,7 @@ const LogosGame = () => {
                   editorSelectedTool === 'goal' ? 'bg-amber-600 ring-2 ring-amber-400' : 'bg-white/10 hover:bg-white/20'
                 }`}
               >
-                <span className="text-2xl">🏠</span>
+                <img src="/goal.png" alt="집" className="w-10 h-10 object-contain" />
                 <div className="text-left">
                   <div className="text-white font-bold">도착 지점</div>
                   <div className="text-white/50 text-xs">목표 위치</div>
@@ -4340,7 +4346,7 @@ const LogosGame = () => {
                   editorSelectedTool === 'ground' ? 'bg-green-600 ring-2 ring-green-400' : 'bg-white/10 hover:bg-white/20'
                 }`}
               >
-                <span className="text-2xl">🟩</span>
+                <img src="/nature/ground_tile.png" alt="바닥" className="w-10 h-10 object-contain" />
                 <div className="text-left">
                   <div className="text-white font-bold">바닥</div>
                   <div className="text-white/50 text-xs">캐릭터가 걸을 수 있는 땅</div>
