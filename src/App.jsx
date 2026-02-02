@@ -1477,10 +1477,14 @@ const LogosGame = () => {
 
       // 커스텀 맵인 경우 에디터에서 만든 바닥과 충돌
       if (isCustomMap && customMapData) {
+        const cw = canvas.width;
+        const ch = canvas.height;
+
         customMapData.grounds.forEach(ground => {
-          const groundTop = ground.y;
-          const groundLeft = ground.x;
-          const groundRight = ground.x + ground.width;
+          // 비율 -> 실제 좌표
+          const groundTop = ground.yRatio * ch;
+          const groundLeft = ground.xRatio * cw;
+          const groundRight = groundLeft + ground.widthRatio * cw;
           // 플레이어가 바닥 위에 있는지 체크
           if (p.x + p.width > groundLeft && p.x < groundRight &&
               p.y + p.height >= groundTop && p.y + p.height <= groundTop + 20) {
@@ -1490,12 +1494,16 @@ const LogosGame = () => {
           }
         });
 
-        // 커스텀 맵 장애물 충돌
+        // 커스텀 맵 장애물 충돌 (비율 -> 실제 좌표)
         customMapData.obstacles.forEach(obs => {
-          const obsLeft = obs.x - obs.width / 2;
-          const obsRight = obs.x + obs.width / 2;
-          const obsTop = obs.y - obs.height;
-          const obsBottom = obs.y;
+          const ox = obs.xRatio * cw;
+          const oy = obs.yRatio * ch;
+          const ow = obs.widthRatio * cw;
+          const oh = obs.heightRatio * ch;
+          const obsLeft = ox - ow / 2;
+          const obsRight = ox + ow / 2;
+          const obsTop = oy - oh;
+          const obsBottom = oy;
 
           if (obs.type === 'wall') {
             // 벽 위에 착지
@@ -1719,9 +1727,9 @@ const LogosGame = () => {
 
       let goalX, goalY;
       if (isCustomMap && customMapData) {
-        // 커스텀 맵의 골 위치
-        goalX = customMapData.goal.x - goalWidth / 2;
-        goalY = customMapData.goal.y - goalHeight;
+        // 커스텀 맵의 골 위치 (비율 -> 실제 좌표)
+        goalX = customMapData.goal.xRatio * canvas.width - goalWidth / 2;
+        goalY = customMapData.goal.yRatio * canvas.height - goalHeight;
       } else {
         // 기본 스테이지 골 위치
         goalX = canvas.width - goalWidth;
@@ -3418,40 +3426,50 @@ const LogosGame = () => {
 
     // 커스텀 맵인 경우 에디터에서 만든 바닥 사용
     if (isCustomMap && customMapData) {
-      // 커스텀 바닥 그리기
+      const cw = canvas.width;
+      const ch = canvas.height;
+
+      // 커스텀 바닥 그리기 (비율 -> 실제 좌표)
       customMapData.grounds.forEach(ground => {
-        drawGroundTiles(ctx, canvas, ground.x, ground.x + ground.width, ground.y);
+        const gx = ground.xRatio * cw;
+        const gy = ground.yRatio * ch;
+        const gw = ground.widthRatio * cw;
+        drawGroundTiles(ctx, canvas, gx, gx + gw, gy);
       });
 
-      // 커스텀 장애물 그리기
+      // 커스텀 장애물 그리기 (비율 -> 실제 좌표)
       customMapData.obstacles.forEach(obs => {
-        const obsX = obs.x - obs.width / 2;
-        const obsY = obs.y - obs.height;
+        const ox = obs.xRatio * cw;
+        const oy = obs.yRatio * ch;
+        const ow = obs.widthRatio * cw;
+        const oh = obs.heightRatio * ch;
+        const obsX = ox - ow / 2;
+        const obsY = oy - oh;
         if (obs.type === 'wall') {
           ctx.fillStyle = '#6B7280';
-          ctx.fillRect(obsX, obsY, obs.width, obs.height);
+          ctx.fillRect(obsX, obsY, ow, oh);
           ctx.strokeStyle = '#4B5563';
           ctx.lineWidth = 2;
-          ctx.strokeRect(obsX, obsY, obs.width, obs.height);
+          ctx.strokeRect(obsX, obsY, ow, oh);
         } else if (obs.type === 'hazard') {
           ctx.fillStyle = '#DC2626';
           const spikeWidth = 20;
-          const spikeCount = Math.floor(obs.width / spikeWidth);
+          const spikeCount = Math.floor(ow / spikeWidth);
           for (let i = 0; i < spikeCount; i++) {
             ctx.beginPath();
-            ctx.moveTo(obsX + i * spikeWidth, obs.y);
-            ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, obs.y - 35);
-            ctx.lineTo(obsX + (i + 1) * spikeWidth, obs.y);
+            ctx.moveTo(obsX + i * spikeWidth, oy);
+            ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, oy - 35);
+            ctx.lineTo(obsX + (i + 1) * spikeWidth, oy);
             ctx.fill();
           }
         }
       });
 
-      // 커스텀 골 (집)
+      // 커스텀 골 (집) - 비율 -> 실제 좌표
       const goalWidth = 160;
       const goalHeight = 130;
-      const goalX = customMapData.goal.x - goalWidth / 2;
-      const goalY = customMapData.goal.y - goalHeight;
+      const goalX = customMapData.goal.xRatio * cw - goalWidth / 2;
+      const goalY = customMapData.goal.yRatio * ch - goalHeight;
 
       if (goalImageLoadedRef.current && goalImageRef.current) {
         ctx.drawImage(goalImageRef.current, 125, 90, 380, 310, goalX, goalY, goalWidth, goalHeight);
@@ -3701,11 +3719,18 @@ const LogosGame = () => {
       canvas.width = rect.width;
       canvas.height = rect.height;
 
-      // 플레이어 초기 위치 업데이트 (인벤토리 위쪽)
+      // 플레이어 초기 위치 업데이트
       const FLOOR_OFFSET = 130;
       if (gameState === 'planning') {
-        playerRef.current.x = 50;
-        playerRef.current.y = canvas.height - FLOOR_OFFSET - 100;
+        if (isCustomMap && customMapData) {
+          // 커스텀 맵: 비율 기반 시작 위치
+          playerRef.current.x = customMapData.start.xRatio * canvas.width - 20;
+          playerRef.current.y = customMapData.start.yRatio * canvas.height - 60;
+        } else {
+          // 기본 스테이지
+          playerRef.current.x = 50;
+          playerRef.current.y = canvas.height - FLOOR_OFFSET - 100;
+        }
       }
     };
 
@@ -4137,6 +4162,33 @@ const LogosGame = () => {
     }
   }, [editorStart, editorGoal, editorObstacles, editorGrounds, editorSelectedTool, editorMousePos]);
 
+  // 에디터 캔버스 리사이즈
+  useEffect(() => {
+    if (screen !== 'mapEditor') return;
+
+    const canvas = editorCanvasRef.current;
+    if (!canvas) return;
+
+    const resizeEditorCanvas = () => {
+      const container = document.getElementById('editorCanvasContainer');
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      drawEditorCanvas();
+    };
+
+    const timer = setTimeout(resizeEditorCanvas, 50);
+    window.addEventListener('resize', resizeEditorCanvas);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', resizeEditorCanvas);
+    };
+  }, [screen, drawEditorCanvas]);
+
   // 에디터 캔버스 업데이트
   useEffect(() => {
     if (screen === 'mapEditor') {
@@ -4146,32 +4198,45 @@ const LogosGame = () => {
 
   // 커스텀 맵 플레이
   const playEditorMap = () => {
+    const editorCanvas = editorCanvasRef.current;
+    if (!editorCanvas) return;
+
+    // 에디터 캔버스 크기 저장 (비율 계산용)
+    const editorWidth = editorCanvas.width;
+    const editorHeight = editorCanvas.height;
+
     setIsCreativeMode(false);
     setIsCustomMap(true);
     setTokens(editorTokens);
 
-    // 커스텀 맵 데이터 저장
+    // 커스텀 맵 데이터를 비율로 저장
     setCustomMapData({
-      start: { ...editorStart },
-      goal: { ...editorGoal },
-      grounds: [...editorGrounds],
+      editorSize: { width: editorWidth, height: editorHeight },
+      start: {
+        xRatio: editorStart.x / editorWidth,
+        yRatio: editorStart.y / editorHeight
+      },
+      goal: {
+        xRatio: editorGoal.x / editorWidth,
+        yRatio: editorGoal.y / editorHeight
+      },
+      grounds: editorGrounds.map(g => ({
+        ...g,
+        xRatio: g.x / editorWidth,
+        yRatio: g.y / editorHeight,
+        widthRatio: g.width / editorWidth
+      })),
       obstacles: editorObstacles.map(obs => ({
         ...obs,
+        xRatio: obs.x / editorWidth,
+        yRatio: obs.y / editorHeight,
+        widthRatio: obs.width / editorWidth,
+        heightRatio: obs.height / editorHeight,
         color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
       }))
     });
 
-    setStageObstacles(editorObstacles.map(obs => ({
-      ...obs,
-      color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
-    })));
-
-    // 플레이어 시작 위치 설정
-    playerRef.current.x = editorStart.x - 20;
-    playerRef.current.y = editorStart.y - 60;
-    playerRef.current.vx = 0;
-    playerRef.current.vy = 0;
-    playerRef.current.grounded = false;
+    setStageObstacles([]);
 
     // 오브젝트 초기화
     objectsRef.current = [];
@@ -4202,11 +4267,9 @@ const LogosGame = () => {
           </div>
 
           {/* 캔버스 영역 - 좌클릭 배치, 우클릭 삭제 */}
-          <div className="flex-1 relative m-4 rounded-xl overflow-hidden">
+          <div className="flex-1 relative m-4 rounded-xl overflow-hidden bg-sky-200" id="editorCanvasContainer">
             <canvas
               ref={editorCanvasRef}
-              width={1200}
-              height={500}
               className={`w-full h-full ${editorSelectedTool ? 'cursor-crosshair' : 'cursor-default'}`}
               onClick={handleEditorCanvasClick}
               onContextMenu={handleEditorRightClick}
