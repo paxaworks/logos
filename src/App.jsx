@@ -4184,9 +4184,10 @@ const LogosGame = () => {
     const canvas = editorCanvasRef.current;
     if (!canvas) return;
 
+    const container = document.getElementById('editorCanvasContainer');
+    if (!container) return;
+
     const resizeEditorCanvas = () => {
-      const container = document.getElementById('editorCanvasContainer');
-      if (!container) return;
       const rect = container.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
