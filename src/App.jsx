@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2, ChevronLeft, ChevronRight, Lock, Star, Sparkles, Home } from 'lucide-react';
+import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2, ChevronLeft, ChevronRight, Lock, Star, Sparkles, Home, MapPin, Flag, Square, Triangle, Minus, Plus, Save, Trash2 } from 'lucide-react';
 import objectsData from './objects.json';
 import stagesData from './stages.json';
 
@@ -16,6 +16,13 @@ const LogosGame = () => {
   const [selectedStage, setSelectedStage] = useState(1);
   const [clearedStages, setClearedStages] = useState({});
   const [stageObstacles, setStageObstacles] = useState([]);
+
+  // --- 맵 에디터 ---
+  const [editorStartX, setEditorStartX] = useState(50);
+  const [editorGoalX, setEditorGoalX] = useState(800);
+  const [editorObstacles, setEditorObstacles] = useState([]);
+  const [editorTokens, setEditorTokens] = useState(8);
+  const [savedMaps, setSavedMaps] = useState([]);
 
   // --- 게임 상태 관리 ---
   const [gameState, setGameState] = useState('planning');
@@ -3724,6 +3731,156 @@ const LogosGame = () => {
     }
   };
 
+  // 맵 에디터에서 장애물 추가
+  const addEditorObstacle = (type) => {
+    const x = 200 + Math.random() * 500;
+    const newObs = {
+      id: Date.now(),
+      type: type,
+      x: Math.round(x),
+      width: type === 'wall' ? 60 : 100,
+      height: type === 'wall' ? 150 : 30
+    };
+    setEditorObstacles([...editorObstacles, newObs]);
+  };
+
+  // 맵 에디터에서 장애물 삭제
+  const removeEditorObstacle = (id) => {
+    setEditorObstacles(editorObstacles.filter(o => o.id !== id));
+  };
+
+  // 커스텀 맵 플레이
+  const playEditorMap = () => {
+    setIsCreativeMode(false);
+    setTokens(editorTokens);
+
+    // 장애물 변환
+    const obstacles = editorObstacles.map(obs => ({
+      ...obs,
+      color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
+    }));
+    setStageObstacles(obstacles);
+
+    setMessages([
+      { id: 1, role: 'ai', text: "커스텀 맵!" },
+      { id: 2, role: 'ai', text: `토큰 ${editorTokens}개로 목표 도달하세요.` }
+    ]);
+
+    setScreen('game');
+  };
+
+  // 맵 에디터 화면
+  if (screen === 'mapEditor') {
+    return (
+      <div className="w-screen h-screen overflow-hidden relative bg-gradient-to-b from-slate-900 to-slate-950 flex" style={{ maxHeight: '100dvh' }}>
+        {/* 왼쪽: 미리보기 */}
+        <div className="flex-1 flex flex-col">
+          <div className="p-4 flex items-center justify-between bg-black/30">
+            <button onClick={() => setScreen('menu')} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-bold">
+              <ChevronLeft size={20} /> 뒤로
+            </button>
+            <h1 className="text-2xl font-black text-white">맵 에디터</h1>
+            <button onClick={playEditorMap} className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 rounded-xl text-black font-bold">
+              <Play size={18} /> 플레이
+            </button>
+          </div>
+
+          <div className="flex-1 relative bg-slate-800 m-4 rounded-xl overflow-hidden">
+            <div className="w-full h-full bg-gradient-to-b from-sky-400 to-sky-600 rounded-lg relative p-4">
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-green-700 rounded-b-lg" />
+
+              <div className="absolute bottom-16 w-10 h-20 bg-blue-500 rounded flex items-center justify-center" style={{ left: `${(editorStartX / 1200) * 100}%` }}>
+                <MapPin size={20} className="text-white" />
+              </div>
+
+              <div className="absolute bottom-16 w-14 h-24 bg-amber-500 rounded flex items-center justify-center" style={{ left: `${(editorGoalX / 1200) * 100}%` }}>
+                <Flag size={24} className="text-white" />
+              </div>
+
+              {editorObstacles.map(obs => (
+                <div
+                  key={obs.id}
+                  onClick={() => removeEditorObstacle(obs.id)}
+                  className={`absolute cursor-pointer hover:opacity-50 transition-opacity ${
+                    obs.type === 'wall' ? 'bg-gray-600' : obs.type === 'gap' ? 'bg-black' : 'bg-red-500'
+                  }`}
+                  style={{
+                    left: `${(obs.x / 1200) * 100}%`,
+                    bottom: '64px',
+                    width: `${(obs.width / 1200) * 100}%`,
+                    minWidth: '30px',
+                    height: obs.type === 'wall' ? '80px' : '24px'
+                  }}
+                  title="클릭하여 삭제"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 오른쪽: 설정 패널 */}
+        <div className="w-80 bg-slate-900 border-l border-white/10 p-4 overflow-y-auto">
+          <div className="mb-6">
+            <h3 className="text-white font-bold mb-3">토큰 수</h3>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setEditorTokens(Math.max(1, editorTokens - 1))} className="p-2 bg-white/10 rounded hover:bg-white/20">
+                <Minus size={16} className="text-white" />
+              </button>
+              <span className="text-white font-bold text-2xl w-12 text-center">{editorTokens}</span>
+              <button onClick={() => setEditorTokens(Math.min(20, editorTokens + 1))} className="p-2 bg-white/10 rounded hover:bg-white/20">
+                <Plus size={16} className="text-white" />
+              </button>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-white font-bold mb-2">시작 위치</h3>
+            <input type="range" min="50" max="200" value={editorStartX} onChange={(e) => setEditorStartX(Number(e.target.value))} className="w-full" />
+            <span className="text-white/50 text-sm">{editorStartX}px</span>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-white font-bold mb-2">도착 위치</h3>
+            <input type="range" min="600" max="1100" value={editorGoalX} onChange={(e) => setEditorGoalX(Number(e.target.value))} className="w-full" />
+            <span className="text-white/50 text-sm">{editorGoalX}px</span>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-white font-bold mb-3">장애물 추가</h3>
+            <div className="grid grid-cols-3 gap-2">
+              <button onClick={() => addEditorObstacle('wall')} className="p-3 bg-gray-600 hover:bg-gray-500 rounded-lg flex flex-col items-center">
+                <Square size={24} className="text-white" />
+                <span className="text-white text-xs mt-1">벽</span>
+              </button>
+              <button onClick={() => addEditorObstacle('gap')} className="p-3 bg-black border border-white/20 hover:bg-gray-800 rounded-lg flex flex-col items-center">
+                <Minus size={24} className="text-white" />
+                <span className="text-white text-xs mt-1">구멍</span>
+              </button>
+              <button onClick={() => addEditorObstacle('hazard')} className="p-3 bg-red-600 hover:bg-red-500 rounded-lg flex flex-col items-center">
+                <Triangle size={24} className="text-white" />
+                <span className="text-white text-xs mt-1">위험</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-white font-bold mb-2">장애물 ({editorObstacles.length})</h3>
+            <div className="space-y-1 max-h-40 overflow-y-auto">
+              {editorObstacles.map(obs => (
+                <div key={obs.id} className="flex items-center justify-between bg-white/5 rounded p-2 text-sm">
+                  <span className="text-white">{obs.type === 'wall' ? '벽' : obs.type === 'gap' ? '구멍' : '위험'}</span>
+                  <button onClick={() => removeEditorObstacle(obs.id)} className="text-red-400 hover:text-red-300">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // 스테이지 선택 화면
   if (screen === 'stageSelect') {
     const currentWorldData = stagesData.worlds.find(w => w.id === selectedWorld);
@@ -3896,11 +4053,11 @@ const LogosGame = () => {
 
             {/* 맵 만들기 */}
             <button
-              onClick={() => startCreativeMode()}
+              onClick={() => setScreen('mapEditor')}
               className="group bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-black text-4xl py-8 px-12 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <Sparkles size={48} />
+              <PenTool size={48} />
               맵 만들기
             </button>
 
