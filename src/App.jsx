@@ -1,10 +1,21 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2 } from 'lucide-react';
+import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2, ChevronLeft, ChevronRight, Lock, Star, Sparkles, Home } from 'lucide-react';
 import objectsData from './objects.json';
+import stagesData from './stages.json';
 
 const LogosGame = () => {
   // --- 게임 화면 상태 ---
-  const [screen, setScreen] = useState('menu'); // 'menu' | 'game'
+  const [screen, setScreen] = useState('menu'); // 'menu' | 'stageSelect' | 'game'
+
+  // --- 게임 모드 ---
+  const [gameMode, setGameMode] = useState('stage'); // 'stage' | 'creative'
+  const [isCreativeMode, setIsCreativeMode] = useState(false);
+
+  // --- 스테이지 시스템 ---
+  const [selectedWorld, setSelectedWorld] = useState(1);
+  const [selectedStage, setSelectedStage] = useState(1);
+  const [clearedStages, setClearedStages] = useState({});
+  const [stageObstacles, setStageObstacles] = useState([]);
 
   // --- 게임 상태 관리 ---
   const [gameState, setGameState] = useState('planning');
@@ -458,7 +469,7 @@ const LogosGame = () => {
     if (!prompt.trim()) return;
     if (gameState !== 'planning') return;
 
-    if (tokens <= 0) {
+    if (!isCreativeMode && tokens <= 0) {
       setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "토큰이 부족해요! 리셋하면 토큰이 충전돼요." }]);
       return;
     }
@@ -497,7 +508,9 @@ const LogosGame = () => {
     };
 
     setInventory(prev => [...prev, newItem]);
-    setTokens(prev => prev - 1);
+    if (!isCreativeMode) {
+      setTokens(prev => prev - 1);
+    }
     setIsTyping(false);
     setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', text: chatResponse }]);
   };
@@ -3631,30 +3644,175 @@ const LogosGame = () => {
     return <canvas ref={iconCanvasRef} width={64} height={64} className="w-full h-full object-contain" />;
   };
 
-  // 게임 시작 함수
-  const startGame = () => {
+  // 스테이지 클리어 여부 확인
+  const isStageCleared = (worldId, stageId) => {
+    return clearedStages[`${worldId}-${stageId}`] === true;
+  };
+
+  // 스테이지 잠금 여부 확인
+  const isStageUnlocked = (worldId, stageId) => {
+    if (stageId === 1) {
+      if (worldId === 1) return true;
+      const prevWorld = stagesData.worlds.find(w => w.id === worldId - 1);
+      if (!prevWorld) return true;
+      return isStageCleared(worldId - 1, prevWorld.stages.length);
+    }
+    return isStageCleared(worldId, stageId - 1);
+  };
+
+  // 스테이지 클리어 처리
+  const handleStageClear = () => {
+    if (isCreativeMode) return;
+    const stageKey = `${selectedWorld}-${selectedStage}`;
+    const newCleared = { ...clearedStages, [stageKey]: true };
+    setClearedStages(newCleared);
+  };
+
+  // 게임 시작 함수 (스테이지 모드)
+  const startGame = (worldId, stageId) => {
+    setIsCreativeMode(false);
+    const wId = worldId || selectedWorld;
+    const sId = stageId || selectedStage;
+    setSelectedWorld(wId);
+    setSelectedStage(sId);
+
+    const world = stagesData.worlds.find(w => w.id === wId);
+    const stage = world?.stages.find(s => s.id === sId);
+
+    setCurrentWorld(world?.background || 1);
+    setTokens(stage?.tokens || MAX_TOKENS);
+
     setMessages([
-      { id: 1, role: 'ai', text: "안녕하세요! 무엇을 만들어볼까요?" },
-      { id: 2, role: 'ai', text: "자동차, 상자, 다리, 계단, 나무, 집, 로봇 등을 만들 수 있어요." }
+      { id: 1, role: 'ai', text: `${world?.name || '월드'} - ${stage?.name || '스테이지'}` },
+      { id: 2, role: 'ai', text: stage?.description || "목표를 향해 가세요!" }
     ]);
+
     // 배경 이미지 로드 확인 후 게임 시작
     if (bgImagesLoadedRef.current) {
       setScreen('game');
     } else {
-      // 이미지 로드 대기
       const checkLoaded = setInterval(() => {
         if (bgImagesLoadedRef.current) {
           clearInterval(checkLoaded);
           setScreen('game');
         }
       }, 50);
-      // 최대 2초 대기 후 강제 시작
       setTimeout(() => {
         clearInterval(checkLoaded);
         setScreen('game');
       }, 2000);
     }
   };
+
+  // 크리에이티브 모드 시작
+  const startCreativeMode = () => {
+    setIsCreativeMode(true);
+    setTokens(999);
+
+    setMessages([
+      { id: 1, role: 'ai', text: "크리에이티브 모드!" },
+      { id: 2, role: 'ai', text: "토큰 무제한! 자유롭게 만들어보세요." }
+    ]);
+
+    if (bgImagesLoadedRef.current) {
+      setScreen('game');
+    } else {
+      const checkLoaded = setInterval(() => {
+        if (bgImagesLoadedRef.current) {
+          clearInterval(checkLoaded);
+          setScreen('game');
+        }
+      }, 50);
+      setTimeout(() => {
+        clearInterval(checkLoaded);
+        setScreen('game');
+      }, 2000);
+    }
+  };
+
+  // 스테이지 선택 화면
+  if (screen === 'stageSelect') {
+    const currentWorldData = stagesData.worlds.find(w => w.id === selectedWorld);
+
+    return (
+      <div className="w-screen h-screen overflow-hidden relative bg-gradient-to-b from-slate-900 to-slate-950" style={{ maxHeight: '100dvh' }}>
+        {/* 상단 헤더 */}
+        <div className="relative z-10 p-6 flex items-center justify-between">
+          <button
+            onClick={() => setScreen('menu')}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-bold transition-all"
+          >
+            <ChevronLeft size={24} />
+            뒤로
+          </button>
+          <h1 className="text-3xl font-black text-white">스테이지 선택</h1>
+          <div className="w-24" />
+        </div>
+
+        {/* 월드 선택 */}
+        <div className="relative z-10 flex items-center justify-center gap-4 mt-4">
+          <button
+            onClick={() => setSelectedWorld(Math.max(1, selectedWorld - 1))}
+            disabled={selectedWorld === 1}
+            className="p-3 bg-white/10 hover:bg-white/20 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronLeft size={32} className="text-white" />
+          </button>
+
+          <div className="text-center min-w-[300px]">
+            <h2 className="text-4xl font-black text-amber-400 mb-2">
+              월드 {selectedWorld}: {currentWorldData?.name}
+            </h2>
+            <p className="text-white/70">{currentWorldData?.description}</p>
+          </div>
+
+          <button
+            onClick={() => setSelectedWorld(Math.min(stagesData.worlds.length, selectedWorld + 1))}
+            disabled={selectedWorld === stagesData.worlds.length}
+            className="p-3 bg-white/10 hover:bg-white/20 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronRight size={32} className="text-white" />
+          </button>
+        </div>
+
+        {/* 스테이지 그리드 */}
+        <div className="relative z-10 flex flex-wrap justify-center gap-6 mt-12 px-12">
+          {currentWorldData?.stages.map((stage) => {
+            const unlocked = isStageUnlocked(selectedWorld, stage.id);
+            const cleared = isStageCleared(selectedWorld, stage.id);
+
+            return (
+              <button
+                key={stage.id}
+                onClick={() => unlocked && startGame(selectedWorld, stage.id)}
+                disabled={!unlocked}
+                className={`relative w-48 h-48 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all duration-300 ${
+                  unlocked
+                    ? cleared
+                      ? 'bg-gradient-to-br from-green-600 to-green-700 hover:scale-105 shadow-lg'
+                      : 'bg-gradient-to-br from-amber-500 to-orange-600 hover:scale-105 shadow-lg'
+                    : 'bg-slate-800/50 cursor-not-allowed'
+                }`}
+              >
+                {!unlocked && <Lock size={48} className="text-white/30" />}
+                {unlocked && cleared && <Star size={48} className="text-yellow-300" fill="currentColor" />}
+                {unlocked && !cleared && <span className="text-5xl font-black text-white">{stage.id}</span>}
+                <span className={`text-lg font-bold ${unlocked ? 'text-white' : 'text-white/30'}`}>
+                  {stage.name}
+                </span>
+                {unlocked && (
+                  <div className="absolute bottom-3 flex items-center gap-1 text-sm">
+                    <Zap size={14} className="text-yellow-300" />
+                    <span className="text-white/80">{stage.tokens} 토큰</span>
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   // 메뉴 화면
   if (screen === 'menu') {
@@ -3731,33 +3889,34 @@ const LogosGame = () => {
           </div>
 
           {/* 메뉴 버튼들 */}
-          <div className="flex flex-col gap-8 w-[500px]">
-            {/* 시작하기 */}
+          <div className="flex flex-col gap-6 w-[500px]">
+            {/* 스테이지 모드 */}
             <button
-              onClick={() => startGame()}
-              className="group bg-amber-500 hover:bg-amber-400 text-black font-black text-5xl py-10 px-14 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 flex items-center gap-6"
+              onClick={() => setScreen('stageSelect')}
+              className="group bg-amber-500 hover:bg-amber-400 text-black font-black text-4xl py-8 px-12 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <Play size={56} />
-              시작하기
+              <Play size={48} />
+              스테이지 모드
             </button>
 
-            {/* 맵 만들기 */}
+            {/* 크리에이티브 모드 */}
             <button
-              className="group bg-black/50 hover:bg-black/70 text-white font-black text-5xl py-10 px-14 rounded-3xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-6"
+              onClick={() => startCreativeMode()}
+              className="group bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-black text-4xl py-8 px-12 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <PenTool size={56} />
-              맵 만들기
+              <Sparkles size={48} />
+              크리에이티브
             </button>
 
             {/* 설정 */}
             <button
               onClick={() => setShowSettings(true)}
-              className="group bg-black/50 hover:bg-black/70 text-white font-black text-5xl py-10 px-14 rounded-3xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-6"
+              className="group bg-black/50 hover:bg-black/70 text-white font-black text-4xl py-8 px-12 rounded-3xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <Settings size={56} />
+              <Settings size={48} />
               설정
             </button>
           </div>
@@ -3832,25 +3991,46 @@ const LogosGame = () => {
       {/* 게임 영역 */}
       <div className="flex-1 relative border-r border-white/5 flex flex-col min-w-0 min-h-0">
         <div className="absolute top-4 left-4 z-10 flex gap-3">
-          {/* 로고 */}
+          {/* 홈 버튼 */}
+          <button
+            onClick={() => setScreen('menu')}
+            className="bg-black/60 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10 shadow-xl flex items-center hover:bg-black/70 transition-all"
+          >
+            <Home className="text-white" size={20} />
+          </button>
+          {/* 모드 표시 */}
           <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center font-black text-xl shadow-lg">L</div>
-            <div>
-              <h1 className="text-sm font-bold text-white tracking-wider">LOGOS</h1>
-              <div className="text-[10px] font-medium text-amber-400">
-                PUZZLE GAME
-              </div>
-            </div>
+            {isCreativeMode ? (
+              <>
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <Sparkles className="text-white" size={20} />
+                </div>
+                <div>
+                  <h1 className="text-sm font-bold text-white tracking-wider">CREATIVE</h1>
+                  <div className="text-[10px] font-medium text-purple-400">자유 모드</div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center font-black text-xl shadow-lg">{selectedWorld}</div>
+                <div>
+                  <h1 className="text-sm font-bold text-white tracking-wider">STAGE {selectedStage}</h1>
+                  <div className="text-[10px] font-medium text-amber-400">
+                    {stagesData.worlds.find(w => w.id === selectedWorld)?.stages.find(s => s.id === selectedStage)?.name || ''}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           {/* 토큰 */}
           <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-lg">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${isCreativeMode ? 'bg-gradient-to-br from-purple-400 to-pink-500' : 'bg-gradient-to-br from-yellow-400 to-amber-500'}`}>
               <Zap className="text-white" size={20} />
             </div>
             <div>
               <div className="text-[10px] text-white/50 font-bold tracking-wider">TOKENS</div>
               <div className="text-xl font-black text-white leading-none">
-                {tokens}<span className="text-sm text-white/40 font-medium ml-1">/ {MAX_TOKENS}</span>
+                {isCreativeMode ? '∞' : tokens}
               </div>
             </div>
           </div>
