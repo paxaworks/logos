@@ -18,9 +18,13 @@ const LogosGame = () => {
   const [stageObstacles, setStageObstacles] = useState([]);
 
   // --- 맵 에디터 ---
-  const [editorStartX, setEditorStartX] = useState(50);
-  const [editorGoalX, setEditorGoalX] = useState(800);
+  const [editorStart, setEditorStart] = useState({ x: 100, y: 350 });
+  const [editorGoal, setEditorGoal] = useState({ x: 1000, y: 350 });
   const [editorObstacles, setEditorObstacles] = useState([]);
+  const [editorGrounds, setEditorGrounds] = useState([
+    { id: 1, x: 0, y: 420, width: 300 },
+    { id: 2, x: 900, y: 420, width: 300 }
+  ]);
   const [editorTokens, setEditorTokens] = useState(8);
   const [savedMaps, setSavedMaps] = useState([]);
 
@@ -3732,38 +3736,69 @@ const LogosGame = () => {
   };
 
   // 맵 에디터: 선택된 도구
-  const [editorSelectedTool, setEditorSelectedTool] = useState(null); // 'start' | 'goal' | 'wall' | 'gap' | 'hazard'
+  const [editorSelectedTool, setEditorSelectedTool] = useState(null); // 'start' | 'goal' | 'wall' | 'hazard' | 'ground'
   const editorCanvasRef = useRef(null);
 
-  // 맵 에디터: 캔버스 클릭시 배치
+  // 맵 에디터: 캔버스 클릭시 배치 (X, Y 자유롭게)
   const handleEditorCanvasClick = (e) => {
     if (!editorSelectedTool) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 1200;
+    const x = Math.round((e.clientX - rect.left) / rect.width * 1200);
+    const y = Math.round((e.clientY - rect.top) / rect.height * 500);
 
     if (editorSelectedTool === 'start') {
-      setEditorStartX(Math.max(50, Math.min(400, Math.round(x))));
-      setEditorSelectedTool(null);
+      setEditorStart({ x, y });
     } else if (editorSelectedTool === 'goal') {
-      setEditorGoalX(Math.max(500, Math.min(1100, Math.round(x))));
-      setEditorSelectedTool(null);
-    } else if (editorSelectedTool === 'wall' || editorSelectedTool === 'gap' || editorSelectedTool === 'hazard') {
+      setEditorGoal({ x, y });
+    } else if (editorSelectedTool === 'ground') {
+      const newGround = {
+        id: Date.now(),
+        x: x - 96,
+        y: y,
+        width: 192
+      };
+      setEditorGrounds([...editorGrounds, newGround]);
+    } else if (editorSelectedTool === 'wall' || editorSelectedTool === 'hazard') {
       const newObs = {
         id: Date.now(),
         type: editorSelectedTool,
-        x: Math.round(x),
+        x: x,
+        y: y,
         width: editorSelectedTool === 'wall' ? 60 : 120,
-        height: editorSelectedTool === 'wall' ? 180 : 40
+        height: editorSelectedTool === 'wall' ? 150 : 40
       };
       setEditorObstacles([...editorObstacles, newObs]);
     }
   };
 
-  // 맵 에디터에서 장애물 삭제
-  const removeEditorObstacle = (id, e) => {
-    e.stopPropagation();
-    setEditorObstacles(editorObstacles.filter(o => o.id !== id));
+  // 맵 에디터에서 아이템 삭제 (우클릭)
+  const handleEditorRightClick = (e) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.round((e.clientX - rect.left) / rect.width * 1200);
+    const y = Math.round((e.clientY - rect.top) / rect.height * 500);
+
+    // 클릭 위치 근처의 장애물 찾기
+    const obsToRemove = editorObstacles.find(obs => {
+      const obsLeft = obs.x - obs.width / 2;
+      const obsRight = obs.x + obs.width / 2;
+      const obsTop = obs.y - obs.height;
+      const obsBottom = obs.y;
+      return x >= obsLeft && x <= obsRight && y >= obsTop && y <= obsBottom;
+    });
+    if (obsToRemove) {
+      setEditorObstacles(editorObstacles.filter(o => o.id !== obsToRemove.id));
+      return;
+    }
+
+    // 바닥 찾기
+    const groundToRemove = editorGrounds.find(g => {
+      return x >= g.x && x <= g.x + g.width && y >= g.y && y <= g.y + 64;
+    });
+    if (groundToRemove) {
+      setEditorGrounds(editorGrounds.filter(g => g.id !== groundToRemove.id));
+    }
   };
 
   // 맵 에디터 캔버스 그리기
@@ -3774,45 +3809,70 @@ const LogosGame = () => {
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
-    const groundHeight = 60;
-    const floorY = height - groundHeight;
 
     // 배경 - 하늘
-    const skyGradient = ctx.createLinearGradient(0, 0, 0, floorY);
+    const skyGradient = ctx.createLinearGradient(0, 0, 0, height);
     skyGradient.addColorStop(0, '#87CEEB');
     skyGradient.addColorStop(1, '#4A90D9');
     ctx.fillStyle = skyGradient;
-    ctx.fillRect(0, 0, width, floorY);
+    ctx.fillRect(0, 0, width, height);
 
-    // 바닥
-    ctx.fillStyle = '#4A7C23';
-    ctx.fillRect(0, floorY, width, groundHeight);
-    ctx.fillStyle = '#3D6B1E';
-    ctx.fillRect(0, floorY, width, 8);
+    // 그리드 표시 (배치 도움)
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < width; x += 64) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+    for (let y = 0; y < height; y += 64) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+
+    // 바닥 타일 그리기
+    editorGrounds.forEach(ground => {
+      if (groundTileRef.current) {
+        const tileSize = 64;
+        const tilesNeeded = Math.ceil(ground.width / tileSize);
+        for (let i = 0; i < tilesNeeded; i++) {
+          const tileX = ground.x + i * tileSize;
+          if (tileX < ground.x + ground.width) {
+            ctx.drawImage(groundTileRef.current, tileX, ground.y, tileSize, tileSize);
+          }
+        }
+      } else {
+        // 폴백
+        ctx.fillStyle = '#4A7C23';
+        ctx.fillRect(ground.x, ground.y, ground.width, 64);
+        ctx.fillStyle = '#3D6B1E';
+        ctx.fillRect(ground.x, ground.y, ground.width, 8);
+      }
+    });
 
     // 장애물 그리기
     editorObstacles.forEach(obs => {
       const obsX = obs.x - obs.width / 2;
+      const obsY = obs.y - obs.height;
       if (obs.type === 'wall') {
         // 벽
         ctx.fillStyle = '#6B7280';
-        ctx.fillRect(obsX, floorY - obs.height, obs.width, obs.height);
+        ctx.fillRect(obsX, obsY, obs.width, obs.height);
         ctx.strokeStyle = '#4B5563';
         ctx.lineWidth = 2;
-        ctx.strokeRect(obsX, floorY - obs.height, obs.width, obs.height);
+        ctx.strokeRect(obsX, obsY, obs.width, obs.height);
         // 벽돌 패턴
         ctx.strokeStyle = '#374151';
         ctx.lineWidth = 1;
         for (let row = 0; row < obs.height; row += 25) {
           ctx.beginPath();
-          ctx.moveTo(obsX, floorY - obs.height + row);
-          ctx.lineTo(obsX + obs.width, floorY - obs.height + row);
+          ctx.moveTo(obsX, obsY + row);
+          ctx.lineTo(obsX + obs.width, obsY + row);
           ctx.stroke();
         }
-      } else if (obs.type === 'gap') {
-        // 구멍 - 바닥을 지움
-        ctx.fillStyle = '#1a1a2e';
-        ctx.fillRect(obsX, floorY, obs.width, groundHeight);
       } else if (obs.type === 'hazard') {
         // 위험 지역 (가시)
         ctx.fillStyle = '#DC2626';
@@ -3820,48 +3880,65 @@ const LogosGame = () => {
         const spikeCount = Math.floor(obs.width / spikeWidth);
         for (let i = 0; i < spikeCount; i++) {
           ctx.beginPath();
-          ctx.moveTo(obsX + i * spikeWidth, floorY);
-          ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, floorY - 35);
-          ctx.lineTo(obsX + (i + 1) * spikeWidth, floorY);
+          ctx.moveTo(obsX + i * spikeWidth, obs.y);
+          ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, obs.y - 35);
+          ctx.lineTo(obsX + (i + 1) * spikeWidth, obs.y);
           ctx.fill();
         }
       }
     });
 
-    // 캐릭터 (시작 위치)
+    // 캐릭터 (시작 위치) - 자유 배치
     if (charImagesLoadedRef.current && charIdleRef.current) {
       const charImg = charIdleRef.current;
       const crop = { x: 200, y: 10, w: 290, h: 350 };
       const drawHeight = 90;
       const drawWidth = (crop.w / crop.h) * drawHeight;
-      const drawX = editorStartX - drawWidth / 2;
-      const drawY = floorY - drawHeight;
+      const drawX = editorStart.x - drawWidth / 2;
+      const drawY = editorStart.y - drawHeight;
 
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(charImg, crop.x, crop.y, crop.w, crop.h, drawX, drawY, drawWidth, drawHeight);
       ctx.imageSmoothingEnabled = true;
+
+      // 시작 표시
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.8)';
+      ctx.fillRect(editorStart.x - 20, editorStart.y - drawHeight - 20, 40, 18);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('시작', editorStart.x, editorStart.y - drawHeight - 7);
     }
 
-    // 집 (도착 위치)
+    // 집 (도착 위치) - 자유 배치
     if (goalImageLoadedRef.current && goalImageRef.current) {
       const goalWidth = 160;
       const goalHeight = 130;
-      const goalX = editorGoalX - goalWidth / 2;
-      const goalY = floorY - goalHeight;
+      const goalX = editorGoal.x - goalWidth / 2;
+      const goalY = editorGoal.y - goalHeight;
 
-      ctx.drawImage(goalImageRef.current, 90, 15, 310, 270, goalX, goalY, goalWidth, goalHeight);
+      // 집 이미지 크롭 (스테이지 모드와 동일)
+      ctx.drawImage(goalImageRef.current, 125, 90, 380, 310, goalX, goalY, goalWidth, goalHeight);
+
+      // 도착 표시
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.8)';
+      ctx.fillRect(editorGoal.x - 20, editorGoal.y - goalHeight - 20, 40, 18);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('도착', editorGoal.x, editorGoal.y - goalHeight - 7);
     }
 
     // 선택된 도구 안내
     if (editorSelectedTool) {
       ctx.fillStyle = 'rgba(0,0,0,0.8)';
-      ctx.fillRect(width / 2 - 100, 15, 200, 30);
+      ctx.fillRect(width / 2 - 120, 15, 240, 30);
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('클릭하여 배치', width / 2, 36);
+      ctx.fillText('좌클릭: 배치 / 우클릭: 삭제', width / 2, 36);
     }
-  }, [editorStartX, editorGoalX, editorObstacles, editorSelectedTool]);
+  }, [editorStart, editorGoal, editorObstacles, editorGrounds, editorSelectedTool]);
 
   // 에디터 캔버스 업데이트
   useEffect(() => {
@@ -3905,7 +3982,7 @@ const LogosGame = () => {
             </button>
           </div>
 
-          {/* 캔버스 영역 - 클릭으로 배치 */}
+          {/* 캔버스 영역 - 좌클릭 배치, 우클릭 삭제 */}
           <div className="flex-1 relative m-4 rounded-xl overflow-hidden">
             <canvas
               ref={editorCanvasRef}
@@ -3913,6 +3990,7 @@ const LogosGame = () => {
               height={500}
               className={`w-full h-full ${editorSelectedTool ? 'cursor-crosshair' : 'cursor-default'}`}
               onClick={handleEditorCanvasClick}
+              onContextMenu={handleEditorRightClick}
             />
           </div>
         </div>
@@ -3971,6 +4049,25 @@ const LogosGame = () => {
             </div>
           </div>
 
+          {/* 지형 */}
+          <div className="mb-6">
+            <h3 className="text-white font-bold mb-3">지형</h3>
+            <div className="space-y-2">
+              <button
+                onClick={() => setEditorSelectedTool(editorSelectedTool === 'ground' ? null : 'ground')}
+                className={`w-full p-3 rounded-lg flex items-center gap-3 transition-all ${
+                  editorSelectedTool === 'ground' ? 'bg-green-600 ring-2 ring-green-400' : 'bg-white/10 hover:bg-white/20'
+                }`}
+              >
+                <span className="text-2xl">🟩</span>
+                <div className="text-left">
+                  <div className="text-white font-bold">바닥</div>
+                  <div className="text-white/50 text-xs">캐릭터가 걸을 수 있는 땅</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
           {/* 장애물 */}
           <div className="mb-6">
             <h3 className="text-white font-bold mb-3">장애물</h3>
@@ -3989,19 +4086,6 @@ const LogosGame = () => {
               </button>
 
               <button
-                onClick={() => setEditorSelectedTool(editorSelectedTool === 'gap' ? null : 'gap')}
-                className={`w-full p-3 rounded-lg flex items-center gap-3 transition-all ${
-                  editorSelectedTool === 'gap' ? 'bg-black ring-2 ring-white/50' : 'bg-white/10 hover:bg-white/20'
-                }`}
-              >
-                <span className="text-2xl">🕳️</span>
-                <div className="text-left">
-                  <div className="text-white font-bold">구멍</div>
-                  <div className="text-white/50 text-xs">떨어지면 실패</div>
-                </div>
-              </button>
-
-              <button
                 onClick={() => setEditorSelectedTool(editorSelectedTool === 'hazard' ? null : 'hazard')}
                 className={`w-full p-3 rounded-lg flex items-center gap-3 transition-all ${
                   editorSelectedTool === 'hazard' ? 'bg-red-600 ring-2 ring-red-400' : 'bg-white/10 hover:bg-white/20'
@@ -4016,16 +4100,30 @@ const LogosGame = () => {
             </div>
           </div>
 
-          {/* 배치된 장애물 목록 */}
+          {/* 배치된 아이템 목록 */}
+          <div className="mb-4">
+            <h3 className="text-white font-bold mb-2">배치된 바닥 ({editorGrounds.length})</h3>
+            <div className="space-y-1 max-h-24 overflow-y-auto">
+              {editorGrounds.map(g => (
+                <div key={g.id} className="flex items-center justify-between bg-white/5 rounded p-2 text-sm">
+                  <span className="text-white">🟩 바닥 (x:{g.x})</span>
+                  <button onClick={() => setEditorGrounds(editorGrounds.filter(gr => gr.id !== g.id))} className="text-red-400 hover:text-red-300">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div>
             <h3 className="text-white font-bold mb-2">배치된 장애물 ({editorObstacles.length})</h3>
-            <div className="space-y-1 max-h-32 overflow-y-auto">
+            <div className="space-y-1 max-h-24 overflow-y-auto">
               {editorObstacles.map(obs => (
                 <div key={obs.id} className="flex items-center justify-between bg-white/5 rounded p-2 text-sm">
                   <span className="text-white">
-                    {obs.type === 'wall' ? '🧱 벽' : obs.type === 'gap' ? '🕳️ 구멍' : '⚠️ 위험'}
+                    {obs.type === 'wall' ? '🧱 벽' : '⚠️ 위험'}
                   </span>
-                  <button onClick={(e) => removeEditorObstacle(obs.id, e)} className="text-red-400 hover:text-red-300">
+                  <button onClick={() => setEditorObstacles(editorObstacles.filter(o => o.id !== obs.id))} className="text-red-400 hover:text-red-300">
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -4034,6 +4132,12 @@ const LogosGame = () => {
                 <p className="text-white/30 text-sm">장애물을 추가하세요</p>
               )}
             </div>
+          </div>
+
+          {/* 안내 */}
+          <div className="mt-4 p-3 bg-white/5 rounded-lg">
+            <p className="text-white/60 text-xs">💡 우클릭으로 삭제</p>
+            <p className="text-white/60 text-xs">💡 아무 곳에나 자유롭게 배치 가능</p>
           </div>
         </div>
       </div>
