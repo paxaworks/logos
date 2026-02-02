@@ -3731,21 +3731,37 @@ const LogosGame = () => {
     }
   };
 
-  // 맵 에디터에서 장애물 추가
-  const addEditorObstacle = (type) => {
-    const x = 200 + Math.random() * 500;
-    const newObs = {
-      id: Date.now(),
-      type: type,
-      x: Math.round(x),
-      width: type === 'wall' ? 60 : 100,
-      height: type === 'wall' ? 150 : 30
-    };
-    setEditorObstacles([...editorObstacles, newObs]);
+  // 맵 에디터: 선택된 도구
+  const [editorSelectedTool, setEditorSelectedTool] = useState(null); // 'start' | 'goal' | 'wall' | 'gap' | 'hazard'
+
+  // 맵 에디터: 캔버스 클릭시 배치
+  const handleEditorCanvasClick = (e) => {
+    if (!editorSelectedTool) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 1200;
+
+    if (editorSelectedTool === 'start') {
+      setEditorStartX(Math.max(50, Math.min(300, Math.round(x))));
+      setEditorSelectedTool(null);
+    } else if (editorSelectedTool === 'goal') {
+      setEditorGoalX(Math.max(600, Math.min(1100, Math.round(x))));
+      setEditorSelectedTool(null);
+    } else if (editorSelectedTool === 'wall' || editorSelectedTool === 'gap' || editorSelectedTool === 'hazard') {
+      const newObs = {
+        id: Date.now(),
+        type: editorSelectedTool,
+        x: Math.round(x),
+        width: editorSelectedTool === 'wall' ? 60 : 100,
+        height: editorSelectedTool === 'wall' ? 150 : 30
+      };
+      setEditorObstacles([...editorObstacles, newObs]);
+    }
   };
 
   // 맵 에디터에서 장애물 삭제
-  const removeEditorObstacle = (id) => {
+  const removeEditorObstacle = (id, e) => {
+    e.stopPropagation();
     setEditorObstacles(editorObstacles.filter(o => o.id !== id));
   };
 
@@ -3754,7 +3770,6 @@ const LogosGame = () => {
     setIsCreativeMode(false);
     setTokens(editorTokens);
 
-    // 장애물 변환
     const obstacles = editorObstacles.map(obs => ({
       ...obs,
       color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
@@ -3773,7 +3788,7 @@ const LogosGame = () => {
   if (screen === 'mapEditor') {
     return (
       <div className="w-screen h-screen overflow-hidden relative bg-gradient-to-b from-slate-900 to-slate-950 flex" style={{ maxHeight: '100dvh' }}>
-        {/* 왼쪽: 미리보기 */}
+        {/* 왼쪽: 캔버스 */}
         <div className="flex-1 flex flex-col">
           <div className="p-4 flex items-center justify-between bg-black/30">
             <button onClick={() => setScreen('menu')} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-bold">
@@ -3785,43 +3800,78 @@ const LogosGame = () => {
             </button>
           </div>
 
-          <div className="flex-1 relative bg-slate-800 m-4 rounded-xl overflow-hidden">
-            <div className="w-full h-full bg-gradient-to-b from-sky-400 to-sky-600 rounded-lg relative p-4">
-              <div className="absolute bottom-0 left-0 right-0 h-16 bg-green-700 rounded-b-lg" />
+          {/* 캔버스 영역 - 클릭으로 배치 */}
+          <div
+            className={`flex-1 relative m-4 rounded-xl overflow-hidden cursor-${editorSelectedTool ? 'crosshair' : 'default'}`}
+            onClick={handleEditorCanvasClick}
+            style={{ background: 'linear-gradient(to bottom, #38bdf8, #0284c7)' }}
+          >
+            {/* 바닥 */}
+            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-green-800 to-green-600" />
 
-              <div className="absolute bottom-16 w-10 h-20 bg-blue-500 rounded flex items-center justify-center" style={{ left: `${(editorStartX / 1200) * 100}%` }}>
-                <MapPin size={20} className="text-white" />
+            {/* 시작 지점 - 캐릭터 */}
+            <div
+              className="absolute bottom-20 flex flex-col items-center"
+              style={{ left: `${(editorStartX / 1200) * 100}%`, transform: 'translateX(-50%)' }}
+            >
+              <div className="w-12 h-24 bg-blue-500 rounded-lg border-4 border-blue-300 flex items-center justify-center">
+                <span className="text-2xl">🧑</span>
               </div>
-
-              <div className="absolute bottom-16 w-14 h-24 bg-amber-500 rounded flex items-center justify-center" style={{ left: `${(editorGoalX / 1200) * 100}%` }}>
-                <Flag size={24} className="text-white" />
-              </div>
-
-              {editorObstacles.map(obs => (
-                <div
-                  key={obs.id}
-                  onClick={() => removeEditorObstacle(obs.id)}
-                  className={`absolute cursor-pointer hover:opacity-50 transition-opacity ${
-                    obs.type === 'wall' ? 'bg-gray-600' : obs.type === 'gap' ? 'bg-black' : 'bg-red-500'
-                  }`}
-                  style={{
-                    left: `${(obs.x / 1200) * 100}%`,
-                    bottom: '64px',
-                    width: `${(obs.width / 1200) * 100}%`,
-                    minWidth: '30px',
-                    height: obs.type === 'wall' ? '80px' : '24px'
-                  }}
-                  title="클릭하여 삭제"
-                />
-              ))}
+              <span className="text-white text-xs mt-1 bg-black/50 px-2 rounded">시작</span>
             </div>
+
+            {/* 도착 지점 - 집 */}
+            <div
+              className="absolute bottom-20 flex flex-col items-center"
+              style={{ left: `${(editorGoalX / 1200) * 100}%`, transform: 'translateX(-50%)' }}
+            >
+              <div className="w-20 h-28 bg-amber-500 rounded-t-lg border-4 border-amber-300 flex items-center justify-center relative">
+                <div className="absolute -top-6 w-0 h-0 border-l-[40px] border-r-[40px] border-b-[24px] border-l-transparent border-r-transparent border-b-red-600" />
+                <span className="text-3xl">🏠</span>
+              </div>
+              <span className="text-white text-xs mt-1 bg-black/50 px-2 rounded">도착</span>
+            </div>
+
+            {/* 장애물들 */}
+            {editorObstacles.map(obs => (
+              <div
+                key={obs.id}
+                onClick={(e) => removeEditorObstacle(obs.id, e)}
+                className={`absolute cursor-pointer hover:opacity-60 transition-opacity flex items-center justify-center ${
+                  obs.type === 'wall' ? 'bg-gray-700 border-4 border-gray-500' :
+                  obs.type === 'gap' ? 'bg-black/80' :
+                  'bg-red-600 border-4 border-red-400'
+                }`}
+                style={{
+                  left: `${(obs.x / 1200) * 100}%`,
+                  bottom: '80px',
+                  width: obs.type === 'wall' ? '50px' : '80px',
+                  height: obs.type === 'wall' ? '100px' : '30px',
+                  transform: 'translateX(-50%)'
+                }}
+                title="클릭하여 삭제"
+              >
+                {obs.type === 'wall' && <span className="text-2xl">🧱</span>}
+                {obs.type === 'hazard' && <span className="text-lg">⚠️</span>}
+              </div>
+            ))}
+
+            {/* 선택된 도구 안내 */}
+            {editorSelectedTool && (
+              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-lg">
+                캔버스를 클릭하여 배치하세요
+              </div>
+            )}
           </div>
         </div>
 
-        {/* 오른쪽: 설정 패널 */}
-        <div className="w-80 bg-slate-900 border-l border-white/10 p-4 overflow-y-auto">
+        {/* 오른쪽: 도구 패널 */}
+        <div className="w-72 bg-slate-900 border-l border-white/10 p-4 overflow-y-auto">
+          {/* 토큰 설정 */}
           <div className="mb-6">
-            <h3 className="text-white font-bold mb-3">토큰 수</h3>
+            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+              <Zap size={18} className="text-yellow-400" /> 토큰 수
+            </h3>
             <div className="flex items-center gap-3">
               <button onClick={() => setEditorTokens(Math.max(1, editorTokens - 1))} className="p-2 bg-white/10 rounded hover:bg-white/20">
                 <Minus size={16} className="text-white" />
@@ -3833,47 +3883,104 @@ const LogosGame = () => {
             </div>
           </div>
 
+          {/* 배치 도구 */}
           <div className="mb-6">
-            <h3 className="text-white font-bold mb-2">시작 위치</h3>
-            <input type="range" min="50" max="200" value={editorStartX} onChange={(e) => setEditorStartX(Number(e.target.value))} className="w-full" />
-            <span className="text-white/50 text-sm">{editorStartX}px</span>
-          </div>
+            <h3 className="text-white font-bold mb-3">배치하기</h3>
+            <p className="text-white/50 text-xs mb-3">아래 아이템을 선택 후 캔버스 클릭</p>
 
-          <div className="mb-6">
-            <h3 className="text-white font-bold mb-2">도착 위치</h3>
-            <input type="range" min="600" max="1100" value={editorGoalX} onChange={(e) => setEditorGoalX(Number(e.target.value))} className="w-full" />
-            <span className="text-white/50 text-sm">{editorGoalX}px</span>
-          </div>
+            <div className="space-y-2">
+              {/* 시작 지점 */}
+              <button
+                onClick={() => setEditorSelectedTool(editorSelectedTool === 'start' ? null : 'start')}
+                className={`w-full p-3 rounded-lg flex items-center gap-3 transition-all ${
+                  editorSelectedTool === 'start' ? 'bg-blue-600 ring-2 ring-blue-400' : 'bg-white/10 hover:bg-white/20'
+                }`}
+              >
+                <span className="text-2xl">🧑</span>
+                <div className="text-left">
+                  <div className="text-white font-bold">시작 지점</div>
+                  <div className="text-white/50 text-xs">캐릭터 시작 위치</div>
+                </div>
+              </button>
 
-          <div className="mb-6">
-            <h3 className="text-white font-bold mb-3">장애물 추가</h3>
-            <div className="grid grid-cols-3 gap-2">
-              <button onClick={() => addEditorObstacle('wall')} className="p-3 bg-gray-600 hover:bg-gray-500 rounded-lg flex flex-col items-center">
-                <Square size={24} className="text-white" />
-                <span className="text-white text-xs mt-1">벽</span>
-              </button>
-              <button onClick={() => addEditorObstacle('gap')} className="p-3 bg-black border border-white/20 hover:bg-gray-800 rounded-lg flex flex-col items-center">
-                <Minus size={24} className="text-white" />
-                <span className="text-white text-xs mt-1">구멍</span>
-              </button>
-              <button onClick={() => addEditorObstacle('hazard')} className="p-3 bg-red-600 hover:bg-red-500 rounded-lg flex flex-col items-center">
-                <Triangle size={24} className="text-white" />
-                <span className="text-white text-xs mt-1">위험</span>
+              {/* 도착 지점 */}
+              <button
+                onClick={() => setEditorSelectedTool(editorSelectedTool === 'goal' ? null : 'goal')}
+                className={`w-full p-3 rounded-lg flex items-center gap-3 transition-all ${
+                  editorSelectedTool === 'goal' ? 'bg-amber-600 ring-2 ring-amber-400' : 'bg-white/10 hover:bg-white/20'
+                }`}
+              >
+                <span className="text-2xl">🏠</span>
+                <div className="text-left">
+                  <div className="text-white font-bold">도착 지점</div>
+                  <div className="text-white/50 text-xs">목표 위치</div>
+                </div>
               </button>
             </div>
           </div>
 
+          {/* 장애물 */}
+          <div className="mb-6">
+            <h3 className="text-white font-bold mb-3">장애물</h3>
+            <div className="space-y-2">
+              <button
+                onClick={() => setEditorSelectedTool(editorSelectedTool === 'wall' ? null : 'wall')}
+                className={`w-full p-3 rounded-lg flex items-center gap-3 transition-all ${
+                  editorSelectedTool === 'wall' ? 'bg-gray-600 ring-2 ring-gray-400' : 'bg-white/10 hover:bg-white/20'
+                }`}
+              >
+                <span className="text-2xl">🧱</span>
+                <div className="text-left">
+                  <div className="text-white font-bold">벽</div>
+                  <div className="text-white/50 text-xs">넘어야 하는 장애물</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setEditorSelectedTool(editorSelectedTool === 'gap' ? null : 'gap')}
+                className={`w-full p-3 rounded-lg flex items-center gap-3 transition-all ${
+                  editorSelectedTool === 'gap' ? 'bg-black ring-2 ring-white/50' : 'bg-white/10 hover:bg-white/20'
+                }`}
+              >
+                <span className="text-2xl">🕳️</span>
+                <div className="text-left">
+                  <div className="text-white font-bold">구멍</div>
+                  <div className="text-white/50 text-xs">떨어지면 실패</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setEditorSelectedTool(editorSelectedTool === 'hazard' ? null : 'hazard')}
+                className={`w-full p-3 rounded-lg flex items-center gap-3 transition-all ${
+                  editorSelectedTool === 'hazard' ? 'bg-red-600 ring-2 ring-red-400' : 'bg-white/10 hover:bg-white/20'
+                }`}
+              >
+                <span className="text-2xl">⚠️</span>
+                <div className="text-left">
+                  <div className="text-white font-bold">위험 지역</div>
+                  <div className="text-white/50 text-xs">닿으면 실패</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* 배치된 장애물 목록 */}
           <div>
-            <h3 className="text-white font-bold mb-2">장애물 ({editorObstacles.length})</h3>
-            <div className="space-y-1 max-h-40 overflow-y-auto">
+            <h3 className="text-white font-bold mb-2">배치된 장애물 ({editorObstacles.length})</h3>
+            <div className="space-y-1 max-h-32 overflow-y-auto">
               {editorObstacles.map(obs => (
                 <div key={obs.id} className="flex items-center justify-between bg-white/5 rounded p-2 text-sm">
-                  <span className="text-white">{obs.type === 'wall' ? '벽' : obs.type === 'gap' ? '구멍' : '위험'}</span>
-                  <button onClick={() => removeEditorObstacle(obs.id)} className="text-red-400 hover:text-red-300">
+                  <span className="text-white">
+                    {obs.type === 'wall' ? '🧱 벽' : obs.type === 'gap' ? '🕳️ 구멍' : '⚠️ 위험'}
+                  </span>
+                  <button onClick={(e) => removeEditorObstacle(obs.id, e)} className="text-red-400 hover:text-red-300">
                     <Trash2 size={14} />
                   </button>
                 </div>
               ))}
+              {editorObstacles.length === 0 && (
+                <p className="text-white/30 text-sm">장애물을 추가하세요</p>
+              )}
             </div>
           </div>
         </div>
