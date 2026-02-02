@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2, ChevronLeft, ChevronRight, Lock, Star, Sparkles, Home } from 'lucide-react';
+import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2, ChevronLeft, ChevronRight, Lock, Star, Sparkles, Home, MapPin, Flag, Square, Triangle, Minus, Plus, Save, Trash2, Move } from 'lucide-react';
 import objectsData from './objects.json';
 import stagesData from './stages.json';
 
@@ -16,6 +16,21 @@ const LogosGame = () => {
   const [selectedStage, setSelectedStage] = useState(1);
   const [clearedStages, setClearedStages] = useState({});
   const [stageObstacles, setStageObstacles] = useState([]);
+
+  // --- 맵 에디터 ---
+  const [mapEditorMode, setMapEditorMode] = useState(false);
+  const [editorTool, setEditorTool] = useState('select'); // 'select' | 'start' | 'goal' | 'wall' | 'gap' | 'hazard' | 'delete'
+  const [customStartX, setCustomStartX] = useState(50);
+  const [customGoalX, setCustomGoalX] = useState(800);
+  const [customObstacles, setCustomObstacles] = useState([]);
+  const [customTokens, setCustomTokens] = useState(8);
+  const [allowedObjects, setAllowedObjects] = useState([]); // 비어있으면 모두 허용
+  const [savedMaps, setSavedMaps] = useState(() => {
+    try {
+      const saved = localStorage.getItem('custom_maps');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
 
   // --- 게임 상태 관리 ---
   const [gameState, setGameState] = useState('planning');
@@ -3724,6 +3739,320 @@ const LogosGame = () => {
     }
   };
 
+  // 맵 에디터에서 장애물 추가
+  const addObstacle = (type, x) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const FLOOR_OFFSET = 130;
+    const floorY = canvas.height - FLOOR_OFFSET;
+
+    const newObs = {
+      id: Date.now(),
+      type,
+      x,
+      width: type === 'wall' ? 60 : 100,
+      height: type === 'wall' ? 150 : 30,
+      y: type === 'wall' ? floorY - 150 : floorY - 30
+    };
+    setCustomObstacles(prev => [...prev, newObs]);
+  };
+
+  // 맵 에디터에서 장애물 삭제
+  const removeObstacle = (id) => {
+    setCustomObstacles(prev => prev.filter(obs => obs.id !== id));
+  };
+
+  // 맵 저장
+  const saveMap = () => {
+    const mapData = {
+      id: Date.now(),
+      name: `내 맵 ${savedMaps.length + 1}`,
+      startX: customStartX,
+      goalX: customGoalX,
+      tokens: customTokens,
+      obstacles: customObstacles,
+      allowedObjects: allowedObjects,
+      createdAt: new Date().toISOString()
+    };
+    const newMaps = [...savedMaps, mapData];
+    setSavedMaps(newMaps);
+    localStorage.setItem('custom_maps', JSON.stringify(newMaps));
+    alert('맵이 저장되었습니다!');
+  };
+
+  // 맵 불러오기
+  const loadMap = (mapData) => {
+    setCustomStartX(mapData.startX);
+    setCustomGoalX(mapData.goalX);
+    setCustomTokens(mapData.tokens);
+    setCustomObstacles(mapData.obstacles || []);
+    setAllowedObjects(mapData.allowedObjects || []);
+  };
+
+  // 맵 삭제
+  const deleteMap = (id) => {
+    const newMaps = savedMaps.filter(m => m.id !== id);
+    setSavedMaps(newMaps);
+    localStorage.setItem('custom_maps', JSON.stringify(newMaps));
+  };
+
+  // 커스텀 맵 플레이
+  const playCustomMap = () => {
+    setIsCreativeMode(false);
+    setMapEditorMode(false);
+    setTokens(customTokens);
+    setStageObstacles(customObstacles.map(obs => ({
+      ...obs,
+      type: obs.type,
+      color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
+    })));
+
+    // 플레이어 시작 위치 설정
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const FLOOR_OFFSET = 130;
+      playerRef.current.x = customStartX;
+      playerRef.current.y = canvas.height - FLOOR_OFFSET - 100;
+    }
+
+    setMessages([
+      { id: 1, role: 'ai', text: "커스텀 맵 플레이!" },
+      { id: 2, role: 'ai', text: `토큰 ${customTokens}개로 목표에 도달하세요.` }
+    ]);
+
+    setScreen('game');
+  };
+
+  // 맵 에디터 화면
+  if (screen === 'mapEditor') {
+    return (
+      <div className="w-screen h-screen overflow-hidden relative bg-gradient-to-b from-slate-900 to-slate-950 flex" style={{ maxHeight: '100dvh' }}>
+        {/* 왼쪽: 캔버스 미리보기 */}
+        <div className="flex-1 flex flex-col">
+          {/* 상단 헤더 */}
+          <div className="p-4 flex items-center justify-between bg-black/30">
+            <button
+              onClick={() => setScreen('menu')}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-bold"
+            >
+              <ChevronLeft size={20} />
+              뒤로
+            </button>
+            <h1 className="text-2xl font-black text-white">맵 에디터</h1>
+            <div className="flex gap-2">
+              <button
+                onClick={saveMap}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 rounded-xl text-white font-bold"
+              >
+                <Save size={18} />
+                저장
+              </button>
+              <button
+                onClick={playCustomMap}
+                className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 rounded-xl text-black font-bold"
+              >
+                <Play size={18} />
+                플레이
+              </button>
+            </div>
+          </div>
+
+          {/* 미리보기 영역 */}
+          <div className="flex-1 relative bg-slate-800 m-4 rounded-xl overflow-hidden">
+            <div className="absolute inset-0 p-4">
+              {/* 간단한 미리보기 */}
+              <div className="w-full h-full bg-gradient-to-b from-sky-400 to-sky-600 rounded-lg relative">
+                {/* 바닥 */}
+                <div className="absolute bottom-0 left-0 right-0 h-16 bg-green-700" />
+
+                {/* 시작 지점 */}
+                <div
+                  className="absolute bottom-16 w-8 h-16 bg-blue-500 rounded flex items-center justify-center"
+                  style={{ left: `${(customStartX / 1000) * 100}%` }}
+                >
+                  <MapPin size={16} className="text-white" />
+                </div>
+
+                {/* 도착 지점 */}
+                <div
+                  className="absolute bottom-16 w-12 h-20 bg-amber-500 rounded flex items-center justify-center"
+                  style={{ left: `${(customGoalX / 1000) * 100}%` }}
+                >
+                  <Flag size={20} className="text-white" />
+                </div>
+
+                {/* 장애물들 */}
+                {customObstacles.map(obs => (
+                  <div
+                    key={obs.id}
+                    className={`absolute cursor-pointer hover:opacity-70 ${
+                      obs.type === 'wall' ? 'bg-gray-600' :
+                      obs.type === 'gap' ? 'bg-black' :
+                      'bg-red-500'
+                    }`}
+                    style={{
+                      left: `${(obs.x / 1000) * 100}%`,
+                      bottom: obs.type === 'wall' ? '64px' : '64px',
+                      width: `${(obs.width / 1000) * 100}%`,
+                      height: obs.type === 'wall' ? '60px' : '20px'
+                    }}
+                    onClick={() => removeObstacle(obs.id)}
+                    title="클릭해서 삭제"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 오른쪽: 도구 패널 */}
+        <div className="w-80 bg-slate-900 border-l border-white/10 p-4 overflow-y-auto">
+          {/* 기본 설정 */}
+          <div className="mb-6">
+            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+              <Settings size={18} />
+              기본 설정
+            </h3>
+
+            {/* 토큰 수 */}
+            <div className="mb-4">
+              <label className="text-white/70 text-sm block mb-2">토큰 수</label>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCustomTokens(Math.max(1, customTokens - 1))}
+                  className="p-2 bg-white/10 rounded hover:bg-white/20"
+                >
+                  <Minus size={16} className="text-white" />
+                </button>
+                <span className="text-white font-bold text-xl w-12 text-center">{customTokens}</span>
+                <button
+                  onClick={() => setCustomTokens(Math.min(20, customTokens + 1))}
+                  className="p-2 bg-white/10 rounded hover:bg-white/20"
+                >
+                  <Plus size={16} className="text-white" />
+                </button>
+              </div>
+            </div>
+
+            {/* 시작 위치 */}
+            <div className="mb-4">
+              <label className="text-white/70 text-sm block mb-2">시작 위치 (X)</label>
+              <input
+                type="range"
+                min="50"
+                max="300"
+                value={customStartX}
+                onChange={(e) => setCustomStartX(Number(e.target.value))}
+                className="w-full"
+              />
+              <span className="text-white/50 text-xs">{customStartX}px</span>
+            </div>
+
+            {/* 도착 위치 */}
+            <div className="mb-4">
+              <label className="text-white/70 text-sm block mb-2">도착 위치 (X)</label>
+              <input
+                type="range"
+                min="500"
+                max="1500"
+                value={customGoalX}
+                onChange={(e) => setCustomGoalX(Number(e.target.value))}
+                className="w-full"
+              />
+              <span className="text-white/50 text-xs">{customGoalX}px</span>
+            </div>
+          </div>
+
+          {/* 장애물 추가 */}
+          <div className="mb-6">
+            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+              <Square size={18} />
+              장애물 추가
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => addObstacle('wall', 300 + Math.random() * 400)}
+                className="p-3 bg-gray-600 hover:bg-gray-500 rounded-lg flex flex-col items-center gap-1"
+              >
+                <Square size={24} className="text-white" />
+                <span className="text-white text-xs">벽</span>
+              </button>
+              <button
+                onClick={() => addObstacle('gap', 300 + Math.random() * 400)}
+                className="p-3 bg-black hover:bg-gray-800 rounded-lg flex flex-col items-center gap-1 border border-white/20"
+              >
+                <Minus size={24} className="text-white" />
+                <span className="text-white text-xs">구멍</span>
+              </button>
+              <button
+                onClick={() => addObstacle('hazard', 300 + Math.random() * 400)}
+                className="p-3 bg-red-600 hover:bg-red-500 rounded-lg flex flex-col items-center gap-1"
+              >
+                <Triangle size={24} className="text-white" />
+                <span className="text-white text-xs">위험</span>
+              </button>
+            </div>
+            <p className="text-white/40 text-xs mt-2">* 미리보기에서 장애물 클릭시 삭제</p>
+          </div>
+
+          {/* 현재 장애물 목록 */}
+          <div className="mb-6">
+            <h3 className="text-white font-bold mb-3">장애물 목록 ({customObstacles.length})</h3>
+            <div className="space-y-2 max-h-32 overflow-y-auto">
+              {customObstacles.map(obs => (
+                <div key={obs.id} className="flex items-center justify-between bg-white/5 rounded p-2">
+                  <span className="text-white text-sm">
+                    {obs.type === 'wall' ? '벽' : obs.type === 'gap' ? '구멍' : '위험'} (x:{Math.round(obs.x)})
+                  </span>
+                  <button
+                    onClick={() => removeObstacle(obs.id)}
+                    className="p-1 hover:bg-red-500/50 rounded"
+                  >
+                    <Trash2 size={14} className="text-red-400" />
+                  </button>
+                </div>
+              ))}
+              {customObstacles.length === 0 && (
+                <p className="text-white/30 text-sm">장애물 없음</p>
+              )}
+            </div>
+          </div>
+
+          {/* 저장된 맵 */}
+          <div>
+            <h3 className="text-white font-bold mb-3">저장된 맵 ({savedMaps.length})</h3>
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {savedMaps.map(map => (
+                <div key={map.id} className="flex items-center justify-between bg-white/5 rounded p-2">
+                  <span className="text-white text-sm truncate flex-1">{map.name}</span>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => loadMap(map)}
+                      className="p-1 hover:bg-blue-500/50 rounded text-blue-400"
+                      title="불러오기"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                    <button
+                      onClick={() => deleteMap(map.id)}
+                      className="p-1 hover:bg-red-500/50 rounded text-red-400"
+                      title="삭제"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {savedMaps.length === 0 && (
+                <p className="text-white/30 text-sm">저장된 맵 없음</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // 스테이지 선택 화면
   if (screen === 'stageSelect') {
     const currentWorldData = stagesData.worlds.find(w => w.id === selectedWorld);
@@ -3896,11 +4225,11 @@ const LogosGame = () => {
 
             {/* 맵 만들기 */}
             <button
-              onClick={() => startCreativeMode()}
+              onClick={() => setScreen('mapEditor')}
               className="group bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-black text-4xl py-8 px-12 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <Sparkles size={48} />
+              <PenTool size={48} />
               맵 만들기
             </button>
 
