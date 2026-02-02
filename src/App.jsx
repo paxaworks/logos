@@ -3737,15 +3737,33 @@ const LogosGame = () => {
 
   // 맵 에디터: 선택된 도구
   const [editorSelectedTool, setEditorSelectedTool] = useState(null); // 'start' | 'goal' | 'wall' | 'hazard' | 'ground'
+  const [editorMousePos, setEditorMousePos] = useState({ x: 0, y: 0 });
   const editorCanvasRef = useRef(null);
+
+  // 마우스 좌표 변환 함수
+  const getEditorCanvasCoords = (e) => {
+    const canvas = editorCanvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: Math.round((e.clientX - rect.left) * scaleX),
+      y: Math.round((e.clientY - rect.top) * scaleY)
+    };
+  };
+
+  // 마우스 이동 추적
+  const handleEditorMouseMove = (e) => {
+    const coords = getEditorCanvasCoords(e);
+    setEditorMousePos(coords);
+  };
 
   // 맵 에디터: 캔버스 클릭시 배치 (X, Y 자유롭게)
   const handleEditorCanvasClick = (e) => {
     if (!editorSelectedTool) return;
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = Math.round((e.clientX - rect.left) / rect.width * 1200);
-    const y = Math.round((e.clientY - rect.top) / rect.height * 500);
+    const { x, y } = getEditorCanvasCoords(e);
 
     if (editorSelectedTool === 'start') {
       setEditorStart({ x, y });
@@ -3775,9 +3793,7 @@ const LogosGame = () => {
   // 맵 에디터에서 아이템 삭제 (우클릭)
   const handleEditorRightClick = (e) => {
     e.preventDefault();
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = Math.round((e.clientX - rect.left) / rect.width * 1200);
-    const y = Math.round((e.clientY - rect.top) / rect.height * 500);
+    const { x, y } = getEditorCanvasCoords(e);
 
     // 클릭 위치 근처의 장애물 찾기
     const obsToRemove = editorObstacles.find(obs => {
@@ -3929,6 +3945,77 @@ const LogosGame = () => {
       ctx.fillText('도착', editorGoal.x, editorGoal.y - goalHeight - 7);
     }
 
+    // 마우스 위치에 미리보기 표시
+    if (editorSelectedTool && editorMousePos.x > 0 && editorMousePos.y > 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+
+      const mx = editorMousePos.x;
+      const my = editorMousePos.y;
+
+      if (editorSelectedTool === 'start') {
+        // 캐릭터 미리보기
+        const drawHeight = 90;
+        const drawWidth = 75;
+        ctx.strokeStyle = '#3B82F6';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(mx - drawWidth / 2, my - drawHeight, drawWidth, drawHeight);
+        ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+        ctx.fillRect(mx - drawWidth / 2, my - drawHeight, drawWidth, drawHeight);
+      } else if (editorSelectedTool === 'goal') {
+        // 집 미리보기
+        const goalWidth = 160;
+        const goalHeight = 130;
+        ctx.strokeStyle = '#F59E0B';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(mx - goalWidth / 2, my - goalHeight, goalWidth, goalHeight);
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.3)';
+        ctx.fillRect(mx - goalWidth / 2, my - goalHeight, goalWidth, goalHeight);
+      } else if (editorSelectedTool === 'ground') {
+        // 바닥 미리보기
+        const groundWidth = 192;
+        const groundHeight = 64;
+        ctx.strokeStyle = '#22C55E';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(mx - groundWidth / 2, my, groundWidth, groundHeight);
+        ctx.fillStyle = 'rgba(34, 197, 94, 0.3)';
+        ctx.fillRect(mx - groundWidth / 2, my, groundWidth, groundHeight);
+      } else if (editorSelectedTool === 'wall') {
+        // 벽 미리보기
+        const wallWidth = 60;
+        const wallHeight = 150;
+        ctx.strokeStyle = '#6B7280';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(mx - wallWidth / 2, my - wallHeight, wallWidth, wallHeight);
+        ctx.fillStyle = 'rgba(107, 114, 128, 0.3)';
+        ctx.fillRect(mx - wallWidth / 2, my - wallHeight, wallWidth, wallHeight);
+      } else if (editorSelectedTool === 'hazard') {
+        // 가시 미리보기
+        const hazardWidth = 120;
+        const hazardHeight = 40;
+        ctx.strokeStyle = '#DC2626';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(mx - hazardWidth / 2, my - hazardHeight, hazardWidth, hazardHeight);
+        ctx.fillStyle = 'rgba(220, 38, 38, 0.3)';
+        ctx.fillRect(mx - hazardWidth / 2, my - hazardHeight, hazardWidth, hazardHeight);
+      }
+
+      ctx.restore();
+
+      // 좌표 표시
+      ctx.fillStyle = 'rgba(0,0,0,0.8)';
+      ctx.fillRect(mx + 15, my - 25, 70, 20);
+      ctx.fillStyle = '#fff';
+      ctx.font = '11px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${mx}, ${my}`, mx + 20, my - 11);
+    }
+
     // 선택된 도구 안내
     if (editorSelectedTool) {
       ctx.fillStyle = 'rgba(0,0,0,0.8)';
@@ -3938,7 +4025,7 @@ const LogosGame = () => {
       ctx.textAlign = 'center';
       ctx.fillText('좌클릭: 배치 / 우클릭: 삭제', width / 2, 36);
     }
-  }, [editorStart, editorGoal, editorObstacles, editorGrounds, editorSelectedTool]);
+  }, [editorStart, editorGoal, editorObstacles, editorGrounds, editorSelectedTool, editorMousePos]);
 
   // 에디터 캔버스 업데이트
   useEffect(() => {
@@ -3991,6 +4078,8 @@ const LogosGame = () => {
               className={`w-full h-full ${editorSelectedTool ? 'cursor-crosshair' : 'cursor-default'}`}
               onClick={handleEditorCanvasClick}
               onContextMenu={handleEditorRightClick}
+              onMouseMove={handleEditorMouseMove}
+              onMouseLeave={() => setEditorMousePos({ x: 0, y: 0 })}
             />
           </div>
         </div>
