@@ -21,10 +21,7 @@ const LogosGame = () => {
   const [editorStart, setEditorStart] = useState({ x: 100, y: 350 });
   const [editorGoal, setEditorGoal] = useState({ x: 1000, y: 350 });
   const [editorObstacles, setEditorObstacles] = useState([]);
-  const [editorGrounds, setEditorGrounds] = useState([
-    { id: 1, x: 0, y: 420, width: 300 },
-    { id: 2, x: 900, y: 420, width: 300 }
-  ]);
+  const [editorGrounds, setEditorGrounds] = useState([]);
   const [editorTokens, setEditorTokens] = useState(8);
   const [savedMaps, setSavedMaps] = useState([]);
 
