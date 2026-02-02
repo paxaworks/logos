@@ -555,15 +555,32 @@ const LogosGame = () => {
     setGameState('planning');
     const canvas = canvasRef.current;
     const FLOOR_OFFSET = 130;
+
+    // 커스텀 맵이면 커스텀 시작 위치로, 아니면 기본 위치로
+    let startX = 50;
+    let startY = canvas ? canvas.height - FLOOR_OFFSET - 100 : 500;
+
+    if (isCustomMap && customMapData && canvas) {
+      startX = customMapData.start.xRatio * canvas.width - 20;
+      startY = customMapData.start.yRatio * canvas.height - 60;
+    }
+
     playerRef.current = {
       ...INITIAL_PLAYER,
-      x: 50,
-      y: canvas ? canvas.height - FLOOR_OFFSET - 100 : 500
+      x: startX,
+      y: startY
     };
     setObjects([]);
     objectsRef.current = [];
     setInventory([]);
-    setTokens(MAX_TOKENS);
+
+    // 커스텀 맵이면 에디터에서 설정한 토큰 수, 아니면 기본 토큰
+    if (isCustomMap && customMapData) {
+      setTokens(editorTokens);
+    } else {
+      setTokens(MAX_TOKENS);
+    }
+
     setSelectedSlot(null);
     setMessages([
       { id: Date.now(), role: 'ai', text: "리셋 완료! 새로운 오브젝트를 만들어보세요." }
