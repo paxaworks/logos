@@ -1,10 +1,23 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2 } from 'lucide-react';
+import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2, ChevronLeft, ChevronRight, Lock, Star, Sparkles, Upload, Image, Trash2, Home } from 'lucide-react';
 import objectsData from './objects.json';
+import stagesData from './stages.json';
 
 const LogosGame = () => {
   // --- 게임 화면 상태 ---
-  const [screen, setScreen] = useState('menu'); // 'menu' | 'game'
+  const [screen, setScreen] = useState('menu'); // 'menu' | 'stageSelect' | 'game'
+
+  // --- 게임 모드 ---
+  const [gameMode, setGameMode] = useState('stage'); // 'stage' | 'creative'
+
+  // --- 스테이지 시스템 ---
+  const [selectedWorld, setSelectedWorld] = useState(1);
+  const [selectedStage, setSelectedStage] = useState(1);
+  const [clearedStages, setClearedStages] = useState(() => {
+    const saved = localStorage.getItem('cleared_stages');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [stageObstacles, setStageObstacles] = useState([]); // 현재 스테이지의 장애물
 
   // --- 게임 상태 관리 ---
   const [gameState, setGameState] = useState('planning');
@@ -20,9 +33,21 @@ const LogosGame = () => {
   const MAX_TOKENS = 8;
   const [tokens, setTokens] = useState(MAX_TOKENS);
 
+  // 크리에이티브 모드용 무제한 토큰
+  const [isCreativeMode, setIsCreativeMode] = useState(false);
+
   // 설정
   const [showSettings, setShowSettings] = useState(false);
   const [selectedMode, setSelectedMode] = useState('basic');
+
+  // PNG 교체 시스템
+  const [showImageReplacer, setShowImageReplacer] = useState(false);
+  const [customImages, setCustomImages] = useState(() => {
+    const saved = localStorage.getItem('custom_images');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const fileInputRef = useRef(null);
+  const [selectedObjectForImage, setSelectedObjectForImage] = useState(null);
 
   // 게임 설정
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('sound_enabled') !== 'false');
@@ -458,7 +483,7 @@ const LogosGame = () => {
     if (!prompt.trim()) return;
     if (gameState !== 'planning') return;
 
-    if (tokens <= 0) {
+    if (!isCreativeMode && tokens <= 0) {
       setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "토큰이 부족해요! 리셋하면 토큰이 충전돼요." }]);
       return;
     }
@@ -497,7 +522,9 @@ const LogosGame = () => {
     };
 
     setInventory(prev => [...prev, newItem]);
-    setTokens(prev => prev - 1);
+    if (!isCreativeMode) {
+      setTokens(prev => prev - 1);
+    }
     setIsTyping(false);
     setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', text: chatResponse }]);
   };
@@ -530,19 +557,119 @@ const LogosGame = () => {
     setGameState('planning');
     const canvas = canvasRef.current;
     const FLOOR_OFFSET = 130;
+
+    // 스테이지 모드면 스테이지 설정 적용
+    const currentStageData = getCurrentStageData();
+    const startX = currentStageData?.playerStart?.x || 50;
+
     playerRef.current = {
       ...INITIAL_PLAYER,
-      x: 50,
+      x: startX,
       y: canvas ? canvas.height - FLOOR_OFFSET - 100 : 500
     };
     setObjects([]);
     objectsRef.current = [];
     setInventory([]);
-    setTokens(MAX_TOKENS);
+
+    // 크리에이티브 모드면 무제한, 아니면 스테이지 토큰 수
+    if (isCreativeMode) {
+      setTokens(999);
+    } else {
+      setTokens(currentStageData?.tokens || MAX_TOKENS);
+    }
+
     setSelectedSlot(null);
     setMessages([
-      { id: Date.now(), role: 'ai', text: "리셋 완료! 새로운 오브젝트를 만들어보세요." }
+      { id: Date.now(), role: 'ai', text: isCreativeMode ? "크리에이티브 모드! 자유롭게 만들어보세요." : "리셋 완료! 새로운 오브젝트를 만들어보세요." }
     ]);
+
+    // 스테이지 장애물 로드
+    if (!isCreativeMode && currentStageData?.obstacles) {
+      loadStageObstacles(currentStageData.obstacles);
+    } else {
+      setStageObstacles([]);
+    }
+  };
+
+  // 현재 스테이지 데이터 가져오기
+  const getCurrentStageData = () => {
+    if (isCreativeMode) return null;
+    const world = stagesData.worlds.find(w => w.id === selectedWorld);
+    if (!world) return null;
+    return world.stages.find(s => s.id === selectedStage);
+  };
+
+  // 스테이지 장애물 로드
+  const loadStageObstacles = (obstacles) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const FLOOR_OFFSET = 130;
+    const floorY = canvas.height - FLOOR_OFFSET;
+
+    const loadedObstacles = obstacles.map((obs, idx) => {
+      if (obs.type === 'gap') {
+        return {
+          id: `obstacle_${idx}`,
+          type: 'gap',
+          x: obs.x,
+          width: obs.width,
+          y: floorY,
+          height: 50
+        };
+      } else if (obs.type === 'wall') {
+        return {
+          id: `obstacle_${idx}`,
+          type: 'wall',
+          x: obs.x,
+          width: 60,
+          y: floorY - obs.height,
+          height: obs.height,
+          color: '#4B5563'
+        };
+      } else if (obs.type === 'hazard') {
+        return {
+          id: `obstacle_${idx}`,
+          type: 'hazard',
+          x: obs.x,
+          width: obs.width,
+          y: floorY - 30,
+          height: 30,
+          color: '#EF4444',
+          physics: 'hazard'
+        };
+      }
+      return null;
+    }).filter(Boolean);
+
+    setStageObstacles(loadedObstacles);
+  };
+
+  // 스테이지 클리어 처리
+  const handleStageClear = () => {
+    if (isCreativeMode) return;
+
+    const stageKey = `${selectedWorld}-${selectedStage}`;
+    const newCleared = { ...clearedStages, [stageKey]: true };
+    setClearedStages(newCleared);
+    localStorage.setItem('cleared_stages', JSON.stringify(newCleared));
+  };
+
+  // 스테이지 클리어 여부 확인
+  const isStageCleared = (worldId, stageId) => {
+    return clearedStages[`${worldId}-${stageId}`] === true;
+  };
+
+  // 스테이지 잠금 여부 확인 (이전 스테이지 클리어해야 잠금 해제)
+  const isStageUnlocked = (worldId, stageId) => {
+    if (stageId === 1) {
+      // 첫 스테이지는 해당 월드가 첫 월드거나 이전 월드의 마지막 스테이지를 클리어했으면 해금
+      if (worldId === 1) return true;
+      const prevWorld = stagesData.worlds.find(w => w.id === worldId - 1);
+      if (!prevWorld) return true;
+      return isStageCleared(worldId - 1, prevWorld.stages.length);
+    }
+    return isStageCleared(worldId, stageId - 1);
   };
 
   const getSurfaceHeight = (obj, px) => {
@@ -1451,6 +1578,54 @@ const LogosGame = () => {
       if (p.x < groundWidth && p.x + p.width > 0 && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
       if (p.x + p.width > canvas.width - groundWidth && p.x < canvas.width && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
 
+      // 스테이지 장애물 충돌 체크
+      stageObstacles.forEach(obs => {
+        if (obs.type === 'gap') {
+          // 구멍: 겹치면 빠짐 (아무 처리 없음, 아래로 떨어짐)
+          // 구멍 위치에 바닥이 없으므로 자연스럽게 떨어짐
+        } else if (obs.type === 'wall') {
+          // 벽 충돌
+          const pRight = p.x + p.width;
+          const pBottom = p.y + p.height;
+          const obsRight = obs.x + obs.width;
+          const obsBottom = obs.y + obs.height;
+
+          // X축 겹침
+          if (pRight > obs.x && p.x < obsRight) {
+            // Y축 겹침
+            if (pBottom > obs.y && p.y < obsBottom) {
+              // 위에서 밟기 (STEP_HEIGHT 이내)
+              const distToTop = pBottom - obs.y;
+              if (distToTop >= 0 && distToTop <= STEP_HEIGHT && p.vy >= 0) {
+                p.y = obs.y - p.height;
+                p.vy = 0;
+                p.grounded = true;
+              } else {
+                // 옆면 충돌
+                const overlapLeft = pRight - obs.x;
+                const overlapRight = obsRight - p.x;
+                if (overlapLeft < overlapRight) {
+                  p.x = obs.x - p.width;
+                } else {
+                  p.x = obsRight;
+                }
+              }
+            }
+          }
+        } else if (obs.type === 'hazard') {
+          // 위험 지역 충돌 체크
+          const pRight = p.x + p.width;
+          const pBottom = p.y + p.height;
+          const obsRight = obs.x + obs.width;
+          const obsBottom = obs.y + obs.height;
+
+          if (pRight > obs.x && p.x < obsRight && pBottom > obs.y && p.y < obsBottom) {
+            setGameState('lost');
+            p.vx = 0;
+          }
+        }
+      });
+
       let onIce = false;
       let inWater = false;
       let inSlow = false;
@@ -1642,7 +1817,8 @@ const LogosGame = () => {
           p.y + p.height > goalY + goalHeight * 0.5 && p.y + p.height <= floorY + 5) {
         setGameState('won');
         p.vx = 0;
-        setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "축하해요! 목표에 도착했어요!" }]);
+        handleStageClear(); // 스테이지 클리어 처리
+        setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: isCreativeMode ? "목표 도착!" : "축하해요! 스테이지 클리어!" }]);
       }
     }
   };
@@ -2727,7 +2903,25 @@ const LogosGame = () => {
     ctx.restore();
   };
 
+  // 커스텀 이미지 캐시
+  const customImageCacheRef = useRef({});
+
   const drawCompositeShape = (ctx, obj, x, y, w, h) => {
+    // 커스텀 이미지가 있으면 사용
+    if (obj.name && customImages[obj.name]) {
+      // 캐시된 이미지 사용
+      if (!customImageCacheRef.current[obj.name]) {
+        const img = new window.Image();
+        img.src = customImages[obj.name];
+        customImageCacheRef.current[obj.name] = img;
+      }
+      const cachedImg = customImageCacheRef.current[obj.name];
+      if (cachedImg.complete) {
+        ctx.drawImage(cachedImg, x, y, w, h);
+        return;
+      }
+    }
+
     // 우산은 별도 함수로 그리기
     if (obj.name === '우산') {
       drawUmbrella(ctx, x, y, w, h, obj.color);
@@ -3331,6 +3525,53 @@ const LogosGame = () => {
     // 오른쪽 바닥 - 타일맵 방식 (64px * 3 = 192px)
     drawGroundTiles(ctx, canvas, canvas.width - 192, canvas.width, floorY);
 
+    // 스테이지 장애물 렌더링
+    stageObstacles.forEach(obs => {
+      if (obs.type === 'gap') {
+        // 구멍은 배경 색으로 (투명 처리)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+        // 경계선
+        ctx.strokeStyle = '#374151';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+      } else if (obs.type === 'wall') {
+        // 벽
+        ctx.fillStyle = obs.color || '#4B5563';
+        ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+        // 벽돌 패턴
+        ctx.strokeStyle = '#374151';
+        ctx.lineWidth = 1;
+        const brickH = 20;
+        const brickW = 30;
+        for (let row = 0; row < Math.ceil(obs.height / brickH); row++) {
+          const offsetX = row % 2 === 0 ? 0 : brickW / 2;
+          for (let col = 0; col < Math.ceil(obs.width / brickW) + 1; col++) {
+            const bx = obs.x + col * brickW - offsetX;
+            const by = obs.y + row * brickH;
+            if (bx >= obs.x - brickW && bx <= obs.x + obs.width) {
+              ctx.strokeRect(bx, by, brickW, brickH);
+            }
+          }
+        }
+      } else if (obs.type === 'hazard') {
+        // 위험 지역 (가시)
+        ctx.fillStyle = obs.color || '#EF4444';
+        // 삼각형 가시 패턴
+        const spikeCount = Math.floor(obs.width / 20);
+        for (let i = 0; i < spikeCount; i++) {
+          const sx = obs.x + i * (obs.width / spikeCount);
+          const sw = obs.width / spikeCount;
+          ctx.beginPath();
+          ctx.moveTo(sx, obs.y + obs.height);
+          ctx.lineTo(sx + sw / 2, obs.y);
+          ctx.lineTo(sx + sw, obs.y + obs.height);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+    });
+
     // 골인 지점 (집) - 이미지와 충돌 영역 일치
     const goalWidth = 160;
     const goalHeight = 130;
@@ -3631,24 +3872,74 @@ const LogosGame = () => {
     return <canvas ref={iconCanvasRef} width={64} height={64} className="w-full h-full object-contain" />;
   };
 
-  // 게임 시작 함수
-  const startGame = () => {
+  // 게임 시작 함수 (스테이지 모드)
+  const startGame = (worldId, stageId) => {
+    setIsCreativeMode(false);
+    setSelectedWorld(worldId || selectedWorld);
+    setSelectedStage(stageId || selectedStage);
+
+    const world = stagesData.worlds.find(w => w.id === (worldId || selectedWorld));
+    const stage = world?.stages.find(s => s.id === (stageId || selectedStage));
+
+    setCurrentWorld(world?.background || 1);
+
     setMessages([
-      { id: 1, role: 'ai', text: "안녕하세요! 무엇을 만들어볼까요?" },
-      { id: 2, role: 'ai', text: "자동차, 상자, 다리, 계단, 나무, 집, 로봇 등을 만들 수 있어요." }
+      { id: 1, role: 'ai', text: `${world?.name || '월드'} - ${stage?.name || '스테이지'}` },
+      { id: 2, role: 'ai', text: stage?.description || "목표를 향해 가세요!" },
+      { id: 3, role: 'ai', text: stage?.hints?.[0] || "오브젝트를 만들어 배치하세요." }
     ]);
+
+    setTokens(stage?.tokens || MAX_TOKENS);
+
+    // 배경 이미지 로드 확인 후 게임 시작
+    const startGameScreen = () => {
+      setScreen('game');
+      // 스테이지 장애물 로드는 resetGame에서 처리
+      setTimeout(() => {
+        if (stage?.obstacles) {
+          loadStageObstacles(stage.obstacles);
+        }
+      }, 100);
+    };
+
+    if (bgImagesLoadedRef.current) {
+      startGameScreen();
+    } else {
+      const checkLoaded = setInterval(() => {
+        if (bgImagesLoadedRef.current) {
+          clearInterval(checkLoaded);
+          startGameScreen();
+        }
+      }, 50);
+      setTimeout(() => {
+        clearInterval(checkLoaded);
+        startGameScreen();
+      }, 2000);
+    }
+  };
+
+  // 크리에이티브 모드 시작
+  const startCreativeMode = () => {
+    setIsCreativeMode(true);
+    setGameMode('creative');
+    setTokens(999);
+    setStageObstacles([]);
+
+    setMessages([
+      { id: 1, role: 'ai', text: "크리에이티브 모드에 오신 것을 환영합니다!" },
+      { id: 2, role: 'ai', text: "토큰 제한 없이 자유롭게 오브젝트를 만들고 배치할 수 있어요." }
+    ]);
+
     // 배경 이미지 로드 확인 후 게임 시작
     if (bgImagesLoadedRef.current) {
       setScreen('game');
     } else {
-      // 이미지 로드 대기
       const checkLoaded = setInterval(() => {
         if (bgImagesLoadedRef.current) {
           clearInterval(checkLoaded);
           setScreen('game');
         }
       }, 50);
-      // 최대 2초 대기 후 강제 시작
       setTimeout(() => {
         clearInterval(checkLoaded);
         setScreen('game');
@@ -3656,10 +3947,218 @@ const LogosGame = () => {
     }
   };
 
+  // 스테이지 선택 화면으로
+  const goToStageSelect = () => {
+    setGameMode('stage');
+    setScreen('stageSelect');
+  };
+
+  // PNG 이미지 교체 핸들러
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedObjectForImage) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const imageData = event.target?.result;
+      if (imageData) {
+        const newCustomImages = {
+          ...customImages,
+          [selectedObjectForImage]: imageData
+        };
+        setCustomImages(newCustomImages);
+        localStorage.setItem('custom_images', JSON.stringify(newCustomImages));
+        setSelectedObjectForImage(null);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // 커스텀 이미지 삭제
+  const removeCustomImage = (objectName) => {
+    const newCustomImages = { ...customImages };
+    delete newCustomImages[objectName];
+    setCustomImages(newCustomImages);
+    localStorage.setItem('custom_images', JSON.stringify(newCustomImages));
+  };
+
+  // 이미지 교체 가능한 오브젝트 목록
+  const replaceableObjects = Object.entries(objectsData)
+    .filter(([_, data]) => data.renderType === 'image' || data.parts)
+    .map(([name, data]) => ({ name, ...data }))
+    .slice(0, 30); // 상위 30개만
+
+  // 스테이지 선택 화면
+  if (screen === 'stageSelect') {
+    const currentWorldData = stagesData.worlds.find(w => w.id === selectedWorld);
+
+    return (
+      <div className="w-screen h-screen overflow-hidden relative bg-gradient-to-b from-slate-900 to-slate-950" style={{ maxHeight: '100dvh' }}>
+        {/* 배경 */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-[url('/menu_bg.png')] bg-cover bg-center blur-sm" />
+        </div>
+
+        {/* 상단 헤더 */}
+        <div className="relative z-10 p-6 flex items-center justify-between">
+          <button
+            onClick={() => setScreen('menu')}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-bold transition-all"
+          >
+            <ChevronLeft size={24} />
+            뒤로
+          </button>
+          <h1 className="text-3xl font-black text-white">스테이지 선택</h1>
+          <div className="w-24" />
+        </div>
+
+        {/* 월드 선택 */}
+        <div className="relative z-10 flex items-center justify-center gap-4 mt-4">
+          <button
+            onClick={() => setSelectedWorld(Math.max(1, selectedWorld - 1))}
+            disabled={selectedWorld === 1}
+            className="p-3 bg-white/10 hover:bg-white/20 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronLeft size={32} className="text-white" />
+          </button>
+
+          <div className="text-center min-w-[300px]">
+            <h2 className="text-4xl font-black text-amber-400 mb-2">
+              월드 {selectedWorld}: {currentWorldData?.name}
+            </h2>
+            <p className="text-white/70">{currentWorldData?.description}</p>
+          </div>
+
+          <button
+            onClick={() => setSelectedWorld(Math.min(stagesData.worlds.length, selectedWorld + 1))}
+            disabled={selectedWorld === stagesData.worlds.length}
+            className="p-3 bg-white/10 hover:bg-white/20 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <ChevronRight size={32} className="text-white" />
+          </button>
+        </div>
+
+        {/* 스테이지 그리드 */}
+        <div className="relative z-10 flex flex-wrap justify-center gap-6 mt-12 px-12">
+          {currentWorldData?.stages.map((stage) => {
+            const unlocked = isStageUnlocked(selectedWorld, stage.id);
+            const cleared = isStageCleared(selectedWorld, stage.id);
+
+            return (
+              <button
+                key={stage.id}
+                onClick={() => unlocked && startGame(selectedWorld, stage.id)}
+                disabled={!unlocked}
+                className={`relative w-48 h-48 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all duration-300 ${
+                  unlocked
+                    ? cleared
+                      ? 'bg-gradient-to-br from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 hover:scale-105 shadow-lg shadow-green-500/30'
+                      : 'bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 hover:scale-105 shadow-lg shadow-amber-500/30'
+                    : 'bg-slate-800/50 cursor-not-allowed'
+                }`}
+              >
+                {!unlocked && (
+                  <Lock size={48} className="text-white/30" />
+                )}
+                {unlocked && cleared && (
+                  <Star size={48} className="text-yellow-300" fill="currentColor" />
+                )}
+                {unlocked && !cleared && (
+                  <span className="text-5xl font-black text-white">{stage.id}</span>
+                )}
+                <span className={`text-lg font-bold ${unlocked ? 'text-white' : 'text-white/30'}`}>
+                  {stage.name}
+                </span>
+                {unlocked && (
+                  <div className="absolute bottom-3 flex items-center gap-1 text-sm">
+                    <Zap size={14} className="text-yellow-300" />
+                    <span className="text-white/80">{stage.tokens} 토큰</span>
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 하단 정보 */}
+        <div className="absolute bottom-6 left-0 right-0 text-center">
+          <p className="text-white/40 text-sm">클리어한 스테이지: {Object.keys(clearedStages).length} / {stagesData.worlds.reduce((acc, w) => acc + w.stages.length, 0)}</p>
+        </div>
+      </div>
+    );
+  }
+
   // 메뉴 화면
   if (screen === 'menu') {
     return (
       <div className="w-screen h-screen overflow-hidden relative" style={{ maxHeight: '100dvh' }}>
+        {/* 이미지 교체 모달 */}
+        {showImageReplacer && (
+          <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 backdrop-blur-sm">
+            <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-[600px] max-w-[95vw] max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2 text-white">
+                  <Image size={20} className="text-purple-400" />
+                  오브젝트 이미지 교체
+                </h2>
+                <button onClick={() => { setShowImageReplacer(false); setSelectedObjectForImage(null); }} className="p-1 hover:bg-slate-800 rounded text-white">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <p className="text-white/60 text-sm mb-4">오브젝트를 선택하고 PNG 이미지를 업로드하세요</p>
+
+              <div className="flex-1 overflow-y-auto grid grid-cols-4 gap-3">
+                {replaceableObjects.map((obj) => (
+                  <button
+                    key={obj.name}
+                    onClick={() => {
+                      setSelectedObjectForImage(obj.name);
+                      fileInputRef.current?.click();
+                    }}
+                    className={`relative p-3 rounded-lg border-2 transition-all ${
+                      selectedObjectForImage === obj.name
+                        ? 'border-purple-500 bg-purple-500/20'
+                        : customImages[obj.name]
+                          ? 'border-green-500 bg-green-500/10'
+                          : 'border-white/10 bg-white/5 hover:border-white/30'
+                    }`}
+                  >
+                    <div className="w-12 h-12 mx-auto mb-2 rounded bg-slate-800 flex items-center justify-center overflow-hidden">
+                      {customImages[obj.name] ? (
+                        <img src={customImages[obj.name]} alt={obj.name} className="w-full h-full object-contain" />
+                      ) : (
+                        <div className="w-8 h-8 rounded" style={{ backgroundColor: obj.color || '#666' }} />
+                      )}
+                    </div>
+                    <p className="text-xs text-white truncate">{obj.name}</p>
+                    {customImages[obj.name] && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); removeCustomImage(obj.name); }}
+                        className="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-400 rounded-full"
+                      >
+                        <Trash2 size={10} className="text-white" />
+                      </button>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+
+              <div className="mt-4 pt-4 border-t border-slate-700 text-center">
+                <p className="text-white/40 text-xs">커스텀 이미지 {Object.keys(customImages).length}개 적용됨</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 설정 모달 */}
         {showSettings && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
@@ -3731,33 +4230,44 @@ const LogosGame = () => {
           </div>
 
           {/* 메뉴 버튼들 */}
-          <div className="flex flex-col gap-8 w-[500px]">
-            {/* 시작하기 */}
+          <div className="flex flex-col gap-6 w-[500px]">
+            {/* 시작하기 - 스테이지 선택 화면으로 */}
             <button
-              onClick={() => startGame()}
-              className="group bg-amber-500 hover:bg-amber-400 text-black font-black text-5xl py-10 px-14 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 flex items-center gap-6"
+              onClick={() => goToStageSelect()}
+              className="group bg-amber-500 hover:bg-amber-400 text-black font-black text-4xl py-8 px-12 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <Play size={56} />
-              시작하기
+              <Play size={48} />
+              스테이지 모드
             </button>
 
-            {/* 맵 만들기 */}
+            {/* 크리에이티브 모드 */}
             <button
-              className="group bg-black/50 hover:bg-black/70 text-white font-black text-5xl py-10 px-14 rounded-3xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-6"
+              onClick={() => startCreativeMode()}
+              className="group bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-black text-4xl py-8 px-12 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <PenTool size={56} />
-              맵 만들기
+              <Sparkles size={48} />
+              크리에이티브
+            </button>
+
+            {/* 이미지 교체 */}
+            <button
+              onClick={() => setShowImageReplacer(true)}
+              className="group bg-black/50 hover:bg-black/70 text-white font-black text-4xl py-8 px-12 rounded-3xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-5"
+              style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
+            >
+              <Image size={48} />
+              이미지 교체
             </button>
 
             {/* 설정 */}
             <button
               onClick={() => setShowSettings(true)}
-              className="group bg-black/50 hover:bg-black/70 text-white font-black text-5xl py-10 px-14 rounded-3xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-6"
+              className="group bg-black/50 hover:bg-black/70 text-white font-black text-4xl py-8 px-12 rounded-3xl border-4 border-white/30 hover:border-white/60 transition-all duration-200 hover:scale-105 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
-              <Settings size={56} />
+              <Settings size={48} />
               설정
             </button>
           </div>
@@ -3832,25 +4342,47 @@ const LogosGame = () => {
       {/* 게임 영역 */}
       <div className="flex-1 relative border-r border-white/5 flex flex-col min-w-0 min-h-0">
         <div className="absolute top-4 left-4 z-10 flex gap-3">
-          {/* 로고 */}
+          {/* 홈 버튼 */}
+          <button
+            onClick={() => setScreen('menu')}
+            className="bg-black/60 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-2 hover:bg-black/70 hover:border-white/20 transition-all duration-200"
+            title="메뉴로"
+          >
+            <Home className="text-white/70" size={20} />
+          </button>
+          {/* 스테이지 정보 또는 크리에이티브 모드 표시 */}
           <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center font-black text-xl shadow-lg">L</div>
-            <div>
-              <h1 className="text-sm font-bold text-white tracking-wider">LOGOS</h1>
-              <div className="text-[10px] font-medium text-amber-400">
-                PUZZLE GAME
-              </div>
-            </div>
+            {isCreativeMode ? (
+              <>
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <Sparkles className="text-white" size={20} />
+                </div>
+                <div>
+                  <h1 className="text-sm font-bold text-white tracking-wider">CREATIVE</h1>
+                  <div className="text-[10px] font-medium text-purple-400">자유 모드</div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center font-black text-xl shadow-lg">{selectedWorld}</div>
+                <div>
+                  <h1 className="text-sm font-bold text-white tracking-wider">STAGE {selectedStage}</h1>
+                  <div className="text-[10px] font-medium text-amber-400">
+                    {stagesData.worlds.find(w => w.id === selectedWorld)?.stages.find(s => s.id === selectedStage)?.name || 'PUZZLE GAME'}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           {/* 토큰 */}
           <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-lg">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${isCreativeMode ? 'bg-gradient-to-br from-purple-400 to-pink-500' : 'bg-gradient-to-br from-yellow-400 to-amber-500'}`}>
               <Zap className="text-white" size={20} />
             </div>
             <div>
               <div className="text-[10px] text-white/50 font-bold tracking-wider">TOKENS</div>
               <div className="text-xl font-black text-white leading-none">
-                {tokens}<span className="text-sm text-white/40 font-medium ml-1">/ {MAX_TOKENS}</span>
+                {isCreativeMode ? '∞' : tokens}<span className="text-sm text-white/40 font-medium ml-1">{isCreativeMode ? '' : `/ ${getCurrentStageData()?.tokens || MAX_TOKENS}`}</span>
               </div>
             </div>
           </div>
@@ -3876,15 +4408,75 @@ const LogosGame = () => {
           />
           {(gameState === 'won' || gameState === 'lost') && (
             <div className="absolute inset-0 bg-black/80 flex items-center justify-center flex-col z-50 backdrop-blur-sm">
-              <h1 className={`text-5xl font-black mb-4 drop-shadow-2xl ${gameState === 'won' ? 'text-green-500' : 'text-red-500'}`}>
+              <h1 className={`text-5xl font-black mb-2 drop-shadow-2xl ${gameState === 'won' ? 'text-green-500' : 'text-red-500'}`}>
                 {gameState === 'won' ? 'SUCCESS!' : 'FAILED...'}
               </h1>
-              <button
-                onClick={resetGame}
-                className="px-10 py-4 bg-white text-black text-xl font-bold rounded-lg hover:bg-slate-200 transition-transform hover:scale-105"
-              >
-                다시 시작
-              </button>
+              {gameState === 'won' && !isCreativeMode && (
+                <div className="flex items-center gap-2 mb-6">
+                  <Star size={32} className="text-yellow-400" fill="currentColor" />
+                  <Star size={32} className="text-yellow-400" fill="currentColor" />
+                  <Star size={32} className="text-yellow-400" fill="currentColor" />
+                </div>
+              )}
+              <div className="flex gap-4">
+                <button
+                  onClick={resetGame}
+                  className="px-8 py-4 bg-white text-black text-lg font-bold rounded-lg hover:bg-slate-200 transition-transform hover:scale-105 flex items-center gap-2"
+                >
+                  <RotateCcw size={20} />
+                  다시 시작
+                </button>
+                {gameState === 'won' && !isCreativeMode && (
+                  <>
+                    {/* 다음 스테이지가 있으면 */}
+                    {(() => {
+                      const world = stagesData.worlds.find(w => w.id === selectedWorld);
+                      const hasNextStage = world?.stages.find(s => s.id === selectedStage + 1);
+                      const hasNextWorld = stagesData.worlds.find(w => w.id === selectedWorld + 1);
+
+                      if (hasNextStage) {
+                        return (
+                          <button
+                            onClick={() => startGame(selectedWorld, selectedStage + 1)}
+                            className="px-8 py-4 bg-amber-500 text-black text-lg font-bold rounded-lg hover:bg-amber-400 transition-transform hover:scale-105 flex items-center gap-2"
+                          >
+                            다음 스테이지
+                            <ChevronRight size={20} />
+                          </button>
+                        );
+                      } else if (hasNextWorld) {
+                        return (
+                          <button
+                            onClick={() => startGame(selectedWorld + 1, 1)}
+                            className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black text-lg font-bold rounded-lg hover:from-amber-400 hover:to-orange-400 transition-transform hover:scale-105 flex items-center gap-2"
+                          >
+                            다음 월드
+                            <ChevronRight size={20} />
+                          </button>
+                        );
+                      }
+                      return (
+                        <button
+                          onClick={() => setScreen('menu')}
+                          className="px-8 py-4 bg-green-500 text-black text-lg font-bold rounded-lg hover:bg-green-400 transition-transform hover:scale-105 flex items-center gap-2"
+                        >
+                          <Star size={20} fill="currentColor" />
+                          모든 스테이지 클리어!
+                        </button>
+                      );
+                    })()}
+                  </>
+                )}
+                {isCreativeMode && gameState === 'won' && (
+                  <button
+                    onClick={() => setScreen('menu')}
+                    className="px-8 py-4 bg-purple-500 text-white text-lg font-bold rounded-lg hover:bg-purple-400 transition-transform hover:scale-105 flex items-center gap-2"
+                  >
+                    <Home size={20} />
+                    메뉴로
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>

@@ -1,0 +1,307 @@
+{
+  "worlds": [
+    {
+      "id": 1,
+      "name": "아침 숲",
+      "description": "햇살이 비추는 평화로운 숲",
+      "background": 1,
+      "stages": [
+        {
+          "id": 1,
+          "name": "첫 걸음",
+          "description": "기본 이동과 오브젝트 배치를 배워보세요",
+          "tokens": 3,
+          "goalX": 800,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [],
+          "hints": ["상자나 발판을 만들어보세요"]
+        },
+        {
+          "id": 2,
+          "name": "작은 언덕",
+          "description": "언덕을 넘어가세요",
+          "tokens": 4,
+          "goalX": 1000,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "gap", "x": 300, "width": 150 }
+          ],
+          "hints": ["다리나 발판을 만들어 틈을 건너세요"]
+        },
+        {
+          "id": 3,
+          "name": "높은 벽",
+          "description": "벽을 넘어가세요",
+          "tokens": 5,
+          "goalX": 1000,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "wall", "x": 400, "height": 200 }
+          ],
+          "hints": ["계단이나 사다리를 만들어보세요"]
+        },
+        {
+          "id": 4,
+          "name": "구멍과 벽",
+          "description": "여러 장애물을 통과하세요",
+          "tokens": 6,
+          "goalX": 1200,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "gap", "x": 250, "width": 120 },
+            { "type": "wall", "x": 500, "height": 180 }
+          ],
+          "hints": ["다리와 계단을 조합해보세요"]
+        },
+        {
+          "id": 5,
+          "name": "숲의 끝",
+          "description": "아침 숲의 마지막 도전",
+          "tokens": 8,
+          "goalX": 1400,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "gap", "x": 200, "width": 100 },
+            { "type": "wall", "x": 450, "height": 150 },
+            { "type": "gap", "x": 700, "width": 150 },
+            { "type": "hazard", "x": 900, "width": 100 }
+          ],
+          "hints": ["여러 오브젝트를 조합하세요"]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "한낮 사막",
+      "description": "뜨거운 사막을 횡단하세요",
+      "background": 2,
+      "stages": [
+        {
+          "id": 1,
+          "name": "모래 언덕",
+          "description": "모래 언덕을 넘어가세요",
+          "tokens": 4,
+          "goalX": 900,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "gap", "x": 300, "width": 180 }
+          ],
+          "hints": ["넓은 다리가 필요해요"]
+        },
+        {
+          "id": 2,
+          "name": "선인장 밭",
+          "description": "선인장을 피해가세요",
+          "tokens": 5,
+          "goalX": 1000,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "hazard", "x": 300, "width": 80 },
+            { "type": "hazard", "x": 500, "width": 80 }
+          ],
+          "hints": ["위로 점프하거나 높은 발판을 만드세요"]
+        },
+        {
+          "id": 3,
+          "name": "사막 절벽",
+          "description": "높은 절벽을 넘으세요",
+          "tokens": 6,
+          "goalX": 1100,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "wall", "x": 350, "height": 250 }
+          ],
+          "hints": ["큰 계단이나 사다리가 필요해요"]
+        },
+        {
+          "id": 4,
+          "name": "오아시스로",
+          "description": "오아시스를 향해 가세요",
+          "tokens": 7,
+          "goalX": 1200,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "gap", "x": 200, "width": 120 },
+            { "type": "hazard", "x": 450, "width": 100 },
+            { "type": "wall", "x": 700, "height": 200 }
+          ],
+          "hints": ["장애물을 피하고 높이 올라가세요"]
+        },
+        {
+          "id": 5,
+          "name": "사막의 끝",
+          "description": "사막을 탈출하세요",
+          "tokens": 8,
+          "goalX": 1400,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "wall", "x": 250, "height": 180 },
+            { "type": "gap", "x": 500, "width": 200 },
+            { "type": "hazard", "x": 850, "width": 120 },
+            { "type": "wall", "x": 1050, "height": 220 }
+          ],
+          "hints": ["모든 기술을 활용하세요"]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "저녁 산",
+      "description": "노을 지는 산을 오르세요",
+      "background": 3,
+      "stages": [
+        {
+          "id": 1,
+          "name": "산 입구",
+          "description": "산을 오르기 시작하세요",
+          "tokens": 5,
+          "goalX": 1000,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "wall", "x": 300, "height": 200 },
+            { "type": "gap", "x": 600, "width": 100 }
+          ],
+          "hints": ["계단으로 올라가고 다리를 건너세요"]
+        },
+        {
+          "id": 2,
+          "name": "바위 지대",
+          "description": "바위를 피해 전진하세요",
+          "tokens": 6,
+          "goalX": 1100,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "hazard", "x": 250, "width": 100 },
+            { "type": "wall", "x": 500, "height": 230 },
+            { "type": "hazard", "x": 800, "width": 80 }
+          ],
+          "hints": ["위험을 피하며 나아가세요"]
+        },
+        {
+          "id": 3,
+          "name": "절벽 길",
+          "description": "좁은 절벽 길을 지나세요",
+          "tokens": 6,
+          "goalX": 1100,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "gap", "x": 200, "width": 150 },
+            { "type": "gap", "x": 500, "width": 180 },
+            { "type": "gap", "x": 800, "width": 120 }
+          ],
+          "hints": ["여러 개의 다리가 필요해요"]
+        },
+        {
+          "id": 4,
+          "name": "폭포 근처",
+          "description": "폭포 옆을 지나가세요",
+          "tokens": 7,
+          "goalX": 1200,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "wall", "x": 300, "height": 280 },
+            { "type": "hazard", "x": 550, "width": 150 },
+            { "type": "gap", "x": 850, "width": 200 }
+          ],
+          "hints": ["높이 올라가서 위험을 피하세요"]
+        },
+        {
+          "id": 5,
+          "name": "정상 근처",
+          "description": "정상이 눈앞에!",
+          "tokens": 8,
+          "goalX": 1500,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "gap", "x": 180, "width": 140 },
+            { "type": "wall", "x": 400, "height": 200 },
+            { "type": "hazard", "x": 650, "width": 100 },
+            { "type": "gap", "x": 900, "width": 180 },
+            { "type": "wall", "x": 1200, "height": 250 }
+          ],
+          "hints": ["최고의 조합을 찾아보세요"]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "밤하늘 성",
+      "description": "신비로운 밤의 성을 탐험하세요",
+      "background": 4,
+      "stages": [
+        {
+          "id": 1,
+          "name": "성문 앞",
+          "description": "성 안으로 들어가세요",
+          "tokens": 5,
+          "goalX": 1000,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "wall", "x": 350, "height": 300 }
+          ],
+          "hints": ["아주 높은 계단이 필요해요"]
+        },
+        {
+          "id": 2,
+          "name": "성 내부",
+          "description": "성 안을 탐험하세요",
+          "tokens": 6,
+          "goalX": 1100,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "hazard", "x": 250, "width": 120 },
+            { "type": "gap", "x": 500, "width": 200 },
+            { "type": "hazard", "x": 850, "width": 100 }
+          ],
+          "hints": ["위험을 피해 건너세요"]
+        },
+        {
+          "id": 3,
+          "name": "탑 오르기",
+          "description": "탑 위로 올라가세요",
+          "tokens": 7,
+          "goalX": 1200,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "wall", "x": 250, "height": 250 },
+            { "type": "wall", "x": 550, "height": 200 },
+            { "type": "wall", "x": 850, "height": 280 }
+          ],
+          "hints": ["연속으로 계단을 배치하세요"]
+        },
+        {
+          "id": 4,
+          "name": "지붕 위",
+          "description": "성의 지붕을 건너세요",
+          "tokens": 8,
+          "goalX": 1300,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "gap", "x": 200, "width": 180 },
+            { "type": "hazard", "x": 500, "width": 150 },
+            { "type": "gap", "x": 800, "width": 200 },
+            { "type": "wall", "x": 1100, "height": 200 }
+          ],
+          "hints": ["정확한 위치에 오브젝트를 배치하세요"]
+        },
+        {
+          "id": 5,
+          "name": "최종 도전",
+          "description": "마지막 관문을 통과하세요!",
+          "tokens": 10,
+          "goalX": 1600,
+          "playerStart": { "x": 50, "y": 500 },
+          "obstacles": [
+            { "type": "wall", "x": 200, "height": 220 },
+            { "type": "gap", "x": 400, "width": 160 },
+            { "type": "hazard", "x": 650, "width": 130 },
+            { "type": "wall", "x": 900, "height": 280 },
+            { "type": "gap", "x": 1150, "width": 220 },
+            { "type": "hazard", "x": 1400, "width": 100 }
+          ],
+          "hints": ["모든 것을 활용하세요!"]
+        }
+      ]
+    }
+  ]
+}
