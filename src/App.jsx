@@ -3717,10 +3717,6 @@ const LogosGame = () => {
     return () => cancelAnimationFrame(requestRef.current);
   }, [loop]);
 
-  // 게임 가상 해상도 (에디터와 동일)
-  const GAME_VIRTUAL_WIDTH = 1200;
-  const GAME_VIRTUAL_HEIGHT = 675;
-
   // 캔버스 리사이즈 핸들러
   useEffect(() => {
     if (screen !== 'game') return;
@@ -3734,28 +3730,9 @@ const LogosGame = () => {
       const rect = parent.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      // 커스텀 맵이면 에디터와 동일한 가상 해상도 사용
-      if (isCustomMap && customMapData) {
-        const aspectRatio = GAME_VIRTUAL_WIDTH / GAME_VIRTUAL_HEIGHT;
-        let displayWidth = rect.width;
-        let displayHeight = rect.width / aspectRatio;
-
-        if (displayHeight > rect.height) {
-          displayHeight = rect.height;
-          displayWidth = rect.height * aspectRatio;
-        }
-
-        canvas.width = GAME_VIRTUAL_WIDTH;
-        canvas.height = GAME_VIRTUAL_HEIGHT;
-        canvas.style.width = `${displayWidth}px`;
-        canvas.style.height = `${displayHeight}px`;
-      } else {
-        // 기본 스테이지는 부모 크기 사용
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        canvas.style.width = '';
-        canvas.style.height = '';
-      }
+      // 부모 크기에 맞춤 (원래 방식)
+      canvas.width = rect.width;
+      canvas.height = rect.height;
 
       // 플레이어 초기 위치 업데이트
       const FLOOR_OFFSET = 130;
@@ -4200,11 +4177,7 @@ const LogosGame = () => {
     }
   }, [editorStart, editorGoal, editorObstacles, editorGrounds, editorSelectedTool, editorMousePos]);
 
-  // 에디터 가상 해상도 (게임과 동일한 비율 사용)
-  const EDITOR_VIRTUAL_WIDTH = 1200;
-  const EDITOR_VIRTUAL_HEIGHT = 675; // 16:9 비율
-
-  // 에디터 캔버스 리사이즈
+  // 에디터 캔버스 리사이즈 (게임과 동일하게 부모 크기에 맞춤)
   useEffect(() => {
     if (screen !== 'mapEditor') return;
 
@@ -4217,29 +4190,22 @@ const LogosGame = () => {
       const rect = container.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      // 컨테이너에 맞추되 가상 해상도 비율 유지
-      const aspectRatio = EDITOR_VIRTUAL_WIDTH / EDITOR_VIRTUAL_HEIGHT;
-      let width = rect.width;
-      let height = rect.width / aspectRatio;
-
-      if (height > rect.height) {
-        height = rect.height;
-        width = rect.height * aspectRatio;
-      }
-
-      canvas.width = EDITOR_VIRTUAL_WIDTH;
-      canvas.height = EDITOR_VIRTUAL_HEIGHT;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      // 부모 크기에 맞춤 (게임과 동일)
+      canvas.width = rect.width;
+      canvas.height = rect.height;
       drawEditorCanvas();
     };
 
     const timer = setTimeout(resizeEditorCanvas, 50);
     window.addEventListener('resize', resizeEditorCanvas);
 
+    const resizeObserver = new ResizeObserver(resizeEditorCanvas);
+    resizeObserver.observe(container);
+
     return () => {
       clearTimeout(timer);
       window.removeEventListener('resize', resizeEditorCanvas);
+      resizeObserver.disconnect();
     };
   }, [screen, drawEditorCanvas]);
 
@@ -4258,33 +4224,38 @@ const LogosGame = () => {
       return;
     }
 
+    const editorCanvas = editorCanvasRef.current;
+    if (!editorCanvas) return;
+
+    const editorWidth = editorCanvas.width;
+    const editorHeight = editorCanvas.height;
+
     setIsCreativeMode(false);
     setIsCustomMap(true);
     setTokens(editorTokens);
 
-    // 커스텀 맵 데이터를 가상 해상도 기준 비율로 저장
+    // 커스텀 맵 데이터를 비율로 저장
     setCustomMapData({
-      virtualSize: { width: EDITOR_VIRTUAL_WIDTH, height: EDITOR_VIRTUAL_HEIGHT },
       start: {
-        xRatio: editorStart.x / EDITOR_VIRTUAL_WIDTH,
-        yRatio: editorStart.y / EDITOR_VIRTUAL_HEIGHT
+        xRatio: editorStart.x / editorWidth,
+        yRatio: editorStart.y / editorHeight
       },
       goal: {
-        xRatio: editorGoal.x / EDITOR_VIRTUAL_WIDTH,
-        yRatio: editorGoal.y / EDITOR_VIRTUAL_HEIGHT
+        xRatio: editorGoal.x / editorWidth,
+        yRatio: editorGoal.y / editorHeight
       },
       grounds: editorGrounds.map(g => ({
         ...g,
-        xRatio: g.x / EDITOR_VIRTUAL_WIDTH,
-        yRatio: g.y / EDITOR_VIRTUAL_HEIGHT,
-        widthRatio: g.width / EDITOR_VIRTUAL_WIDTH
+        xRatio: g.x / editorWidth,
+        yRatio: g.y / editorHeight,
+        widthRatio: g.width / editorWidth
       })),
       obstacles: editorObstacles.map(obs => ({
         ...obs,
-        xRatio: obs.x / EDITOR_VIRTUAL_WIDTH,
-        yRatio: obs.y / EDITOR_VIRTUAL_HEIGHT,
-        widthRatio: obs.width / EDITOR_VIRTUAL_WIDTH,
-        heightRatio: obs.height / EDITOR_VIRTUAL_HEIGHT,
+        xRatio: obs.x / editorWidth,
+        yRatio: obs.y / editorHeight,
+        widthRatio: obs.width / editorWidth,
+        heightRatio: obs.height / editorHeight,
         color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
       }))
     });
