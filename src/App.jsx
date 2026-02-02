@@ -28,6 +28,10 @@ const LogosGame = () => {
   const [editorTokens, setEditorTokens] = useState(8);
   const [savedMaps, setSavedMaps] = useState([]);
 
+  // 커스텀 맵 플레이용 상태
+  const [isCustomMap, setIsCustomMap] = useState(false);
+  const [customMapData, setCustomMapData] = useState(null);
+
   // --- 게임 상태 관리 ---
   const [gameState, setGameState] = useState('planning');
   const [prompt, setPrompt] = useState('');
@@ -1470,10 +1474,64 @@ const LogosGame = () => {
 
       const FLOOR_OFFSET = 130; // 인벤토리 공간 확보
       const floorY = canvas.height - FLOOR_OFFSET;
-      // 바닥 충돌 (타일 크기 64px * 3개 = 192px)
-      const groundWidth = 192;
-      if (p.x < groundWidth && p.x + p.width > 0 && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
-      if (p.x + p.width > canvas.width - groundWidth && p.x < canvas.width && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
+
+      // 커스텀 맵인 경우 에디터에서 만든 바닥과 충돌
+      if (isCustomMap && customMapData) {
+        customMapData.grounds.forEach(ground => {
+          const groundTop = ground.y;
+          const groundLeft = ground.x;
+          const groundRight = ground.x + ground.width;
+          // 플레이어가 바닥 위에 있는지 체크
+          if (p.x + p.width > groundLeft && p.x < groundRight &&
+              p.y + p.height >= groundTop && p.y + p.height <= groundTop + 20) {
+            p.y = groundTop - p.height;
+            p.vy = 0;
+            p.grounded = true;
+          }
+        });
+
+        // 커스텀 맵 장애물 충돌
+        customMapData.obstacles.forEach(obs => {
+          const obsLeft = obs.x - obs.width / 2;
+          const obsRight = obs.x + obs.width / 2;
+          const obsTop = obs.y - obs.height;
+          const obsBottom = obs.y;
+
+          if (obs.type === 'wall') {
+            // 벽 위에 착지
+            if (p.x + p.width > obsLeft && p.x < obsRight &&
+                p.y + p.height >= obsTop && p.y + p.height <= obsTop + 20 && p.vy >= 0) {
+              p.y = obsTop - p.height;
+              p.vy = 0;
+              p.grounded = true;
+            }
+            // 벽 옆면 충돌
+            else if (p.y + p.height > obsTop + 10 && p.y < obsBottom) {
+              if (p.x + p.width > obsLeft && p.x < obsLeft + 10 && p.vx > 0) {
+                p.x = obsLeft - p.width;
+                p.vx = 0;
+              }
+              if (p.x < obsRight && p.x + p.width > obsRight - 10 && p.vx < 0) {
+                p.x = obsRight;
+                p.vx = 0;
+              }
+            }
+          } else if (obs.type === 'hazard') {
+            // 위험 지역 충돌 - 게임 오버
+            if (p.x + p.width > obsLeft && p.x < obsRight &&
+                p.y + p.height > obsTop && p.y < obsBottom) {
+              setGameState('lost');
+              p.vx = 0;
+              setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 위험 지역에 닿았어요..." }]);
+            }
+          }
+        });
+      } else {
+        // 기본 스테이지 바닥 충돌 (타일 크기 64px * 3개 = 192px)
+        const groundWidth = 192;
+        if (p.x < groundWidth && p.x + p.width > 0 && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
+        if (p.x + p.width > canvas.width - groundWidth && p.x < canvas.width && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
+      }
 
       let onIce = false;
       let inWater = false;
@@ -1658,12 +1716,21 @@ const LogosGame = () => {
       // 도착 판정 - 집 영역과 일치
       const goalWidth = 160;
       const goalHeight = 130;
-      // 오른쪽 땅 끝에 딱 맞춤
-      const goalX = canvas.width - goalWidth;
-      const goalY = floorY - goalHeight;
+
+      let goalX, goalY;
+      if (isCustomMap && customMapData) {
+        // 커스텀 맵의 골 위치
+        goalX = customMapData.goal.x - goalWidth / 2;
+        goalY = customMapData.goal.y - goalHeight;
+      } else {
+        // 기본 스테이지 골 위치
+        goalX = canvas.width - goalWidth;
+        goalY = floorY - goalHeight;
+      }
+
       // 플레이어가 집 영역 안에 들어왔는지 확인
       if (p.x + p.width > goalX + 20 && p.x < goalX + goalWidth - 20 &&
-          p.y + p.height > goalY + goalHeight * 0.5 && p.y + p.height <= floorY + 5) {
+          p.y + p.height > goalY && p.y < goalY + goalHeight) {
         setGameState('won');
         p.vx = 0;
         setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "축하해요! 목표에 도착했어요!" }]);
@@ -3349,48 +3416,91 @@ const LogosGame = () => {
     const FLOOR_OFFSET = 130;
     const floorY = canvas.height - FLOOR_OFFSET;
 
-    // 왼쪽 바닥 - 타일맵 방식 (64px * 3 = 192px)
-    drawGroundTiles(ctx, canvas, 0, 192, floorY);
+    // 커스텀 맵인 경우 에디터에서 만든 바닥 사용
+    if (isCustomMap && customMapData) {
+      // 커스텀 바닥 그리기
+      customMapData.grounds.forEach(ground => {
+        drawGroundTiles(ctx, canvas, ground.x, ground.x + ground.width, ground.y);
+      });
 
-    // 오른쪽 바닥 - 타일맵 방식 (64px * 3 = 192px)
-    drawGroundTiles(ctx, canvas, canvas.width - 192, canvas.width, floorY);
+      // 커스텀 장애물 그리기
+      customMapData.obstacles.forEach(obs => {
+        const obsX = obs.x - obs.width / 2;
+        const obsY = obs.y - obs.height;
+        if (obs.type === 'wall') {
+          ctx.fillStyle = '#6B7280';
+          ctx.fillRect(obsX, obsY, obs.width, obs.height);
+          ctx.strokeStyle = '#4B5563';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(obsX, obsY, obs.width, obs.height);
+        } else if (obs.type === 'hazard') {
+          ctx.fillStyle = '#DC2626';
+          const spikeWidth = 20;
+          const spikeCount = Math.floor(obs.width / spikeWidth);
+          for (let i = 0; i < spikeCount; i++) {
+            ctx.beginPath();
+            ctx.moveTo(obsX + i * spikeWidth, obs.y);
+            ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, obs.y - 35);
+            ctx.lineTo(obsX + (i + 1) * spikeWidth, obs.y);
+            ctx.fill();
+          }
+        }
+      });
 
-    // 골인 지점 (집) - 이미지와 충돌 영역 일치
-    const goalWidth = 160;
-    const goalHeight = 130;
-    // 오른쪽 땅 끝에 딱 맞춤 (여백 없음)
-    const goalX = canvas.width - goalWidth;
-    const goalY = floorY - goalHeight;
+      // 커스텀 골 (집)
+      const goalWidth = 160;
+      const goalHeight = 130;
+      const goalX = customMapData.goal.x - goalWidth / 2;
+      const goalY = customMapData.goal.y - goalHeight;
 
-    if (goalImageLoadedRef.current && goalImageRef.current) {
-      const img = goalImageRef.current;
-      // goal.png 크롭 영역 (여백 제거) - 집 부분만
-      const cropX = 125;
-      const cropY = 90;
-      const cropW = 380;
-      const cropH = 310;
-
-      ctx.drawImage(
-        img,
-        cropX, cropY, cropW, cropH,  // 소스 이미지에서 크롭할 영역
-        goalX, goalY, goalWidth, goalHeight  // 캔버스에 그릴 위치와 크기
-      );
+      if (goalImageLoadedRef.current && goalImageRef.current) {
+        ctx.drawImage(goalImageRef.current, 125, 90, 380, 310, goalX, goalY, goalWidth, goalHeight);
+      }
     } else {
-      // 이미지 로딩 전 기본 도형
-      ctx.fillStyle = '#fbbf24';
-      ctx.fillRect(goalX, goalY + goalHeight * 0.3, goalWidth, goalHeight * 0.7);
-      ctx.beginPath();
-      ctx.moveTo(goalX, goalY + goalHeight * 0.3);
-      ctx.lineTo(goalX + goalWidth / 2, goalY);
-      ctx.lineTo(goalX + goalWidth, goalY + goalHeight * 0.3);
-      ctx.fillStyle = '#ef4444';
-      ctx.fill();
-    }
+      // 기본 스테이지 바닥
+      // 왼쪽 바닥 - 타일맵 방식 (64px * 3 = 192px)
+      drawGroundTiles(ctx, canvas, 0, 192, floorY);
 
-    // 디버그: 도착지점 실제 영역 표시 (빨간색)
-    ctx.strokeStyle = 'red';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(goalX, goalY, goalWidth, goalHeight);
+      // 오른쪽 바닥 - 타일맵 방식 (64px * 3 = 192px)
+      drawGroundTiles(ctx, canvas, canvas.width - 192, canvas.width, floorY);
+
+      // 골인 지점 (집) - 이미지와 충돌 영역 일치
+      const goalWidth = 160;
+      const goalHeight = 130;
+      // 오른쪽 땅 끝에 딱 맞춤 (여백 없음)
+      const goalX = canvas.width - goalWidth;
+      const goalY = floorY - goalHeight;
+
+      if (goalImageLoadedRef.current && goalImageRef.current) {
+        const img = goalImageRef.current;
+        // goal.png 크롭 영역 (여백 제거) - 집 부분만
+        const cropX = 125;
+        const cropY = 90;
+        const cropW = 380;
+        const cropH = 310;
+
+        ctx.drawImage(
+          img,
+          cropX, cropY, cropW, cropH,  // 소스 이미지에서 크롭할 영역
+          goalX, goalY, goalWidth, goalHeight  // 캔버스에 그릴 위치와 크기
+        );
+      } else {
+        // 이미지 로딩 전 기본 도형
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(goalX, goalY + goalHeight * 0.3, goalWidth, goalHeight * 0.7);
+        ctx.beginPath();
+        ctx.moveTo(goalX, goalY + goalHeight * 0.3);
+        ctx.lineTo(goalX + goalWidth / 2, goalY);
+        ctx.lineTo(goalX + goalWidth, goalY + goalHeight * 0.3);
+        ctx.fillStyle = '#ef4444';
+        ctx.fill();
+      }
+
+      // 디버그: 도착지점 실제 영역 표시 (빨간색)
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(goalX, goalY, goalWidth, goalHeight);
+    }
 
     // 오브젝트 그리기
     objectsRef.current.forEach(obj => {
@@ -4037,17 +4147,39 @@ const LogosGame = () => {
   // 커스텀 맵 플레이
   const playEditorMap = () => {
     setIsCreativeMode(false);
+    setIsCustomMap(true);
     setTokens(editorTokens);
 
-    const obstacles = editorObstacles.map(obs => ({
+    // 커스텀 맵 데이터 저장
+    setCustomMapData({
+      start: { ...editorStart },
+      goal: { ...editorGoal },
+      grounds: [...editorGrounds],
+      obstacles: editorObstacles.map(obs => ({
+        ...obs,
+        color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
+      }))
+    });
+
+    setStageObstacles(editorObstacles.map(obs => ({
       ...obs,
       color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
-    }));
-    setStageObstacles(obstacles);
+    })));
 
+    // 플레이어 시작 위치 설정
+    playerRef.current.x = editorStart.x - 20;
+    playerRef.current.y = editorStart.y - 60;
+    playerRef.current.vx = 0;
+    playerRef.current.vy = 0;
+    playerRef.current.grounded = false;
+
+    // 오브젝트 초기화
+    objectsRef.current = [];
+
+    setGameState('planning');
     setMessages([
       { id: 1, role: 'ai', text: "커스텀 맵!" },
-      { id: 2, role: 'ai', text: `토큰 ${editorTokens}개로 목표 도달하세요.` }
+      { id: 2, role: 'ai', text: `토큰 ${editorTokens}개로 목표에 도달하세요.` }
     ]);
 
     setScreen('game');
