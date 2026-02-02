@@ -3649,15 +3649,9 @@ const LogosGame = () => {
     return clearedStages[`${worldId}-${stageId}`] === true;
   };
 
-  // 스테이지 잠금 여부 확인
-  const isStageUnlocked = (worldId, stageId) => {
-    if (stageId === 1) {
-      if (worldId === 1) return true;
-      const prevWorld = stagesData.worlds.find(w => w.id === worldId - 1);
-      if (!prevWorld) return true;
-      return isStageCleared(worldId - 1, prevWorld.stages.length);
-    }
-    return isStageCleared(worldId, stageId - 1);
+  // 스테이지 잠금 여부 확인 (모두 해금)
+  const isStageUnlocked = () => {
+    return true;
   };
 
   // 스테이지 클리어 처리
@@ -3704,14 +3698,14 @@ const LogosGame = () => {
     }
   };
 
-  // 크리에이티브 모드 시작
+  // 맵 만들기 모드 시작
   const startCreativeMode = () => {
     setIsCreativeMode(true);
     setTokens(999);
 
     setMessages([
-      { id: 1, role: 'ai', text: "크리에이티브 모드!" },
-      { id: 2, role: 'ai', text: "토큰 무제한! 자유롭게 만들어보세요." }
+      { id: 1, role: 'ai', text: "맵 만들기 모드!" },
+      { id: 2, role: 'ai', text: "오브젝트를 자유롭게 배치해서 나만의 맵을 만들어보세요." }
     ]);
 
     if (bgImagesLoadedRef.current) {
@@ -3900,14 +3894,14 @@ const LogosGame = () => {
               스테이지 모드
             </button>
 
-            {/* 크리에이티브 모드 */}
+            {/* 맵 만들기 */}
             <button
               onClick={() => startCreativeMode()}
               className="group bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-black text-4xl py-8 px-12 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
               <Sparkles size={48} />
-              크리에이티브
+              맵 만들기
             </button>
 
             {/* 설정 */}
@@ -4006,8 +4000,8 @@ const LogosGame = () => {
                   <Sparkles className="text-white" size={20} />
                 </div>
                 <div>
-                  <h1 className="text-sm font-bold text-white tracking-wider">CREATIVE</h1>
-                  <div className="text-[10px] font-medium text-purple-400">자유 모드</div>
+                  <h1 className="text-sm font-bold text-white tracking-wider">MAP EDITOR</h1>
+                  <div className="text-[10px] font-medium text-purple-400">맵 만들기</div>
                 </div>
               </>
             ) : (
