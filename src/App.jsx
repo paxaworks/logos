@@ -3774,56 +3774,54 @@ const LogosGame = () => {
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
-    const floorY = height - 80;
+    const groundHeight = 60;
+    const floorY = height - groundHeight;
 
     // 배경 - 하늘
     const skyGradient = ctx.createLinearGradient(0, 0, 0, floorY);
-    skyGradient.addColorStop(0, '#38bdf8');
-    skyGradient.addColorStop(1, '#0284c7');
+    skyGradient.addColorStop(0, '#87CEEB');
+    skyGradient.addColorStop(1, '#4A90D9');
     ctx.fillStyle = skyGradient;
     ctx.fillRect(0, 0, width, floorY);
 
     // 바닥
-    const groundGradient = ctx.createLinearGradient(0, floorY, 0, height);
-    groundGradient.addColorStop(0, '#22c55e');
-    groundGradient.addColorStop(1, '#166534');
-    ctx.fillStyle = groundGradient;
-    ctx.fillRect(0, floorY, width, height - floorY);
+    ctx.fillStyle = '#4A7C23';
+    ctx.fillRect(0, floorY, width, groundHeight);
+    ctx.fillStyle = '#3D6B1E';
+    ctx.fillRect(0, floorY, width, 8);
 
     // 장애물 그리기
     editorObstacles.forEach(obs => {
       const obsX = obs.x - obs.width / 2;
       if (obs.type === 'wall') {
         // 벽
-        ctx.fillStyle = '#4B5563';
+        ctx.fillStyle = '#6B7280';
         ctx.fillRect(obsX, floorY - obs.height, obs.width, obs.height);
-        ctx.strokeStyle = '#374151';
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#4B5563';
+        ctx.lineWidth = 2;
         ctx.strokeRect(obsX, floorY - obs.height, obs.width, obs.height);
         // 벽돌 패턴
-        ctx.strokeStyle = '#1F2937';
+        ctx.strokeStyle = '#374151';
         ctx.lineWidth = 1;
-        for (let row = 0; row < obs.height; row += 20) {
+        for (let row = 0; row < obs.height; row += 25) {
           ctx.beginPath();
           ctx.moveTo(obsX, floorY - obs.height + row);
           ctx.lineTo(obsX + obs.width, floorY - obs.height + row);
           ctx.stroke();
         }
       } else if (obs.type === 'gap') {
-        // 구멍
+        // 구멍 - 바닥을 지움
         ctx.fillStyle = '#1a1a2e';
-        ctx.fillRect(obsX, floorY, obs.width, 80);
-        ctx.fillStyle = '#0f0f1a';
-        ctx.fillRect(obsX + 5, floorY + 5, obs.width - 10, 70);
+        ctx.fillRect(obsX, floorY, obs.width, groundHeight);
       } else if (obs.type === 'hazard') {
         // 위험 지역 (가시)
         ctx.fillStyle = '#DC2626';
-        const spikeWidth = 15;
+        const spikeWidth = 20;
         const spikeCount = Math.floor(obs.width / spikeWidth);
         for (let i = 0; i < spikeCount; i++) {
           ctx.beginPath();
           ctx.moveTo(obsX + i * spikeWidth, floorY);
-          ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, floorY - 30);
+          ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, floorY - 35);
           ctx.lineTo(obsX + (i + 1) * spikeWidth, floorY);
           ctx.fill();
         }
@@ -3834,7 +3832,7 @@ const LogosGame = () => {
     if (charImagesLoadedRef.current && charIdleRef.current) {
       const charImg = charIdleRef.current;
       const crop = { x: 200, y: 10, w: 290, h: 350 };
-      const drawHeight = 100;
+      const drawHeight = 90;
       const drawWidth = (crop.w / crop.h) * drawHeight;
       const drawX = editorStartX - drawWidth / 2;
       const drawY = floorY - drawHeight;
@@ -3842,65 +3840,26 @@ const LogosGame = () => {
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(charImg, crop.x, crop.y, crop.w, crop.h, drawX, drawY, drawWidth, drawHeight);
       ctx.imageSmoothingEnabled = true;
-
-      // 시작 라벨
-      ctx.fillStyle = 'rgba(0,0,0,0.7)';
-      ctx.fillRect(editorStartX - 25, floorY + 5, 50, 20);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('시작', editorStartX, floorY + 19);
-    } else {
-      // 캐릭터 로딩 안됨 - 플레이스홀더
-      ctx.fillStyle = '#3B82F6';
-      ctx.fillRect(editorStartX - 20, floorY - 60, 40, 60);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('시작', editorStartX, floorY + 15);
     }
 
     // 집 (도착 위치)
     if (goalImageLoadedRef.current && goalImageRef.current) {
-      const goalWidth = 140;
-      const goalHeight = 110;
+      const goalWidth = 160;
+      const goalHeight = 130;
       const goalX = editorGoalX - goalWidth / 2;
       const goalY = floorY - goalHeight;
 
       ctx.drawImage(goalImageRef.current, 90, 15, 310, 270, goalX, goalY, goalWidth, goalHeight);
-
-      // 도착 라벨
-      ctx.fillStyle = 'rgba(0,0,0,0.7)';
-      ctx.fillRect(editorGoalX - 25, floorY + 5, 50, 20);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('도착', editorGoalX, floorY + 19);
-    } else {
-      // 집 로딩 안됨 - 플레이스홀더
-      ctx.fillStyle = '#F59E0B';
-      ctx.fillRect(editorGoalX - 50, floorY - 80, 100, 80);
-      // 지붕
-      ctx.fillStyle = '#DC2626';
-      ctx.beginPath();
-      ctx.moveTo(editorGoalX - 60, floorY - 80);
-      ctx.lineTo(editorGoalX, floorY - 120);
-      ctx.lineTo(editorGoalX + 60, floorY - 80);
-      ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('도착', editorGoalX, floorY + 15);
     }
 
     // 선택된 도구 안내
     if (editorSelectedTool) {
-      ctx.fillStyle = 'rgba(0,0,0,0.7)';
-      ctx.fillRect(width / 2 - 120, 20, 240, 35);
+      ctx.fillStyle = 'rgba(0,0,0,0.8)';
+      ctx.fillRect(width / 2 - 100, 15, 200, 30);
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('캔버스를 클릭하여 배치하세요', width / 2, 43);
+      ctx.fillText('클릭하여 배치', width / 2, 36);
     }
   }, [editorStartX, editorGoalX, editorObstacles, editorSelectedTool]);
 
