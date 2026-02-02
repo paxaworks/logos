@@ -4176,6 +4176,10 @@ const LogosGame = () => {
     }
   }, [editorStart, editorGoal, editorObstacles, editorGrounds, editorSelectedTool, editorMousePos]);
 
+  // 에디터 가상 해상도 (게임과 동일한 비율 사용)
+  const EDITOR_VIRTUAL_WIDTH = 1200;
+  const EDITOR_VIRTUAL_HEIGHT = 675; // 16:9 비율
+
   // 에디터 캔버스 리사이즈
   useEffect(() => {
     if (screen !== 'mapEditor') return;
@@ -4189,8 +4193,20 @@ const LogosGame = () => {
       const rect = container.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      // 컨테이너에 맞추되 가상 해상도 비율 유지
+      const aspectRatio = EDITOR_VIRTUAL_WIDTH / EDITOR_VIRTUAL_HEIGHT;
+      let width = rect.width;
+      let height = rect.width / aspectRatio;
+
+      if (height > rect.height) {
+        height = rect.height;
+        width = rect.height * aspectRatio;
+      }
+
+      canvas.width = EDITOR_VIRTUAL_WIDTH;
+      canvas.height = EDITOR_VIRTUAL_HEIGHT;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
       drawEditorCanvas();
     };
 
@@ -4218,40 +4234,33 @@ const LogosGame = () => {
       return;
     }
 
-    const editorCanvas = editorCanvasRef.current;
-    if (!editorCanvas) return;
-
-    // 에디터 캔버스 크기 저장 (비율 계산용)
-    const editorWidth = editorCanvas.width;
-    const editorHeight = editorCanvas.height;
-
     setIsCreativeMode(false);
     setIsCustomMap(true);
     setTokens(editorTokens);
 
-    // 커스텀 맵 데이터를 비율로 저장
+    // 커스텀 맵 데이터를 가상 해상도 기준 비율로 저장
     setCustomMapData({
-      editorSize: { width: editorWidth, height: editorHeight },
+      virtualSize: { width: EDITOR_VIRTUAL_WIDTH, height: EDITOR_VIRTUAL_HEIGHT },
       start: {
-        xRatio: editorStart.x / editorWidth,
-        yRatio: editorStart.y / editorHeight
+        xRatio: editorStart.x / EDITOR_VIRTUAL_WIDTH,
+        yRatio: editorStart.y / EDITOR_VIRTUAL_HEIGHT
       },
       goal: {
-        xRatio: editorGoal.x / editorWidth,
-        yRatio: editorGoal.y / editorHeight
+        xRatio: editorGoal.x / EDITOR_VIRTUAL_WIDTH,
+        yRatio: editorGoal.y / EDITOR_VIRTUAL_HEIGHT
       },
       grounds: editorGrounds.map(g => ({
         ...g,
-        xRatio: g.x / editorWidth,
-        yRatio: g.y / editorHeight,
-        widthRatio: g.width / editorWidth
+        xRatio: g.x / EDITOR_VIRTUAL_WIDTH,
+        yRatio: g.y / EDITOR_VIRTUAL_HEIGHT,
+        widthRatio: g.width / EDITOR_VIRTUAL_WIDTH
       })),
       obstacles: editorObstacles.map(obs => ({
         ...obs,
-        xRatio: obs.x / editorWidth,
-        yRatio: obs.y / editorHeight,
-        widthRatio: obs.width / editorWidth,
-        heightRatio: obs.height / editorHeight,
+        xRatio: obs.x / EDITOR_VIRTUAL_WIDTH,
+        yRatio: obs.y / EDITOR_VIRTUAL_HEIGHT,
+        widthRatio: obs.width / EDITOR_VIRTUAL_WIDTH,
+        heightRatio: obs.height / EDITOR_VIRTUAL_HEIGHT,
         color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
       }))
     });
