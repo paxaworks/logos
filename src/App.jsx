@@ -3717,6 +3717,10 @@ const LogosGame = () => {
     return () => cancelAnimationFrame(requestRef.current);
   }, [loop]);
 
+  // 게임 가상 해상도 (에디터와 동일)
+  const GAME_VIRTUAL_WIDTH = 1200;
+  const GAME_VIRTUAL_HEIGHT = 675;
+
   // 캔버스 리사이즈 핸들러
   useEffect(() => {
     if (screen !== 'game') return;
@@ -3730,8 +3734,28 @@ const LogosGame = () => {
       const rect = parent.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      // 커스텀 맵이면 에디터와 동일한 가상 해상도 사용
+      if (isCustomMap && customMapData) {
+        const aspectRatio = GAME_VIRTUAL_WIDTH / GAME_VIRTUAL_HEIGHT;
+        let displayWidth = rect.width;
+        let displayHeight = rect.width / aspectRatio;
+
+        if (displayHeight > rect.height) {
+          displayHeight = rect.height;
+          displayWidth = rect.height * aspectRatio;
+        }
+
+        canvas.width = GAME_VIRTUAL_WIDTH;
+        canvas.height = GAME_VIRTUAL_HEIGHT;
+        canvas.style.width = `${displayWidth}px`;
+        canvas.style.height = `${displayHeight}px`;
+      } else {
+        // 기본 스테이지는 부모 크기 사용
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        canvas.style.width = '';
+        canvas.style.height = '';
+      }
 
       // 플레이어 초기 위치 업데이트
       const FLOOR_OFFSET = 130;
