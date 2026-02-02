@@ -118,6 +118,9 @@ const LogosGame = () => {
   const cloudImgRef = useRef(null);
   const natureTilesLoadedRef = useRef(false);
   const bgCloudsRef = useRef([]);
+
+  // 커스텀 이미지 캐시
+  const customImageCacheRef = useRef({});
   const cameraOffsetRef = useRef(0);
 
   // 현재 월드 (1: 아침, 2: 점심, 3: 저녁, 4: 새벽)
@@ -2902,9 +2905,6 @@ const LogosGame = () => {
     ctx.fill();
     ctx.restore();
   };
-
-  // 커스텀 이미지 캐시
-  const customImageCacheRef = useRef({});
 
   const drawCompositeShape = (ctx, obj, x, y, w, h) => {
     // 커스텀 이미지가 있으면 사용
