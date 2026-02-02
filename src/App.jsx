@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2, ChevronLeft, ChevronRight, Lock, Star, Sparkles, Upload, Image, Trash2, Home } from 'lucide-react';
 import objectsData from './objects.json';
-import stagesData from './stages.json';
+import stagesDataRaw from './stages.json';
+
+// 안전하게 stagesData 초기화
+const stagesData = stagesDataRaw || { worlds: [] };
 
 const LogosGame = () => {
   // --- 게임 화면 상태 ---
@@ -14,8 +17,10 @@ const LogosGame = () => {
   const [selectedWorld, setSelectedWorld] = useState(1);
   const [selectedStage, setSelectedStage] = useState(1);
   const [clearedStages, setClearedStages] = useState(() => {
-    const saved = localStorage.getItem('cleared_stages');
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem('cleared_stages');
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
   });
   const [stageObstacles, setStageObstacles] = useState([]); // 현재 스테이지의 장애물
 
@@ -43,8 +48,10 @@ const LogosGame = () => {
   // PNG 교체 시스템
   const [showImageReplacer, setShowImageReplacer] = useState(false);
   const [customImages, setCustomImages] = useState(() => {
-    const saved = localStorage.getItem('custom_images');
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem('custom_images');
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
   });
   const fileInputRef = useRef(null);
   const [selectedObjectForImage, setSelectedObjectForImage] = useState(null);
