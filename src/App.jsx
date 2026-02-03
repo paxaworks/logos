@@ -3733,6 +3733,7 @@ const LogosGame = () => {
       // 부모 크기에 맞춤 (원래 방식)
       canvas.width = rect.width;
       canvas.height = rect.height;
+      console.log('게임 캔버스 크기:', canvas.width, 'x', canvas.height);
 
       // 플레이어 초기 위치 업데이트
       const FLOOR_OFFSET = 130;
@@ -4194,6 +4195,7 @@ const LogosGame = () => {
       // 부모 크기에 맞춤 (게임과 동일)
       canvas.width = rect.width;
       canvas.height = rect.height;
+      console.log('에디터 캔버스 크기:', canvas.width, 'x', canvas.height);
       drawEditorCanvas();
     };
 
