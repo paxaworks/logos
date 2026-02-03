@@ -4292,10 +4292,10 @@ const LogosGame = () => {
           </div>
 
           {/* 캔버스 영역 - 좌클릭 배치, 우클릭 삭제 */}
-          <div className="flex-1 relative m-4 rounded-xl overflow-hidden bg-sky-200" id="editorCanvasContainer">
+          <div className="flex-1 relative overflow-hidden" id="editorCanvasContainer">
             <canvas
               ref={editorCanvasRef}
-              className={`w-full h-full ${editorSelectedTool ? 'cursor-crosshair' : 'cursor-default'}`}
+              className={`absolute inset-0 w-full h-full ${editorSelectedTool ? 'cursor-crosshair' : 'cursor-default'}`}
               onClick={handleEditorCanvasClick}
               onContextMenu={handleEditorRightClick}
               onMouseMove={handleEditorMouseMove}
