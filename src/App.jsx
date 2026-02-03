@@ -561,8 +561,9 @@ const LogosGame = () => {
     let startY = canvas ? canvas.height - FLOOR_OFFSET - 100 : 500;
 
     if (isCustomMap && customMapData && canvas) {
+      const playHeight = canvas.height - FLOOR_OFFSET;
       startX = customMapData.start.xRatio * canvas.width - 20;
-      startY = customMapData.start.yRatio * canvas.height - 60;
+      startY = customMapData.start.yRatio * playHeight - 60;
     }
 
     playerRef.current = {
@@ -1492,7 +1493,7 @@ const LogosGame = () => {
       // 커스텀 맵인 경우 에디터에서 만든 바닥과 충돌
       if (isCustomMap && customMapData) {
         const cw = canvas.width;
-        const ch = canvas.height;
+        const ch = canvas.height - FLOOR_OFFSET; // 인벤토리 제외한 플레이 영역
 
         customMapData.grounds.forEach(ground => {
           // 비율 -> 실제 좌표
@@ -1741,9 +1742,10 @@ const LogosGame = () => {
 
       let goalX, goalY;
       if (isCustomMap && customMapData) {
-        // 커스텀 맵의 골 위치 (비율 -> 실제 좌표)
+        // 커스텀 맵의 골 위치 (비율 -> 실제 좌표, 인벤토리 제외)
+        const playHeight = canvas.height - FLOOR_OFFSET;
         goalX = customMapData.goal.xRatio * canvas.width - goalWidth / 2;
-        goalY = customMapData.goal.yRatio * canvas.height - goalHeight;
+        goalY = customMapData.goal.yRatio * playHeight - goalHeight;
       } else {
         // 기본 스테이지 골 위치
         goalX = canvas.width - goalWidth;
@@ -3441,7 +3443,7 @@ const LogosGame = () => {
     // 커스텀 맵인 경우 에디터에서 만든 바닥 사용
     if (isCustomMap && customMapData) {
       const cw = canvas.width;
-      const ch = canvas.height;
+      const ch = canvas.height - FLOOR_OFFSET; // 인벤토리 제외한 플레이 영역
 
       // 커스텀 바닥 그리기 (비율 -> 실제 좌표)
       customMapData.grounds.forEach(ground => {
@@ -3733,15 +3735,15 @@ const LogosGame = () => {
       // 부모 크기에 맞춤 (원래 방식)
       canvas.width = rect.width;
       canvas.height = rect.height;
-      console.log('게임 캔버스 크기:', canvas.width, 'x', canvas.height);
 
       // 플레이어 초기 위치 업데이트
       const FLOOR_OFFSET = 130;
       if (gameState === 'planning') {
         if (isCustomMap && customMapData) {
-          // 커스텀 맵: 비율 기반 시작 위치
+          // 커스텀 맵: 비율 기반 시작 위치 (인벤토리 제외)
+          const playHeight = canvas.height - FLOOR_OFFSET;
           playerRef.current.x = customMapData.start.xRatio * canvas.width - 20;
-          playerRef.current.y = customMapData.start.yRatio * canvas.height - 60;
+          playerRef.current.y = customMapData.start.yRatio * playHeight - 60;
         } else {
           // 기본 스테이지
           playerRef.current.x = 50;
@@ -4195,7 +4197,6 @@ const LogosGame = () => {
       // 부모 크기에 맞춤 (게임과 동일)
       canvas.width = rect.width;
       canvas.height = rect.height;
-      console.log('에디터 캔버스 크기:', canvas.width, 'x', canvas.height);
       drawEditorCanvas();
     };
 
@@ -4232,33 +4233,36 @@ const LogosGame = () => {
 
     const editorWidth = editorCanvas.width;
     const editorHeight = editorCanvas.height;
+    // 에디터에서 인벤토리 영역을 제외한 플레이 영역 높이
+    const FLOOR_OFFSET = 130;
+    const editorPlayHeight = editorHeight - FLOOR_OFFSET;
 
     setIsCreativeMode(false);
     setIsCustomMap(true);
     setTokens(editorTokens);
 
-    // 커스텀 맵 데이터를 비율로 저장
+    // 커스텀 맵 데이터를 비율로 저장 (인벤토리 영역 제외)
     setCustomMapData({
       start: {
         xRatio: editorStart.x / editorWidth,
-        yRatio: editorStart.y / editorHeight
+        yRatio: editorStart.y / editorPlayHeight
       },
       goal: {
         xRatio: editorGoal.x / editorWidth,
-        yRatio: editorGoal.y / editorHeight
+        yRatio: editorGoal.y / editorPlayHeight
       },
       grounds: editorGrounds.map(g => ({
         ...g,
         xRatio: g.x / editorWidth,
-        yRatio: g.y / editorHeight,
+        yRatio: g.y / editorPlayHeight,
         widthRatio: g.width / editorWidth
       })),
       obstacles: editorObstacles.map(obs => ({
         ...obs,
         xRatio: obs.x / editorWidth,
-        yRatio: obs.y / editorHeight,
+        yRatio: obs.y / editorPlayHeight,
         widthRatio: obs.width / editorWidth,
-        heightRatio: obs.height / editorHeight,
+        heightRatio: obs.height / editorPlayHeight,
         color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
       }))
     });
