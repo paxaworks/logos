@@ -561,9 +561,8 @@ const LogosGame = () => {
     let startY = canvas ? canvas.height - FLOOR_OFFSET - 100 : 500;
 
     if (isCustomMap && customMapData && canvas) {
-      const playHeight = canvas.height - FLOOR_OFFSET;
       startX = customMapData.start.xRatio * canvas.width - 20;
-      startY = customMapData.start.yRatio * playHeight - 60;
+      startY = customMapData.start.yRatio * canvas.height - 60;
     }
 
     playerRef.current = {
@@ -1493,7 +1492,7 @@ const LogosGame = () => {
       // 커스텀 맵인 경우 에디터에서 만든 바닥과 충돌
       if (isCustomMap && customMapData) {
         const cw = canvas.width;
-        const ch = canvas.height - FLOOR_OFFSET; // 인벤토리 제외한 플레이 영역
+        const ch = canvas.height; // 전체 캔버스 (에디터와 동일 비율)
 
         customMapData.grounds.forEach(ground => {
           // 비율 -> 실제 좌표
@@ -1742,10 +1741,9 @@ const LogosGame = () => {
 
       let goalX, goalY;
       if (isCustomMap && customMapData) {
-        // 커스텀 맵의 골 위치 (비율 -> 실제 좌표, 인벤토리 제외)
-        const playHeight = canvas.height - FLOOR_OFFSET;
+        // 커스텀 맵의 골 위치 (비율 -> 실제 좌표)
         goalX = customMapData.goal.xRatio * canvas.width - goalWidth / 2;
-        goalY = customMapData.goal.yRatio * playHeight - goalHeight;
+        goalY = customMapData.goal.yRatio * canvas.height - goalHeight;
       } else {
         // 기본 스테이지 골 위치
         goalX = canvas.width - goalWidth;
@@ -3443,7 +3441,7 @@ const LogosGame = () => {
     // 커스텀 맵인 경우 에디터에서 만든 바닥 사용
     if (isCustomMap && customMapData) {
       const cw = canvas.width;
-      const ch = canvas.height - FLOOR_OFFSET; // 인벤토리 제외한 플레이 영역
+      const ch = canvas.height; // 전체 캔버스 (에디터와 동일 비율)
 
       // 커스텀 바닥 그리기 (비율 -> 실제 좌표)
       customMapData.grounds.forEach(ground => {
@@ -3732,18 +3730,30 @@ const LogosGame = () => {
       const rect = parent.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      // 부모 크기에 맞춤 (원래 방식)
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      // 커스텀 맵이면 에디터와 동일한 비율, 아니면 부모 크기
+      if (isCustomMap) {
+        const editorAspect = 1717 / 1281;
+        const containerAspect = rect.width / rect.height;
+
+        if (containerAspect > editorAspect) {
+          canvas.height = rect.height;
+          canvas.width = rect.height * editorAspect;
+        } else {
+          canvas.width = rect.width;
+          canvas.height = rect.width / editorAspect;
+        }
+      } else {
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+      }
 
       // 플레이어 초기 위치 업데이트
       const FLOOR_OFFSET = 130;
       if (gameState === 'planning') {
         if (isCustomMap && customMapData) {
-          // 커스텀 맵: 비율 기반 시작 위치 (인벤토리 제외)
-          const playHeight = canvas.height - FLOOR_OFFSET;
+          // 커스텀 맵: 비율 기반 시작 위치
           playerRef.current.x = customMapData.start.xRatio * canvas.width - 20;
-          playerRef.current.y = customMapData.start.yRatio * playHeight - 60;
+          playerRef.current.y = customMapData.start.yRatio * canvas.height - 60;
         } else {
           // 기본 스테이지
           playerRef.current.x = 50;
@@ -4194,7 +4204,7 @@ const LogosGame = () => {
       const rect = container.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      // 부모 크기에 맞춤 (게임과 동일)
+      // 부모 크기에 맞춤
       canvas.width = rect.width;
       canvas.height = rect.height;
       drawEditorCanvas();
@@ -4233,36 +4243,33 @@ const LogosGame = () => {
 
     const editorWidth = editorCanvas.width;
     const editorHeight = editorCanvas.height;
-    // 에디터에서 인벤토리 영역을 제외한 플레이 영역 높이
-    const FLOOR_OFFSET = 130;
-    const editorPlayHeight = editorHeight - FLOOR_OFFSET;
 
     setIsCreativeMode(false);
     setIsCustomMap(true);
     setTokens(editorTokens);
 
-    // 커스텀 맵 데이터를 비율로 저장 (인벤토리 영역 제외)
+    // 커스텀 맵 데이터를 비율로 저장 (전체 캔버스 기준)
     setCustomMapData({
       start: {
         xRatio: editorStart.x / editorWidth,
-        yRatio: editorStart.y / editorPlayHeight
+        yRatio: editorStart.y / editorHeight
       },
       goal: {
         xRatio: editorGoal.x / editorWidth,
-        yRatio: editorGoal.y / editorPlayHeight
+        yRatio: editorGoal.y / editorHeight
       },
       grounds: editorGrounds.map(g => ({
         ...g,
         xRatio: g.x / editorWidth,
-        yRatio: g.y / editorPlayHeight,
+        yRatio: g.y / editorHeight,
         widthRatio: g.width / editorWidth
       })),
       obstacles: editorObstacles.map(obs => ({
         ...obs,
         xRatio: obs.x / editorWidth,
-        yRatio: obs.y / editorPlayHeight,
+        yRatio: obs.y / editorHeight,
         widthRatio: obs.width / editorWidth,
-        heightRatio: obs.height / editorPlayHeight,
+        heightRatio: obs.height / editorHeight,
         color: obs.type === 'hazard' ? '#EF4444' : '#4B5563'
       }))
     });
