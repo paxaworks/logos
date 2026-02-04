@@ -4069,25 +4069,31 @@ const LogosGame = () => {
     });
 
     // 캐릭터 (시작 위치) - 자유 배치 (배치된 경우에만)
+    // 게임과 동일한 크기/위치로 표시 (충돌박스: width=40, height=100)
     if (editorStart && charImagesLoadedRef.current && charIdleRef.current) {
       const charImg = charIdleRef.current;
       const crop = { x: 200, y: 10, w: 290, h: 350 };
-      const drawHeight = 90;
+      const drawHeight = 100; // 게임과 동일
       const drawWidth = (crop.w / crop.h) * drawHeight;
+      // 게임에서: startX = customMapData.start.x - 20, 그리기는 charCenterX - drawWidth/2
+      // charCenterX = x + 40/2 = x + 20 = (customMapData.start.x - 20) + 20 = customMapData.start.x
+      // 따라서 drawX = customMapData.start.x - drawWidth/2 = editorStart.x - drawWidth/2
       const drawX = editorStart.x - drawWidth / 2;
-      const drawY = editorStart.y - drawHeight;
+      // 게임에서: startY = customMapData.start.y - 100, 그리기는 y + 100 - 100 + 15 = y + 15
+      // y = customMapData.start.y - 100, 따라서 drawY = (customMapData.start.y - 100) + 15 = customMapData.start.y - 85
+      const drawY = editorStart.y - 85;
 
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(charImg, crop.x, crop.y, crop.w, crop.h, drawX, drawY, drawWidth, drawHeight);
       ctx.imageSmoothingEnabled = true;
 
-      // 시작 표시
+      // 시작 표시 (캐릭터 위에)
       ctx.fillStyle = 'rgba(59, 130, 246, 0.8)';
-      ctx.fillRect(editorStart.x - 20, editorStart.y - drawHeight - 20, 40, 18);
+      ctx.fillRect(editorStart.x - 20, drawY - 22, 40, 18);
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 11px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('시작', editorStart.x, editorStart.y - drawHeight - 7);
+      ctx.fillText('시작', editorStart.x, drawY - 9);
     }
 
     // 집 (도착 위치) - 자유 배치 (배치된 경우에만)
