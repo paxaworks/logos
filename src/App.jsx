@@ -562,7 +562,7 @@ const LogosGame = () => {
 
     if (isCustomMap && customMapData) {
       startX = customMapData.start.x - 20;
-      startY = customMapData.start.y - 60;
+      startY = customMapData.start.y - 100; // 캐릭터 height
     }
 
     playerRef.current = {
@@ -3733,7 +3733,7 @@ const LogosGame = () => {
         if (isCustomMap && customMapData) {
           // 커스텀 맵: 절대 좌표 (에디터와 동일한 해상도)
           playerRef.current.x = customMapData.start.x - 20;
-          playerRef.current.y = customMapData.start.y - 60;
+          playerRef.current.y = customMapData.start.y - 100; // 캐릭터 height
         } else {
           // 기본 스테이지
           playerRef.current.x = 50;
