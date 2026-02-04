@@ -3985,16 +3985,35 @@ const LogosGame = () => {
     ctx.fillStyle = skyGradient;
     ctx.fillRect(0, 0, width, height);
 
-    // 그리드 표시 (배치 도움)
+    // 인벤토리 영역 (게임과 동일하게 하단 130px)
+    const FLOOR_OFFSET = 130;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    ctx.fillRect(0, height - FLOOR_OFFSET, width, FLOOR_OFFSET);
+
+    // 인벤토리 영역 경계선
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, height - FLOOR_OFFSET);
+    ctx.lineTo(width, height - FLOOR_OFFSET);
+    ctx.stroke();
+
+    // 인벤토리 안내 텍스트
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('인벤토리 영역 (배치 불가)', width / 2, height - FLOOR_OFFSET / 2 + 5);
+
+    // 그리드 표시 (배치 도움) - 인벤토리 위까지만
     ctx.strokeStyle = 'rgba(255,255,255,0.1)';
     ctx.lineWidth = 1;
     for (let x = 0; x < width; x += 64) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
+      ctx.lineTo(x, height - FLOOR_OFFSET);
       ctx.stroke();
     }
-    for (let y = 0; y < height; y += 64) {
+    for (let y = 0; y < height - FLOOR_OFFSET; y += 64) {
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(width, y);
