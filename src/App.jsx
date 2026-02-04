@@ -3730,22 +3730,9 @@ const LogosGame = () => {
       const rect = parent.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      // 커스텀 맵이면 에디터와 동일한 비율, 아니면 부모 크기
-      if (isCustomMap) {
-        const editorAspect = 1717 / 1281;
-        const containerAspect = rect.width / rect.height;
-
-        if (containerAspect > editorAspect) {
-          canvas.height = rect.height;
-          canvas.width = rect.height * editorAspect;
-        } else {
-          canvas.width = rect.width;
-          canvas.height = rect.width / editorAspect;
-        }
-      } else {
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-      }
+      // 항상 부모 크기에 맞춤 (원래 방식)
+      canvas.width = rect.width;
+      canvas.height = rect.height;
 
       // 플레이어 초기 위치 업데이트
       const FLOOR_OFFSET = 130;
@@ -3839,6 +3826,8 @@ const LogosGame = () => {
   // 게임 시작 함수 (스테이지 모드)
   const startGame = (worldId, stageId) => {
     setIsCreativeMode(false);
+    setIsCustomMap(false);
+    setCustomMapData(null);
     const wId = worldId || selectedWorld;
     const sId = stageId || selectedStage;
     setSelectedWorld(wId);
