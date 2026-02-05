@@ -3551,79 +3551,62 @@ const LogosGame = () => {
     const floorY = canvas.height - FLOOR_OFFSET;
 
     // 에디터 모드 또는 커스텀 맵 플레이 모드
-    if (isEditorMode || (isCustomMap && customMapData)) {
-      // 에디터 모드일 때는 스케일 없이 직접 그림
-      // 커스텀 맵 플레이 모드일 때는 스케일 적용
-      const useScale = !isEditorMode;
-      const EDITOR_WIDTH = 1920;
-      const EDITOR_HEIGHT = 1080;
-      const scaleX = useScale ? canvas.width / EDITOR_WIDTH : 1;
-      const scaleY = useScale ? canvas.height / EDITOR_HEIGHT : 1;
-
+    // 둘 다 editorGrounds, editorObstacles, editorGoal 직접 사용 (스케일 없이)
+    if (isEditorMode || isCustomMap) {
       // 커스텀 바닥 그리기
-      const groundsToDraw = isEditorMode ? editorGrounds : (customMapData?.grounds || []);
-      groundsToDraw.forEach(ground => {
-        const gx = ground.x * scaleX;
-        const gy = ground.y * scaleY;
-        const gw = ground.width * scaleX;
-        drawGroundTiles(ctx, canvas, gx, gx + gw, gy);
+      editorGrounds.forEach(ground => {
+        drawGroundTiles(ctx, canvas, ground.x, ground.x + ground.width, ground.y);
       });
 
       // 커스텀 장애물 그리기
-      const obstaclesToDraw = isEditorMode ? editorObstacles : (customMapData?.obstacles || []);
-      obstaclesToDraw.forEach(obs => {
-        const scaledX = obs.x * scaleX;
-        const scaledY = obs.y * scaleY;
-        const scaledW = obs.width * scaleX;
-        const scaledH = obs.height * scaleY;
-        const obsX = scaledX - scaledW / 2;
-        const obsY = scaledY - scaledH;
+      editorObstacles.forEach(obs => {
+        const obsX = obs.x - obs.width / 2;
+        const obsY = obs.y - obs.height;
         if (obs.type === 'wall') {
           ctx.fillStyle = '#6B7280';
-          ctx.fillRect(obsX, obsY, scaledW, scaledH);
+          ctx.fillRect(obsX, obsY, obs.width, obs.height);
           ctx.strokeStyle = '#4B5563';
           ctx.lineWidth = 2;
-          ctx.strokeRect(obsX, obsY, scaledW, scaledH);
+          ctx.strokeRect(obsX, obsY, obs.width, obs.height);
           // 벽돌 패턴
           ctx.strokeStyle = '#374151';
           ctx.lineWidth = 1;
-          for (let row = 0; row < scaledH; row += 25 * scaleY) {
+          for (let row = 0; row < obs.height; row += 25) {
             ctx.beginPath();
             ctx.moveTo(obsX, obsY + row);
-            ctx.lineTo(obsX + scaledW, obsY + row);
+            ctx.lineTo(obsX + obs.width, obsY + row);
             ctx.stroke();
           }
         } else if (obs.type === 'hazard') {
           ctx.fillStyle = '#DC2626';
-          const spikeWidth = 20 * scaleX;
-          const spikeCount = Math.floor(scaledW / spikeWidth);
+          const spikeWidth = 20;
+          const spikeCount = Math.floor(obs.width / spikeWidth);
           for (let i = 0; i < spikeCount; i++) {
             ctx.beginPath();
-            ctx.moveTo(obsX + i * spikeWidth, scaledY);
-            ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, scaledY - 35 * scaleY);
-            ctx.lineTo(obsX + (i + 1) * spikeWidth, scaledY);
+            ctx.moveTo(obsX + i * spikeWidth, obs.y);
+            ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, obs.y - 35);
+            ctx.lineTo(obsX + (i + 1) * spikeWidth, obs.y);
             ctx.fill();
           }
         }
       });
 
       // 도착 지점 (집) 그리기
-      const goalData = isEditorMode ? editorGoal : customMapData?.goal;
-      if (goalData && goalImageLoadedRef.current && goalImageRef.current) {
-        const goalWidth = 160 * scaleX;
-        const goalHeight = 130 * scaleY;
-        const goalX = goalData.x * scaleX - goalWidth / 2;
-        const goalY = goalData.y * scaleY - goalHeight;
+      if (editorGoal && goalImageLoadedRef.current && goalImageRef.current) {
+        const goalWidth = 160;
+        const goalHeight = 130;
+        const goalX = editorGoal.x - goalWidth / 2;
+        const goalY = editorGoal.y - goalHeight;
         ctx.drawImage(goalImageRef.current, 125, 90, 380, 310, goalX, goalY, goalWidth, goalHeight);
 
         // 에디터 모드에서 도착 라벨 표시
         if (isEditorMode) {
           ctx.fillStyle = 'rgba(245, 158, 11, 0.8)';
-          ctx.fillRect(goalData.x - 20, goalY - 20, 40, 18);
+          ctx.fillRect(editorGoal.x - 20, goalY - 20, 40, 18);
           ctx.fillStyle = '#fff';
           ctx.font = 'bold 11px sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText('도착', goalData.x, goalY - 7);
+          ctx.fillText('도착', editorGoal.x, goalY - 7);
         }
       }
 
