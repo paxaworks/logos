@@ -4609,6 +4609,8 @@ const LogosGame = () => {
                   }
                   // 에디터 모드 종료하고 플레이 모드로 전환
                   setIsEditorMode(false);
+                  setIsCustomMap(true);
+                  setIsCreativeMode(false);
                   setTokens(editorTokens);
                   // 플레이어 위치 설정
                   const canvas = canvasRef.current;
