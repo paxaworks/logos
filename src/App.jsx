@@ -560,9 +560,14 @@ const LogosGame = () => {
     let startX = 50;
     let startY = canvas ? canvas.height - FLOOR_OFFSET - 100 : 500;
 
-    if (isCustomMap && customMapData) {
-      startX = customMapData.start.x - 20;
-      startY = customMapData.start.y - 100; // 캐릭터 height
+    if (isCustomMap && customMapData && canvas) {
+      // 에디터 좌표를 현재 캔버스 크기에 맞게 변환
+      const EDITOR_WIDTH = 1920;
+      const EDITOR_HEIGHT = 1080;
+      const scaleX = canvas.width / EDITOR_WIDTH;
+      const scaleY = canvas.height / EDITOR_HEIGHT;
+      startX = customMapData.start.x * scaleX - 20;
+      startY = customMapData.start.y * scaleY - 100;
     }
 
     playerRef.current = {
@@ -1489,12 +1494,18 @@ const LogosGame = () => {
       const FLOOR_OFFSET = 130; // 인벤토리 공간 확보
       const floorY = canvas.height - FLOOR_OFFSET;
 
-      // 커스텀 맵인 경우 에디터에서 만든 바닥과 충돌 (절대 좌표)
+      // 커스텀 맵인 경우 에디터에서 만든 바닥과 충돌 (좌표 변환 적용)
       if (isCustomMap && customMapData) {
+        // 에디터 좌표 -> 현재 캔버스 좌표 변환
+        const EDITOR_WIDTH = 1920;
+        const EDITOR_HEIGHT = 1080;
+        const scaleX = canvas.width / EDITOR_WIDTH;
+        const scaleY = canvas.height / EDITOR_HEIGHT;
+
         customMapData.grounds.forEach(ground => {
-          const groundTop = ground.y;
-          const groundLeft = ground.x;
-          const groundRight = ground.x + ground.width;
+          const groundTop = ground.y * scaleY;
+          const groundLeft = ground.x * scaleX;
+          const groundRight = (ground.x + ground.width) * scaleX;
           if (p.x + p.width > groundLeft && p.x < groundRight &&
               p.y + p.height >= groundTop && p.y + p.height <= groundTop + 20) {
             p.y = groundTop - p.height;
@@ -1503,12 +1514,16 @@ const LogosGame = () => {
           }
         });
 
-        // 커스텀 맵 장애물 충돌 (절대 좌표)
+        // 커스텀 맵 장애물 충돌 (좌표 변환 적용)
         customMapData.obstacles.forEach(obs => {
-          const obsLeft = obs.x - obs.width / 2;
-          const obsRight = obs.x + obs.width / 2;
-          const obsTop = obs.y - obs.height;
-          const obsBottom = obs.y;
+          const scaledX = obs.x * scaleX;
+          const scaledY = obs.y * scaleY;
+          const scaledW = obs.width * scaleX;
+          const scaledH = obs.height * scaleY;
+          const obsLeft = scaledX - scaledW / 2;
+          const obsRight = scaledX + scaledW / 2;
+          const obsTop = scaledY - scaledH;
+          const obsBottom = scaledY;
 
           if (obs.type === 'wall') {
             if (p.x + p.width > obsLeft && p.x < obsRight &&
@@ -1724,14 +1739,20 @@ const LogosGame = () => {
         setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 떨어졌어요..." }]);
       }
       // 도착 판정 - 집 영역과 일치
-      const goalWidth = 160;
-      const goalHeight = 130;
+      let goalWidth = 160;
+      let goalHeight = 130;
 
       let goalX, goalY;
       if (isCustomMap && customMapData) {
-        // 커스텀 맵의 골 위치 (절대 좌표)
-        goalX = customMapData.goal.x - goalWidth / 2;
-        goalY = customMapData.goal.y - goalHeight;
+        // 커스텀 맵의 골 위치 (좌표 변환 적용)
+        const EDITOR_WIDTH = 1920;
+        const EDITOR_HEIGHT = 1080;
+        const scaleX = canvas.width / EDITOR_WIDTH;
+        const scaleY = canvas.height / EDITOR_HEIGHT;
+        goalWidth = 160 * scaleX;
+        goalHeight = 130 * scaleY;
+        goalX = customMapData.goal.x * scaleX - goalWidth / 2;
+        goalY = customMapData.goal.y * scaleY - goalHeight;
       } else {
         // 기본 스테이지 골 위치
         goalX = canvas.width - goalWidth;
@@ -3426,42 +3447,55 @@ const LogosGame = () => {
     const FLOOR_OFFSET = 130;
     const floorY = canvas.height - FLOOR_OFFSET;
 
-    // 커스텀 맵인 경우 에디터에서 만든 바닥 사용 (절대 좌표)
+    // 커스텀 맵인 경우 에디터에서 만든 바닥 사용 (좌표 변환 적용)
     if (isCustomMap && customMapData) {
-      // 커스텀 바닥 그리기 (절대 좌표)
+      // 에디터 좌표 -> 현재 캔버스 좌표 변환
+      const EDITOR_WIDTH = 1920;
+      const EDITOR_HEIGHT = 1080;
+      const scaleX = canvas.width / EDITOR_WIDTH;
+      const scaleY = canvas.height / EDITOR_HEIGHT;
+
+      // 커스텀 바닥 그리기
       customMapData.grounds.forEach(ground => {
-        drawGroundTiles(ctx, canvas, ground.x, ground.x + ground.width, ground.y);
+        const gx = ground.x * scaleX;
+        const gy = ground.y * scaleY;
+        const gw = ground.width * scaleX;
+        drawGroundTiles(ctx, canvas, gx, gx + gw, gy);
       });
 
-      // 커스텀 장애물 그리기 (절대 좌표)
+      // 커스텀 장애물 그리기
       customMapData.obstacles.forEach(obs => {
-        const obsX = obs.x - obs.width / 2;
-        const obsY = obs.y - obs.height;
+        const scaledX = obs.x * scaleX;
+        const scaledY = obs.y * scaleY;
+        const scaledW = obs.width * scaleX;
+        const scaledH = obs.height * scaleY;
+        const obsX = scaledX - scaledW / 2;
+        const obsY = scaledY - scaledH;
         if (obs.type === 'wall') {
           ctx.fillStyle = '#6B7280';
-          ctx.fillRect(obsX, obsY, obs.width, obs.height);
+          ctx.fillRect(obsX, obsY, scaledW, scaledH);
           ctx.strokeStyle = '#4B5563';
           ctx.lineWidth = 2;
-          ctx.strokeRect(obsX, obsY, obs.width, obs.height);
+          ctx.strokeRect(obsX, obsY, scaledW, scaledH);
         } else if (obs.type === 'hazard') {
           ctx.fillStyle = '#DC2626';
-          const spikeWidth = 20;
-          const spikeCount = Math.floor(obs.width / spikeWidth);
+          const spikeWidth = 20 * scaleX;
+          const spikeCount = Math.floor(scaledW / spikeWidth);
           for (let i = 0; i < spikeCount; i++) {
             ctx.beginPath();
-            ctx.moveTo(obsX + i * spikeWidth, obs.y);
-            ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, obs.y - 35);
-            ctx.lineTo(obsX + (i + 1) * spikeWidth, obs.y);
+            ctx.moveTo(obsX + i * spikeWidth, scaledY);
+            ctx.lineTo(obsX + i * spikeWidth + spikeWidth / 2, scaledY - 35 * scaleY);
+            ctx.lineTo(obsX + (i + 1) * spikeWidth, scaledY);
             ctx.fill();
           }
         }
       });
 
-      // 커스텀 골 (집) - 절대 좌표
-      const goalWidth = 160;
-      const goalHeight = 130;
-      const goalX = customMapData.goal.x - goalWidth / 2;
-      const goalY = customMapData.goal.y - goalHeight;
+      // 커스텀 골 (집)
+      const goalWidth = 160 * scaleX;
+      const goalHeight = 130 * scaleY;
+      const goalX = customMapData.goal.x * scaleX - goalWidth / 2;
+      const goalY = customMapData.goal.y * scaleY - goalHeight;
 
       if (goalImageLoadedRef.current && goalImageRef.current) {
         ctx.drawImage(goalImageRef.current, 125, 90, 380, 310, goalX, goalY, goalWidth, goalHeight);
@@ -3708,32 +3742,24 @@ const LogosGame = () => {
       const rect = parent.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      // 커스텀 맵: 에디터와 동일한 고정 해상도
-      // 일반 스테이지: 부모 크기에 맞춤
-      const FIXED_WIDTH = 1920;
-      const FIXED_HEIGHT = 1080;
-
-      if (isCustomMap) {
-        canvas.width = FIXED_WIDTH;
-        canvas.height = FIXED_HEIGHT;
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
-        canvas.style.objectFit = 'contain';
-      } else {
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        canvas.style.width = '';
-        canvas.style.height = '';
-        canvas.style.objectFit = '';
-      }
+      // 모든 맵 동일하게 부모 크기에 맞춤
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      canvas.style.width = '';
+      canvas.style.height = '';
+      canvas.style.objectFit = '';
 
       // 플레이어 초기 위치 업데이트
       const FLOOR_OFFSET = 130;
       if (gameState === 'planning') {
         if (isCustomMap && customMapData) {
-          // 커스텀 맵: 절대 좌표 (에디터와 동일한 해상도)
-          playerRef.current.x = customMapData.start.x - 20;
-          playerRef.current.y = customMapData.start.y - 100; // 캐릭터 height
+          // 커스텀 맵: 에디터 좌표를 현재 캔버스 크기에 맞게 변환
+          const EDITOR_WIDTH = 1920;
+          const EDITOR_HEIGHT = 1080;
+          const scaleX = canvas.width / EDITOR_WIDTH;
+          const scaleY = canvas.height / EDITOR_HEIGHT;
+          playerRef.current.x = customMapData.start.x * scaleX - 20;
+          playerRef.current.y = customMapData.start.y * scaleY - 100;
         } else {
           // 기본 스테이지
           playerRef.current.x = 50;
