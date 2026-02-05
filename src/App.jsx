@@ -3881,7 +3881,10 @@ const LogosGame = () => {
       }
     }
 
-    // 플레이어 (픽셀아트 캐릭터)
+    // 플레이어 (픽셀아트 캐릭터) - 에디터 모드에서는 그리지 않음
+    if (isEditorMode) {
+      // 에디터 모드에서는 시작 지점에 배치된 캐릭터만 표시 (위에서 이미 그림)
+    } else {
     const p = playerRef.current;
     const { x, y } = p;
 
@@ -3926,6 +3929,7 @@ const LogosGame = () => {
     ctx.strokeStyle = 'red';
     ctx.lineWidth = 2;
     ctx.strokeRect(p.x, p.y, p.width, p.height);
+    } // isEditorMode else 블록 닫기
   };
 
   const loop = useCallback(() => {
@@ -4575,7 +4579,7 @@ const LogosGame = () => {
                       editorSelectedTool === 'start' ? 'bg-blue-600 ring-2 ring-blue-400' : 'bg-white/10 hover:bg-white/20'
                     }`}
                   >
-                    <MapPin size={18} className="text-blue-400" />
+                    <img src="/char_idle.png" alt="캐릭터" className="w-8 h-10 object-contain" />
                     <span className="text-white font-bold">시작 지점</span>
                   </button>
 
@@ -4585,7 +4589,7 @@ const LogosGame = () => {
                       editorSelectedTool === 'goal' ? 'bg-amber-600 ring-2 ring-amber-400' : 'bg-white/10 hover:bg-white/20'
                     }`}
                   >
-                    <Flag size={18} className="text-amber-400" />
+                    <img src="/goal.png" alt="집" className="w-10 h-10 object-contain" />
                     <span className="text-white font-bold">도착 지점</span>
                   </button>
 
@@ -4595,7 +4599,7 @@ const LogosGame = () => {
                       editorSelectedTool === 'ground' ? 'bg-green-600 ring-2 ring-green-400' : 'bg-white/10 hover:bg-white/20'
                     }`}
                   >
-                    <Square size={18} className="text-green-400" />
+                    <img src="/nature/ground_tile.png" alt="바닥" className="w-10 h-10 object-contain" />
                     <span className="text-white font-bold">바닥</span>
                   </button>
 
