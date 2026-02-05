@@ -4398,17 +4398,38 @@ const LogosGame = () => {
             )}
           </div>
           {/* 토큰 */}
-          <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${isCreativeMode ? 'bg-gradient-to-br from-purple-400 to-pink-500' : 'bg-gradient-to-br from-yellow-400 to-amber-500'}`}>
-              <Zap className="text-white" size={20} />
+          {isEditorMode ? (
+            <div className="bg-black/60 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-2">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-yellow-400 to-amber-500">
+                <Zap className="text-white" size={20} />
+              </div>
+              <button
+                onClick={() => setEditorTokens(Math.max(1, editorTokens - 1))}
+                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white font-bold transition-all"
+              >
+                <Minus size={16} />
+              </button>
+              <div className="text-2xl font-black text-white w-8 text-center">{editorTokens}</div>
+              <button
+                onClick={() => setEditorTokens(Math.min(20, editorTokens + 1))}
+                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white font-bold transition-all"
+              >
+                <Plus size={16} />
+              </button>
             </div>
-            <div>
-              <div className="text-[10px] text-white/50 font-bold tracking-wider">TOKENS</div>
-              <div className="text-xl font-black text-white leading-none">
-                {isCreativeMode ? '∞' : tokens}
+          ) : (
+            <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-xl flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${isCreativeMode ? 'bg-gradient-to-br from-purple-400 to-pink-500' : 'bg-gradient-to-br from-yellow-400 to-amber-500'}`}>
+                <Zap className="text-white" size={20} />
+              </div>
+              <div>
+                <div className="text-[10px] text-white/50 font-bold tracking-wider">TOKENS</div>
+                <div className="text-xl font-black text-white leading-none">
+                  {isCreativeMode ? '∞' : tokens}
+                </div>
               </div>
             </div>
-          </div>
+          )}
           {/* 리셋 버튼 */}
           <button
             onClick={resetGame}
@@ -4626,10 +4647,10 @@ const LogosGame = () => {
                   setGameState('planning');
                   setMessages([{ id: 1, role: 'ai', text: `토큰 ${editorTokens}개로 목표에 도달하세요!` }]);
                 }}
-                className="w-full py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 rounded-lg font-bold text-white flex items-center justify-center gap-2 transition-all"
+                className="w-full py-5 bg-gradient-to-r from-green-500 to-emerald-400 hover:from-green-400 hover:to-emerald-300 rounded-xl font-bold text-white text-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-500/30 hover:shadow-green-400/50 hover:scale-[1.02] active:scale-[0.98]"
               >
-                <Play size={18} fill="currentColor" />
-                플레이 테스트
+                <Play size={28} fill="currentColor" />
+                ▶ 플레이 테스트
               </button>
               <button
                 onClick={() => {
