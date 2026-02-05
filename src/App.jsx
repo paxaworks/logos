@@ -663,14 +663,10 @@ const LogosGame = () => {
     let startX = 50;
     let startY = canvas ? canvas.height - FLOOR_OFFSET - 100 : 500;
 
-    if (isCustomMap && customMapData && canvas) {
-      // 에디터 좌표를 현재 캔버스 크기에 맞게 변환
-      const EDITOR_WIDTH = 1920;
-      const EDITOR_HEIGHT = 1080;
-      const scaleX = canvas.width / EDITOR_WIDTH;
-      const scaleY = canvas.height / EDITOR_HEIGHT;
-      startX = customMapData.start.x * scaleX - 20;
-      startY = customMapData.start.y * scaleY - 100;
+    if (isCustomMap && editorStart) {
+      // 에디터에서 설정한 시작 위치 직접 사용 (스케일 없이)
+      startX = editorStart.x - 20;
+      startY = editorStart.y - 100;
     }
 
     playerRef.current = {
@@ -683,7 +679,7 @@ const LogosGame = () => {
     setInventory([]);
 
     // 커스텀 맵이면 에디터에서 설정한 토큰 수, 아니면 기본 토큰
-    if (isCustomMap && customMapData) {
+    if (isCustomMap) {
       setTokens(editorTokens);
     } else {
       setTokens(MAX_TOKENS);
@@ -1597,18 +1593,12 @@ const LogosGame = () => {
       const FLOOR_OFFSET = 130; // 인벤토리 공간 확보
       const floorY = canvas.height - FLOOR_OFFSET;
 
-      // 커스텀 맵인 경우 에디터에서 만든 바닥과 충돌 (좌표 변환 적용)
-      if (isCustomMap && customMapData) {
-        // 에디터 좌표 -> 현재 캔버스 좌표 변환
-        const EDITOR_WIDTH = 1920;
-        const EDITOR_HEIGHT = 1080;
-        const scaleX = canvas.width / EDITOR_WIDTH;
-        const scaleY = canvas.height / EDITOR_HEIGHT;
-
-        customMapData.grounds.forEach(ground => {
-          const groundTop = ground.y * scaleY;
-          const groundLeft = ground.x * scaleX;
-          const groundRight = (ground.x + ground.width) * scaleX;
+      // 커스텀 맵인 경우 에디터에서 만든 바닥과 충돌 (스케일 없이 직접 사용)
+      if (isCustomMap) {
+        editorGrounds.forEach(ground => {
+          const groundTop = ground.y;
+          const groundLeft = ground.x;
+          const groundRight = ground.x + ground.width;
           if (p.x + p.width > groundLeft && p.x < groundRight &&
               p.y + p.height >= groundTop && p.y + p.height <= groundTop + 20) {
             p.y = groundTop - p.height;
@@ -1617,16 +1607,12 @@ const LogosGame = () => {
           }
         });
 
-        // 커스텀 맵 장애물 충돌 (좌표 변환 적용)
-        customMapData.obstacles.forEach(obs => {
-          const scaledX = obs.x * scaleX;
-          const scaledY = obs.y * scaleY;
-          const scaledW = obs.width * scaleX;
-          const scaledH = obs.height * scaleY;
-          const obsLeft = scaledX - scaledW / 2;
-          const obsRight = scaledX + scaledW / 2;
-          const obsTop = scaledY - scaledH;
-          const obsBottom = scaledY;
+        // 커스텀 맵 장애물 충돌 (스케일 없이 직접 사용)
+        editorObstacles.forEach(obs => {
+          const obsLeft = obs.x - obs.width / 2;
+          const obsRight = obs.x + obs.width / 2;
+          const obsTop = obs.y - obs.height;
+          const obsBottom = obs.y;
 
           if (obs.type === 'wall') {
             if (p.x + p.width > obsLeft && p.x < obsRight &&
@@ -1846,16 +1832,10 @@ const LogosGame = () => {
       let goalHeight = 130;
 
       let goalX, goalY;
-      if (isCustomMap && customMapData) {
-        // 커스텀 맵의 골 위치 (좌표 변환 적용)
-        const EDITOR_WIDTH = 1920;
-        const EDITOR_HEIGHT = 1080;
-        const scaleX = canvas.width / EDITOR_WIDTH;
-        const scaleY = canvas.height / EDITOR_HEIGHT;
-        goalWidth = 160 * scaleX;
-        goalHeight = 130 * scaleY;
-        goalX = customMapData.goal.x * scaleX - goalWidth / 2;
-        goalY = customMapData.goal.y * scaleY - goalHeight;
+      if (isCustomMap && editorGoal) {
+        // 커스텀 맵의 골 위치 (스케일 없이 직접 사용)
+        goalX = editorGoal.x - goalWidth / 2;
+        goalY = editorGoal.y - goalHeight;
       } else {
         // 기본 스테이지 골 위치
         goalX = canvas.width - goalWidth;
@@ -3954,14 +3934,10 @@ const LogosGame = () => {
       // 플레이어 초기 위치 업데이트
       const FLOOR_OFFSET = 130;
       if (gameState === 'planning') {
-        if (isCustomMap && customMapData) {
-          // 커스텀 맵: 에디터 좌표를 현재 캔버스 크기에 맞게 변환
-          const EDITOR_WIDTH = 1920;
-          const EDITOR_HEIGHT = 1080;
-          const scaleX = canvas.width / EDITOR_WIDTH;
-          const scaleY = canvas.height / EDITOR_HEIGHT;
-          playerRef.current.x = customMapData.start.x * scaleX - 20;
-          playerRef.current.y = customMapData.start.y * scaleY - 100;
+        if (isCustomMap && editorStart) {
+          // 커스텀 맵: 에디터에서 설정한 시작 위치 직접 사용 (스케일 없이)
+          playerRef.current.x = editorStart.x - 20;
+          playerRef.current.y = editorStart.y - 100;
         } else {
           // 기본 스테이지
           playerRef.current.x = 50;
