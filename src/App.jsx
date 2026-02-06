@@ -1595,15 +1595,51 @@ const LogosGame = () => {
 
       // 커스텀 맵인 경우 에디터에서 만든 바닥과 충돌 (스케일 없이 직접 사용)
       if (isCustomMap) {
+        const TILE_SIZE = 64;
         editorGrounds.forEach(ground => {
           const groundTop = ground.y;
           const groundLeft = ground.x;
           const groundRight = ground.x + ground.width;
-          if (p.x + p.width > groundLeft && p.x < groundRight &&
-              p.y + p.height >= groundTop && p.y + p.height <= groundTop + 20) {
-            p.y = groundTop - p.height;
-            p.vy = 0;
-            p.grounded = true;
+          const groundBottom = ground.y + TILE_SIZE;
+
+          // 플레이어와 바닥 블록의 겹침 체크
+          const overlapX = p.x + p.width > groundLeft && p.x < groundRight;
+          const overlapY = p.y + p.height > groundTop && p.y < groundBottom;
+
+          if (overlapX && overlapY) {
+            // 이전 프레임 위치 기반으로 충돌 방향 결정
+            const prevBottom = p.y + p.height - p.vy;
+            const prevTop = p.y - p.vy;
+            const prevRight = p.x + p.width - p.vx;
+            const prevLeft = p.x - p.vx;
+
+            // 위에서 착지 (발이 바닥 윗면에 닿음)
+            if (prevBottom <= groundTop + 10 && p.vy >= 0) {
+              p.y = groundTop - p.height;
+              p.vy = 0;
+              p.grounded = true;
+            }
+            // 아래에서 머리 부딪힘
+            else if (prevTop >= groundBottom - 10 && p.vy < 0) {
+              p.y = groundBottom;
+              p.vy = 0;
+            }
+            // 왼쪽에서 부딪힘
+            else if (prevRight <= groundLeft + 5 && p.vx > 0) {
+              p.x = groundLeft - p.width;
+              p.vx = 0;
+            }
+            // 오른쪽에서 부딪힘
+            else if (prevLeft >= groundRight - 5 && p.vx < 0) {
+              p.x = groundRight;
+              p.vx = 0;
+            }
+            // 기본: 위에서 착지로 처리
+            else if (p.vy >= 0) {
+              p.y = groundTop - p.height;
+              p.vy = 0;
+              p.grounded = true;
+            }
           }
         });
 
@@ -1641,10 +1677,38 @@ const LogosGame = () => {
           }
         });
       } else {
-        // 기본 스테이지 바닥 충돌 (타일 크기 64px * 3개 = 192px)
+        // 기본 스테이지 바닥 충돌 (타일 크기 64px * 3개 = 192px, 높이 64px 블록)
         const groundWidth = 192;
-        if (p.x < groundWidth && p.x + p.width > 0 && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
-        if (p.x + p.width > canvas.width - groundWidth && p.x < canvas.width && p.y + p.height > floorY) { p.y = floorY - p.height; p.vy = 0; p.grounded = true; }
+        const TILE_SIZE = 64;
+        const defaultGrounds = [
+          { left: 0, right: groundWidth, top: floorY, bottom: floorY + TILE_SIZE },
+          { left: canvas.width - groundWidth, right: canvas.width, top: floorY, bottom: floorY + TILE_SIZE }
+        ];
+        defaultGrounds.forEach(g => {
+          const overlapX = p.x + p.width > g.left && p.x < g.right;
+          const overlapY = p.y + p.height > g.top && p.y < g.bottom;
+          if (overlapX && overlapY) {
+            const prevBottom = p.y + p.height - p.vy;
+            const prevRight = p.x + p.width - p.vx;
+            const prevLeft = p.x - p.vx;
+
+            if (prevBottom <= g.top + 10 && p.vy >= 0) {
+              p.y = g.top - p.height;
+              p.vy = 0;
+              p.grounded = true;
+            } else if (prevRight <= g.left + 5 && p.vx > 0) {
+              p.x = g.left - p.width;
+              p.vx = 0;
+            } else if (prevLeft >= g.right - 5 && p.vx < 0) {
+              p.x = g.right;
+              p.vx = 0;
+            } else if (p.vy >= 0) {
+              p.y = g.top - p.height;
+              p.vy = 0;
+              p.grounded = true;
+            }
+          }
+        });
       }
 
       let onIce = false;
