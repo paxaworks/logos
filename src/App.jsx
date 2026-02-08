@@ -3675,7 +3675,6 @@ const LogosGame = () => {
   // 바닥 타일 그리기 함수
   const drawGroundTiles = (ctx, canvas, startX, endX, floorY) => {
     if (!natureTilesLoadedRef.current || !groundTileRef.current) {
-      // 폴백: 기존 방식
       ctx.save();
       ctx.fillStyle = 'rgba(60, 60, 60, 0.7)';
       ctx.fillRect(startX, floorY, endX - startX, 50);
@@ -3685,16 +3684,25 @@ const LogosGame = () => {
       return;
     }
 
-    const tileSize = 64; // 타일 크기
-    const tilesNeeded = Math.ceil((endX - startX) / tileSize) + 1;
+    const tileSize = 64;
+    // 정수 좌표로 변환해서 타일 사이 틈 방지
+    const sx = Math.floor(startX);
+    const ex = Math.ceil(endX);
+    const fy = Math.floor(floorY);
+    const tilesNeeded = Math.ceil((ex - sx) / tileSize);
 
-    // 잔디+흙 타일 반복 그리기
+    // 클리핑으로 바닥 영역만 그리기
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(sx, fy, ex - sx, tileSize);
+    ctx.clip();
+
     for (let i = 0; i < tilesNeeded; i++) {
-      const x = startX + i * tileSize;
-      if (x < endX) {
-        ctx.drawImage(groundTileRef.current, x, floorY, tileSize, tileSize);
-      }
+      const x = sx + i * tileSize;
+      // 1px 오버랩으로 틈 완전 방지
+      ctx.drawImage(groundTileRef.current, x, fy, tileSize + 1, tileSize);
     }
+    ctx.restore();
   };
 
   const draw = () => {
