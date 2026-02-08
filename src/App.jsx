@@ -659,14 +659,20 @@ const LogosGame = () => {
     const canvas = canvasRef.current;
     const FLOOR_OFFSET = 130;
 
-    // 커스텀 맵이면 커스텀 시작 위치로, 아니면 기본 위치로
+    // 커스텀 맵이면 커스텀 시작 위치로, 아니면 스테이지 첫 바닥 위
     let startX = 50;
     let startY = canvas ? canvas.height - FLOOR_OFFSET - 100 : 500;
 
     if (isCustomMap && editorStart) {
-      // 에디터에서 설정한 시작 위치 직접 사용 (스케일 없이)
       startX = editorStart.x - 20;
       startY = editorStart.y - 100;
+    } else if (canvas) {
+      const layout = getStageLayout(canvas);
+      if (layout && layout.grounds.length > 0) {
+        const firstGround = layout.grounds[0];
+        startX = firstGround.x + 30;
+        startY = firstGround.y - 100;
+      }
     }
 
     playerRef.current = {
@@ -678,11 +684,13 @@ const LogosGame = () => {
     objectsRef.current = [];
     setInventory([]);
 
-    // 커스텀 맵이면 에디터에서 설정한 토큰 수, 아니면 기본 토큰
+    // 토큰 수 설정
     if (isCustomMap) {
       setTokens(editorTokens);
     } else {
-      setTokens(MAX_TOKENS);
+      const world = stagesData.worlds.find(w => w.id === selectedWorld);
+      const stage = world?.stages.find(s => s.id === selectedStage);
+      setTokens(stage?.tokens || MAX_TOKENS);
     }
 
     setSelectedSlot(null);
@@ -1677,38 +1685,90 @@ const LogosGame = () => {
           }
         });
       } else {
-        // 기본 스테이지 바닥 충돌 (타일 크기 64px * 3개 = 192px, 높이 64px 블록)
-        const groundWidth = 192;
-        const TILE_SIZE = 64;
-        const defaultGrounds = [
-          { left: 0, right: groundWidth, top: floorY, bottom: floorY + TILE_SIZE },
-          { left: canvas.width - groundWidth, right: canvas.width, top: floorY, bottom: floorY + TILE_SIZE }
-        ];
-        defaultGrounds.forEach(g => {
-          const overlapX = p.x + p.width > g.left && p.x < g.right;
-          const overlapY = p.y + p.height > g.top && p.y < g.bottom;
-          if (overlapX && overlapY) {
-            const prevBottom = p.y + p.height - p.vy;
-            const prevRight = p.x + p.width - p.vx;
-            const prevLeft = p.x - p.vx;
+        // 기본 스테이지 - 새 레이아웃 시스템 사용
+        const layout = getStageLayout(canvas);
+        if (layout) {
+          const TILE_SIZE = layout.TILE_SIZE;
 
-            if (prevBottom <= g.top + 10 && p.vy >= 0) {
-              p.y = g.top - p.height;
-              p.vy = 0;
-              p.grounded = true;
-            } else if (prevRight <= g.left + 5 && p.vx > 0) {
-              p.x = g.left - p.width;
-              p.vx = 0;
-            } else if (prevLeft >= g.right - 5 && p.vx < 0) {
-              p.x = g.right;
-              p.vx = 0;
-            } else if (p.vy >= 0) {
-              p.y = g.top - p.height;
-              p.vy = 0;
-              p.grounded = true;
+          // 바닥 블록 충돌
+          layout.grounds.forEach(ground => {
+            const g = { left: ground.x, right: ground.x + ground.width, top: ground.y, bottom: ground.y + TILE_SIZE };
+            const overlapX = p.x + p.width > g.left && p.x < g.right;
+            const overlapY = p.y + p.height > g.top && p.y < g.bottom;
+            if (overlapX && overlapY) {
+              const prevBottom = p.y + p.height - p.vy;
+              const prevTop = p.y - p.vy;
+              const prevRight = p.x + p.width - p.vx;
+              const prevLeft = p.x - p.vx;
+
+              if (prevBottom <= g.top + 10 && p.vy >= 0) {
+                p.y = g.top - p.height;
+                p.vy = 0;
+                p.grounded = true;
+              } else if (prevTop >= g.bottom - 10 && p.vy < 0) {
+                p.y = g.bottom;
+                p.vy = 0;
+              } else if (prevRight <= g.left + 5 && p.vx > 0) {
+                p.x = g.left - p.width;
+                p.vx = 0;
+              } else if (prevLeft >= g.right - 5 && p.vx < 0) {
+                p.x = g.right;
+                p.vx = 0;
+              } else if (p.vy >= 0) {
+                p.y = g.top - p.height;
+                p.vy = 0;
+                p.grounded = true;
+              }
             }
-          }
-        });
+          });
+
+          // 벽 충돌
+          layout.walls.forEach(wall => {
+            const wallLeft = wall.x - wall.width / 2;
+            const wallRight = wall.x + wall.width / 2;
+            const wallTop = wall.y - wall.height;
+            const wallBottom = wall.y;
+
+            const overlapX = p.x + p.width > wallLeft && p.x < wallRight;
+            const overlapY = p.y + p.height > wallTop && p.y < wallBottom;
+
+            if (overlapX && overlapY) {
+              const prevBottom = p.y + p.height - p.vy;
+              const prevTop = p.y - p.vy;
+              const prevRight = p.x + p.width - p.vx;
+              const prevLeft = p.x - p.vx;
+
+              if (prevBottom <= wallTop + 10 && p.vy >= 0) {
+                p.y = wallTop - p.height;
+                p.vy = 0;
+                p.grounded = true;
+              } else if (prevTop >= wallBottom - 10 && p.vy < 0) {
+                p.y = wallBottom;
+                p.vy = 0;
+              } else if (prevRight <= wallLeft + 5 && p.vx > 0) {
+                p.x = wallLeft - p.width;
+                p.vx = 0;
+              } else if (prevLeft >= wallRight - 5 && p.vx < 0) {
+                p.x = wallRight;
+                p.vx = 0;
+              } else if (p.vy >= 0) {
+                p.y = wallTop - p.height;
+                p.vy = 0;
+                p.grounded = true;
+              }
+            }
+          });
+
+          // 위험 지역 (가시) 충돌
+          layout.hazards.forEach(hazard => {
+            if (p.x + p.width > hazard.x && p.x < hazard.x + hazard.width &&
+                p.y + p.height > hazard.y - 8 && p.y < hazard.y + hazard.height) {
+              setGameState('lost');
+              p.vx = 0;
+              setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 가시에 닿았어요..." }]);
+            }
+          });
+        }
       }
 
       let onIce = false;
@@ -1901,9 +1961,15 @@ const LogosGame = () => {
         goalX = editorGoal.x - goalWidth / 2;
         goalY = editorGoal.y - goalHeight;
       } else {
-        // 기본 스테이지 골 위치
-        goalX = canvas.width - goalWidth;
-        goalY = floorY - goalHeight;
+        // 기본 스테이지 골 위치 - 새 레이아웃 시스템
+        const layout = getStageLayout(canvas);
+        if (layout) {
+          goalX = layout.goalX;
+          goalY = layout.goalY;
+        } else {
+          goalX = canvas.width - goalWidth;
+          goalY = floorY - goalHeight;
+        }
       }
 
       // 플레이어가 집 영역 안에 들어왔는지 확인
@@ -3554,6 +3620,58 @@ const LogosGame = () => {
     }
   };
 
+  // 스테이지 레이아웃 계산 함수 (비율 기반 → 픽셀 좌표)
+  const getStageLayout = (canvas) => {
+    if (!canvas) return null;
+    const world = stagesData.worlds.find(w => w.id === selectedWorld);
+    const stage = world?.stages.find(s => s.id === selectedStage);
+    if (!stage || !stage.grounds) return null;
+
+    const FLOOR_OFFSET = 130;
+    const floorY = canvas.height - FLOOR_OFFSET;
+    const gameHeight = canvas.height - FLOOR_OFFSET; // 인벤토리 위까지의 높이
+    const TILE_SIZE = 64;
+
+    const grounds = stage.grounds.map(g => {
+      const elevation = g.elevation || 0;
+      return {
+        x: g.x * canvas.width,
+        width: g.w * canvas.width,
+        y: floorY - (elevation * gameHeight)
+      };
+    });
+
+    const walls = (stage.walls || []).map(w => {
+      const wallWidth = 60;
+      const wallHeight = w.h * gameHeight;
+      return {
+        x: w.x * canvas.width,
+        width: wallWidth,
+        height: wallHeight,
+        y: floorY // 바닥부터 위로
+      };
+    });
+
+    const hazards = (stage.hazards || []).map(h => {
+      const hazardHeight = 30;
+      return {
+        x: h.x * canvas.width,
+        width: h.w * canvas.width,
+        height: hazardHeight,
+        y: floorY - hazardHeight // 바닥 위에 배치
+      };
+    });
+
+    // 골 위치: 마지막 바닥의 오른쪽 끝
+    const lastGround = grounds[grounds.length - 1];
+    const goalWidth = 160;
+    const goalHeight = 130;
+    const goalX = lastGround.x + lastGround.width - goalWidth;
+    const goalY = lastGround.y - goalHeight;
+
+    return { grounds, walls, hazards, goalX, goalY, goalWidth, goalHeight, floorY, TILE_SIZE };
+  };
+
   // 바닥 타일 그리기 함수
   const drawGroundTiles = (ctx, canvas, startX, endX, floorY) => {
     if (!natureTilesLoadedRef.current || !groundTileRef.current) {
@@ -3743,49 +3861,87 @@ const LogosGame = () => {
         ctx.fillText('좌클릭: 배치 / 우클릭: 삭제', canvas.width / 2, 36);
       }
     } else {
-      // 기본 스테이지 바닥
-      // 왼쪽 바닥 - 타일맵 방식 (64px * 3 = 192px)
-      drawGroundTiles(ctx, canvas, 0, 192, floorY);
+      // 기본 스테이지 - 새 레이아웃 시스템
+      const layout = getStageLayout(canvas);
+      if (layout) {
+        // 바닥 그리기
+        layout.grounds.forEach(ground => {
+          drawGroundTiles(ctx, canvas, ground.x, ground.x + ground.width, ground.y);
+        });
 
-      // 오른쪽 바닥 - 타일맵 방식 (64px * 3 = 192px)
-      drawGroundTiles(ctx, canvas, canvas.width - 192, canvas.width, floorY);
+        // 벽 그리기
+        layout.walls.forEach(wall => {
+          const wallLeft = wall.x - wall.width / 2;
+          const wallTop = wall.y - wall.height;
+          ctx.fillStyle = '#4B5563';
+          ctx.fillRect(wallLeft, wallTop, wall.width, wall.height);
+          // 벽 테두리
+          ctx.strokeStyle = '#374151';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(wallLeft, wallTop, wall.width, wall.height);
+          // 벽돌 패턴
+          ctx.strokeStyle = '#374151';
+          ctx.lineWidth = 1;
+          const brickH = 20;
+          for (let by = wallTop; by < wall.y; by += brickH) {
+            ctx.beginPath();
+            ctx.moveTo(wallLeft, by);
+            ctx.lineTo(wallLeft + wall.width, by);
+            ctx.stroke();
+            const offset = (Math.floor((by - wallTop) / brickH) % 2) * (wall.width / 2);
+            ctx.beginPath();
+            ctx.moveTo(wallLeft + offset, by);
+            ctx.lineTo(wallLeft + offset, Math.min(by + brickH, wall.y));
+            ctx.stroke();
+          }
+        });
 
-      // 골인 지점 (집) - 이미지와 충돌 영역 일치
-      const goalWidth = 160;
-      const goalHeight = 130;
-      // 오른쪽 땅 끝에 딱 맞춤 (여백 없음)
-      const goalX = canvas.width - goalWidth;
-      const goalY = floorY - goalHeight;
+        // 위험 지역 (가시) 그리기
+        layout.hazards.forEach(hazard => {
+          // 가시 배경
+          ctx.fillStyle = '#991B1B';
+          ctx.fillRect(hazard.x, hazard.y, hazard.width, hazard.height);
+          // 가시 삼각형들
+          ctx.fillStyle = '#DC2626';
+          const spikeWidth = 15;
+          const spikeCount = Math.floor(hazard.width / spikeWidth);
+          for (let i = 0; i < spikeCount; i++) {
+            const sx = hazard.x + i * spikeWidth;
+            ctx.beginPath();
+            ctx.moveTo(sx, hazard.y + hazard.height);
+            ctx.lineTo(sx + spikeWidth / 2, hazard.y - 8);
+            ctx.lineTo(sx + spikeWidth, hazard.y + hazard.height);
+            ctx.fill();
+          }
+        });
 
-      if (goalImageLoadedRef.current && goalImageRef.current) {
-        const img = goalImageRef.current;
-        // goal.png 크롭 영역 (여백 제거) - 집 부분만
-        const cropX = 125;
-        const cropY = 90;
-        const cropW = 380;
-        const cropH = 310;
-
-        ctx.drawImage(
-          img,
-          cropX, cropY, cropW, cropH,  // 소스 이미지에서 크롭할 영역
-          goalX, goalY, goalWidth, goalHeight  // 캔버스에 그릴 위치와 크기
-        );
+        // 골인 지점 (집)
+        const { goalX, goalY, goalWidth, goalHeight } = layout;
+        if (goalImageLoadedRef.current && goalImageRef.current) {
+          const img = goalImageRef.current;
+          const cropX = 125, cropY = 90, cropW = 380, cropH = 310;
+          ctx.drawImage(img, cropX, cropY, cropW, cropH, goalX, goalY, goalWidth, goalHeight);
+        } else {
+          ctx.fillStyle = '#fbbf24';
+          ctx.fillRect(goalX, goalY + goalHeight * 0.3, goalWidth, goalHeight * 0.7);
+          ctx.beginPath();
+          ctx.moveTo(goalX, goalY + goalHeight * 0.3);
+          ctx.lineTo(goalX + goalWidth / 2, goalY);
+          ctx.lineTo(goalX + goalWidth, goalY + goalHeight * 0.3);
+          ctx.fillStyle = '#ef4444';
+          ctx.fill();
+        }
       } else {
-        // 이미지 로딩 전 기본 도형
-        ctx.fillStyle = '#fbbf24';
-        ctx.fillRect(goalX, goalY + goalHeight * 0.3, goalWidth, goalHeight * 0.7);
-        ctx.beginPath();
-        ctx.moveTo(goalX, goalY + goalHeight * 0.3);
-        ctx.lineTo(goalX + goalWidth / 2, goalY);
-        ctx.lineTo(goalX + goalWidth, goalY + goalHeight * 0.3);
-        ctx.fillStyle = '#ef4444';
-        ctx.fill();
+        // 폴백: 기존 단순 레이아웃
+        drawGroundTiles(ctx, canvas, 0, 192, floorY);
+        drawGroundTiles(ctx, canvas, canvas.width - 192, canvas.width, floorY);
+        const goalWidth = 160, goalHeight = 130;
+        const goalX = canvas.width - goalWidth;
+        const goalY = floorY - goalHeight;
+        if (goalImageLoadedRef.current && goalImageRef.current) {
+          ctx.drawImage(goalImageRef.current, 125, 90, 380, 310, goalX, goalY, goalWidth, goalHeight);
+        }
       }
-
-      // 디버그: 도착지점 실제 영역 표시 (빨간색)
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(goalX, goalY, goalWidth, goalHeight);
     }
 
     // 오브젝트 그리기
@@ -3996,16 +4152,20 @@ const LogosGame = () => {
       canvas.style.objectFit = '';
 
       // 플레이어 초기 위치 업데이트
-      const FLOOR_OFFSET = 130;
       if (gameState === 'planning') {
         if (isCustomMap && editorStart) {
-          // 커스텀 맵: 에디터에서 설정한 시작 위치 직접 사용 (스케일 없이)
           playerRef.current.x = editorStart.x - 20;
           playerRef.current.y = editorStart.y - 100;
         } else {
-          // 기본 스테이지
-          playerRef.current.x = 50;
-          playerRef.current.y = canvas.height - FLOOR_OFFSET - 100;
+          const layout = getStageLayout(canvas);
+          if (layout && layout.grounds.length > 0) {
+            const firstGround = layout.grounds[0];
+            playerRef.current.x = firstGround.x + 30;
+            playerRef.current.y = firstGround.y - 100;
+          } else {
+            playerRef.current.x = 50;
+            playerRef.current.y = canvas.height - 130 - 100;
+          }
         }
       }
     };
