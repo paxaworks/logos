@@ -4972,7 +4972,7 @@ const LogosGame = () => {
                     }
                   }}
                   placeholder="자동차, 상자, 다리, 계단, 나무 등..."
-                  className="w-full bg-white/10 border-2 border-white/10 rounded-2xl pl-5 pr-16 py-4 focus:outline-none focus:border-purple-500/50 focus:bg-white/15 text-lg text-white placeholder-white/40 transition-all resize-none overflow-hidden"
+                  className="w-full bg-white/10 border-2 border-white/10 rounded-2xl pl-5 pr-20 py-4 focus:outline-none focus:border-purple-500/50 focus:bg-white/15 text-lg text-white placeholder-white/40 transition-all resize-none overflow-hidden break-words"
                   rows={1}
                   disabled={gameState !== 'planning' || isTyping}
                 />
