@@ -4957,7 +4957,7 @@ const LogosGame = () => {
 
             {/* 입력 영역 */}
             <div className="p-4 bg-black/40 backdrop-blur-sm border-t border-white/10">
-              <form onSubmit={handleSendMessage} className="relative">
+              <form onSubmit={handleSendMessage} className="flex items-end gap-2">
                 <textarea
                   value={prompt}
                   onChange={(e) => {
@@ -4972,14 +4972,14 @@ const LogosGame = () => {
                     }
                   }}
                   placeholder="자동차, 상자, 다리, 계단, 나무 등..."
-                  className="w-full bg-white/10 border-2 border-white/10 rounded-2xl pl-5 pr-20 py-4 focus:outline-none focus:border-purple-500/50 focus:bg-white/15 text-lg text-white placeholder-white/40 transition-all resize-none overflow-hidden break-words"
+                  className="flex-1 bg-white/10 border-2 border-white/10 rounded-2xl pl-5 pr-4 py-4 focus:outline-none focus:border-purple-500/50 focus:bg-white/15 text-lg text-white placeholder-white/40 transition-all resize-none overflow-hidden break-words"
                   rows={1}
                   disabled={gameState !== 'planning' || isTyping}
                 />
                 <button
                   type="submit"
                   disabled={gameState !== 'planning' || isTyping}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white rounded-xl disabled:opacity-50 shadow-lg transition-all"
+                  className="flex-shrink-0 p-4 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white rounded-2xl disabled:opacity-50 shadow-lg transition-all"
                 >
                   <Send size={22} />
                 </button>
