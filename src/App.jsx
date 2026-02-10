@@ -4963,7 +4963,7 @@ const LogosGame = () => {
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="자동차, 상자, 다리, 계단, 나무 등..."
-                  className="w-full bg-white/10 border border-white/10 rounded-xl pl-4 pr-12 py-4 focus:outline-none focus:border-purple-500/50 focus:bg-white/15 text-base text-white placeholder-white/40 transition-all"
+                  className="w-full bg-white/10 border border-white/10 rounded-xl pl-4 pr-14 py-5 focus:outline-none focus:border-purple-500/50 focus:bg-white/15 text-lg text-white placeholder-white/40 transition-all"
                   disabled={gameState !== 'planning' || isTyping}
                 />
                 <button
@@ -4980,14 +4980,14 @@ const LogosGame = () => {
                   playerRef.current.vx = PLAYER_SPEED;
                 }}
                 disabled={gameState !== 'planning'}
-                className={`w-full mt-3 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all border border-transparent ${
+                className={`w-full mt-3 py-5 rounded-xl font-bold text-xl flex items-center justify-center gap-3 transition-all border-2 ${
                   gameState === 'planning'
-                    ? 'bg-green-600/20 text-green-400 border-green-500/50 hover:bg-green-600/30'
+                    ? 'bg-green-600/30 text-green-400 border-green-500/50 hover:bg-green-600/40 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-green-500/20'
                     : 'bg-slate-800 text-slate-600 border-slate-700 cursor-not-allowed'
                 }`}
               >
-                <Play size={16} fill="currentColor" />
-                {gameState === 'planning' ? 'START' : 'RUNNING...'}
+                <Play size={24} fill="currentColor" />
+                {gameState === 'planning' ? '▶ START' : 'RUNNING...'}
               </button>
             </div>
           </>
