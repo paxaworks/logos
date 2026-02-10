@@ -4254,6 +4254,7 @@ const LogosGame = () => {
 
   // 게임 시작 함수 (스테이지 모드)
   const startGame = (worldId, stageId) => {
+    setIsEditorMode(false);
     setIsCreativeMode(false);
     setIsCustomMap(false);
     setCustomMapData(null);
