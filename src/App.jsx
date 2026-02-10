@@ -4936,7 +4936,7 @@ const LogosGame = () => {
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-black/20">
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                  <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm shadow-lg ${
+                  <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-base shadow-lg ${
                     msg.role === 'user'
                       ? 'bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-br-sm'
                       : 'bg-white/10 backdrop-blur-sm border border-white/10 text-white/90 rounded-tl-sm'
@@ -4958,12 +4958,22 @@ const LogosGame = () => {
             {/* 입력 영역 */}
             <div className="p-4 bg-black/40 backdrop-blur-sm border-t border-white/10">
               <form onSubmit={handleSendMessage} className="relative">
-                <input
-                  type="text"
+                <textarea
                   value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
+                  onChange={(e) => {
+                    setPrompt(e.target.value);
+                    e.target.style.height = 'auto';
+                    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage(e);
+                    }
+                  }}
                   placeholder="자동차, 상자, 다리, 계단, 나무 등..."
-                  className="w-full bg-white/10 border-2 border-white/10 rounded-2xl pl-5 pr-16 py-6 focus:outline-none focus:border-purple-500/50 focus:bg-white/15 text-xl text-white placeholder-white/40 transition-all"
+                  className="w-full bg-white/10 border-2 border-white/10 rounded-2xl pl-5 pr-16 py-4 focus:outline-none focus:border-purple-500/50 focus:bg-white/15 text-lg text-white placeholder-white/40 transition-all resize-none overflow-hidden"
+                  rows={1}
                   disabled={gameState !== 'planning' || isTyping}
                 />
                 <button
