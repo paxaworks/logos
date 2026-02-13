@@ -1532,11 +1532,34 @@ const LogosGame = () => {
             obj.floatStopped = true;
           }
         }
+
+        // 문: 자동 열림/닫힘 타이머
+        if (obj.physics === 'door') {
+          if (!obj.doorTimer) {
+            obj.doorTimer = 0;
+            obj.doorOpen = false;
+            obj.doorProgress = 0; // 0=닫힘, 1=열림 (애니메이션용)
+          }
+          obj.doorTimer++;
+          const cycleDuration = 180; // 3초 (60fps * 3)
+          const cyclePos = obj.doorTimer % cycleDuration;
+          if (cyclePos === 0) {
+            obj.doorOpen = !obj.doorOpen;
+          }
+          // 부드러운 열림/닫힘 애니메이션
+          const speed = 0.05;
+          if (obj.doorOpen) {
+            obj.doorProgress = Math.min(1, obj.doorProgress + speed);
+          } else {
+            obj.doorProgress = Math.max(0, obj.doorProgress - speed);
+          }
+        }
       });
 
       objectsRef.current.forEach(obj => {
-        // bounce 오브젝트는 옆면 충돌 없이 통과 (위에서 밟을 때만 작동)
+        // bounce/ghost/ladder/열린문은 옆면 충돌 없이 통과
         if (obj.physics === 'ghost' || obj.physics === 'ladder' || obj.physics === 'bounce') return;
+        if (obj.physics === 'door' && obj.doorOpen) return;
 
         // 캐릭터와 오브젝트가 수직으로 겹치는지 체크 (캐릭터 전체 높이 기준)
         const isVerticallyOverlapping = (p.y < obj.y + obj.height) && (p.y + p.height > obj.y);
@@ -1905,8 +1928,8 @@ const LogosGame = () => {
           }
         }
 
-        // ghost는 표면 체크 건너뜀
-        if (obj.physics !== 'ghost') {
+        // ghost 및 열린 문은 표면 체크 건너뜀
+        if (obj.physics !== 'ghost' && !(obj.physics === 'door' && obj.doorOpen)) {
           // 사다리: 올라가는 중이면 통과
           if (obj.physics === 'ladder' && p.ladderDirection === 'up') {
             // 올라가는 중엔 통과
@@ -4101,6 +4124,63 @@ const LogosGame = () => {
           ctx.fillStyle = '#1E40AF';
           ctx.beginPath();
           ctx.arc(fanCenterX, fanCenterY, fanRadius * 0.22, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // 문: 열림/닫힘 애니메이션
+        else if (obj.physics === 'door') {
+          const progress = obj.doorProgress || 0;
+          const doorX = obj.x;
+          const doorY = obj.y;
+          const doorW = obj.width;
+          const doorH = obj.height;
+
+          // 문틀 (항상 표시)
+          ctx.fillStyle = '#78350F';
+          ctx.fillRect(doorX - 4, doorY, 4, doorH); // 왼쪽 틀
+          ctx.fillRect(doorX + doorW, doorY, 4, doorH); // 오른쪽 틀
+          ctx.fillRect(doorX - 4, doorY - 4, doorW + 8, 4); // 상단 틀
+
+          // 문짝 (위로 슬라이드)
+          const slideOffset = progress * doorH * 0.9;
+          const visibleH = doorH - slideOffset;
+
+          if (visibleH > 0) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(doorX, doorY + slideOffset, doorW, visibleH);
+            ctx.clip();
+
+            // 문짝 배경
+            ctx.fillStyle = obj.doorOpen ? '#B45309' : '#92400E';
+            ctx.fillRect(doorX, doorY + slideOffset, doorW, visibleH);
+
+            // 문짝 패널 장식
+            const panelMargin = doorW * 0.12;
+            const panelW = doorW - panelMargin * 2;
+            const panelH = doorH * 0.35;
+            ctx.fillStyle = '#7C2D12';
+            ctx.fillRect(doorX + panelMargin, doorY + slideOffset + doorH * 0.08, panelW, panelH);
+            ctx.fillRect(doorX + panelMargin, doorY + slideOffset + doorH * 0.52, panelW, panelH);
+
+            // 문 손잡이
+            ctx.fillStyle = '#FBBF24';
+            ctx.beginPath();
+            ctx.arc(doorX + doorW * 0.75, doorY + slideOffset + doorH * 0.48, doorW * 0.07, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+          }
+
+          // 열림/닫힘 상태 표시 (깜빡이는 표시등)
+          const indicatorColor = obj.doorOpen ? '#22C55E' : '#EF4444';
+          ctx.fillStyle = indicatorColor;
+          ctx.beginPath();
+          ctx.arc(doorX + doorW / 2, doorY - 10, 4, 0, Math.PI * 2);
+          ctx.fill();
+          // 표시등 글로우
+          ctx.fillStyle = obj.doorOpen ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
+          ctx.beginPath();
+          ctx.arc(doorX + doorW / 2, doorY - 10, 8, 0, Math.PI * 2);
           ctx.fill();
         }
         // 버튼 눌림 효과: 눌렸을 때 빨간 버튼 부분이 아래로 내려감

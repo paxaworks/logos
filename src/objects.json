@@ -726,8 +726,8 @@
     "priority": 30,
     "size": [60, 120],
     "color": "#92400E",
-    "message": "문을 만들었어요!",
-    "physics": "solid",
+    "message": "자동으로 열리고 닫히는 문을 만들었어요!",
+    "physics": "door",
     "excludeKeywords": ["문제", "문서"],
     "parts": [
       { "type": "rect", "x": 0, "y": 0, "w": 100, "h": 100 },
