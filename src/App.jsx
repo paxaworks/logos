@@ -1809,7 +1809,7 @@ const LogosGame = () => {
           // 위험 지역 (가시) 충돌
           layout.hazards.forEach(hazard => {
             if (p.x + p.width > hazard.x && p.x < hazard.x + hazard.width &&
-                p.y + p.height > hazard.y - 8 && p.y < hazard.y + hazard.height) {
+                p.y + p.height > hazard.y - 35 && p.y < hazard.y + hazard.height) {
               setGameState('lost');
               p.vx = 0;
               setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 가시에 닿았어요..." }]);
@@ -3974,13 +3974,13 @@ const LogosGame = () => {
           ctx.fillRect(hazard.x, hazard.y, hazard.width, hazard.height);
           // 가시 삼각형들
           ctx.fillStyle = '#DC2626';
-          const spikeWidth = 15;
+          const spikeWidth = 20;
           const spikeCount = Math.floor(hazard.width / spikeWidth);
           for (let i = 0; i < spikeCount; i++) {
             const sx = hazard.x + i * spikeWidth;
             ctx.beginPath();
             ctx.moveTo(sx, hazard.y + hazard.height);
-            ctx.lineTo(sx + spikeWidth / 2, hazard.y - 8);
+            ctx.lineTo(sx + spikeWidth / 2, hazard.y - 35);
             ctx.lineTo(sx + spikeWidth, hazard.y + hazard.height);
             ctx.fill();
           }
@@ -4331,6 +4331,23 @@ const LogosGame = () => {
 
     setCurrentWorld(world?.background || 1);
     setTokens(stage?.tokens || MAX_TOKENS);
+    setGameState('planning');
+    setObjects([]);
+    objectsRef.current = [];
+    setInventory([]);
+    setSelectedSlot(null);
+
+    // 플레이어 초기 위치 설정
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const FLOOR_OFFSET = 130;
+      const floorY = canvas.height - FLOOR_OFFSET;
+      playerRef.current = {
+        ...INITIAL_PLAYER,
+        x: 50,
+        y: floorY - 100
+      };
+    }
 
     setMessages([
       { id: 1, role: 'ai', text: `${world?.name || '월드'} - ${stage?.name || '스테이지'}` },
