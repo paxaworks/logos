@@ -116,6 +116,7 @@ const LogosGame = () => {
   const groundTileRef = useRef(null);
   const cloudImgRef = useRef(null);
   const natureTilesLoadedRef = useRef(false);
+  const brickTileRef = useRef(null);
   const bgCloudsRef = useRef([]);
   const cameraOffsetRef = useRef(0);
 
@@ -214,6 +215,52 @@ const LogosGame = () => {
         natureTilesLoadedRef.current = true;
       }
     };
+
+    // 벽돌 텍스처 생성 (64x64 픽셀아트 스타일)
+    const brickCanvas = document.createElement('canvas');
+    brickCanvas.width = 64;
+    brickCanvas.height = 64;
+    const bctx = brickCanvas.getContext('2d');
+    const brickW = 32;
+    const brickH = 16;
+    const colors = ['#8B6F47', '#7A5C3A', '#9B7B52', '#6E5434', '#A08060'];
+    const mortar = '#4A3728';
+
+    // 모르타르(줄눈) 배경
+    bctx.fillStyle = mortar;
+    bctx.fillRect(0, 0, 64, 64);
+
+    // 벽돌 그리기 (4행, 2열 + 오프셋)
+    for (let row = 0; row < 4; row++) {
+      const offset = (row % 2) * (brickW / 2);
+      for (let col = -1; col < 3; col++) {
+        const bx = col * brickW + offset;
+        const by = row * brickH;
+        if (bx + brickW <= 0 || bx >= 64) continue;
+
+        // 벽돌 메인 색상
+        const colorIdx = (row * 3 + col + 7) % colors.length;
+        bctx.fillStyle = colors[colorIdx];
+        bctx.fillRect(bx + 1, by + 1, brickW - 2, brickH - 2);
+
+        // 벽돌 하이라이트 (상단)
+        bctx.fillStyle = 'rgba(255,255,255,0.15)';
+        bctx.fillRect(bx + 1, by + 1, brickW - 2, 3);
+
+        // 벽돌 그림자 (하단)
+        bctx.fillStyle = 'rgba(0,0,0,0.2)';
+        bctx.fillRect(bx + 1, by + brickH - 4, brickW - 2, 3);
+
+        // 벽돌 표면 텍스처 (노이즈)
+        for (let n = 0; n < 6; n++) {
+          const nx = bx + 2 + Math.floor(Math.random() * (brickW - 4));
+          const ny = by + 3 + Math.floor(Math.random() * (brickH - 6));
+          bctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+          bctx.fillRect(nx, ny, 2, 2);
+        }
+      }
+    }
+    brickTileRef.current = brickCanvas;
   }, []);
 
   // 스프라이트 프레임 정의
@@ -3733,19 +3780,28 @@ const LogosGame = () => {
         const obsX = obs.x - obs.width / 2;
         const obsY = obs.y - obs.height;
         if (obs.type === 'wall') {
-          ctx.fillStyle = '#6B7280';
-          ctx.fillRect(obsX, obsY, obs.width, obs.height);
-          ctx.strokeStyle = '#4B5563';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(obsX, obsY, obs.width, obs.height);
-          // 벽돌 패턴
-          ctx.strokeStyle = '#374151';
-          ctx.lineWidth = 1;
-          for (let row = 0; row < obs.height; row += 25) {
+          if (brickTileRef.current) {
+            ctx.save();
             ctx.beginPath();
-            ctx.moveTo(obsX, obsY + row);
-            ctx.lineTo(obsX + obs.width, obsY + row);
-            ctx.stroke();
+            ctx.rect(obsX, obsY, obs.width, obs.height);
+            ctx.clip();
+            const tileSize = 64;
+            for (let ty = obsY; ty < obs.y; ty += tileSize) {
+              for (let tx = obsX; tx < obsX + obs.width; tx += tileSize) {
+                ctx.drawImage(brickTileRef.current, tx, ty, tileSize, tileSize);
+              }
+            }
+            ctx.fillStyle = '#5C4A3A';
+            ctx.fillRect(obsX - 2, obsY - 4, obs.width + 4, 6);
+            ctx.fillStyle = '#7A6550';
+            ctx.fillRect(obsX - 2, obsY - 4, obs.width + 4, 2);
+            ctx.restore();
+            ctx.strokeStyle = '#3A2A1A';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(obsX, obsY, obs.width, obs.height);
+          } else {
+            ctx.fillStyle = '#6B7280';
+            ctx.fillRect(obsX, obsY, obs.width, obs.height);
           }
         } else if (obs.type === 'hazard') {
           ctx.fillStyle = '#DC2626';
@@ -3877,30 +3933,37 @@ const LogosGame = () => {
           drawGroundTiles(ctx, canvas, ground.x, ground.x + ground.width, ground.y);
         });
 
-        // 벽 그리기
+        // 벽 그리기 (벽돌 텍스처)
         layout.walls.forEach(wall => {
-          const wallLeft = wall.x - wall.width / 2;
-          const wallTop = wall.y - wall.height;
-          ctx.fillStyle = '#4B5563';
-          ctx.fillRect(wallLeft, wallTop, wall.width, wall.height);
-          // 벽 테두리
-          ctx.strokeStyle = '#374151';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(wallLeft, wallTop, wall.width, wall.height);
-          // 벽돌 패턴
-          ctx.strokeStyle = '#374151';
-          ctx.lineWidth = 1;
-          const brickH = 20;
-          for (let by = wallTop; by < wall.y; by += brickH) {
+          const wallLeft = Math.floor(wall.x - wall.width / 2);
+          const wallTop = Math.floor(wall.y - wall.height);
+          const wallW = Math.ceil(wall.width);
+          const wallH = Math.ceil(wall.height);
+
+          if (brickTileRef.current) {
+            ctx.save();
             ctx.beginPath();
-            ctx.moveTo(wallLeft, by);
-            ctx.lineTo(wallLeft + wall.width, by);
-            ctx.stroke();
-            const offset = (Math.floor((by - wallTop) / brickH) % 2) * (wall.width / 2);
-            ctx.beginPath();
-            ctx.moveTo(wallLeft + offset, by);
-            ctx.lineTo(wallLeft + offset, Math.min(by + brickH, wall.y));
-            ctx.stroke();
+            ctx.rect(wallLeft, wallTop, wallW, wallH);
+            ctx.clip();
+            const tileSize = 64;
+            for (let ty = wallTop; ty < wall.y; ty += tileSize) {
+              for (let tx = wallLeft; tx < wallLeft + wallW; tx += tileSize) {
+                ctx.drawImage(brickTileRef.current, tx, ty, tileSize, tileSize);
+              }
+            }
+            // 상단 장식 (돌 테두리)
+            ctx.fillStyle = '#5C4A3A';
+            ctx.fillRect(wallLeft - 2, wallTop - 4, wallW + 4, 6);
+            ctx.fillStyle = '#7A6550';
+            ctx.fillRect(wallLeft - 2, wallTop - 4, wallW + 4, 2);
+            ctx.restore();
+            // 외곽 테두리
+            ctx.strokeStyle = '#3A2A1A';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(wallLeft, wallTop, wallW, wallH);
+          } else {
+            ctx.fillStyle = '#4B5563';
+            ctx.fillRect(wallLeft, wallTop, wallW, wallH);
           }
         });
 
