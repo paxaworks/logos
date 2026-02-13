@@ -344,10 +344,10 @@ const LogosGame = () => {
 
   // --- 크기 파서 ---
   const parseSize = (text) => {
-    if (text.includes('거대') || text.includes('엄청 큰') || text.includes('초대형')) return 2.0;
-    if (text.includes('큰') || text.includes('대형')) return 1.5;
-    if (text.includes('작은') || text.includes('소형') || text.includes('미니')) return 0.6;
-    if (text.includes('아주 작은') || text.includes('초소형')) return 0.4;
+    if (text.includes('거대') || text.includes('엄청 큰') || text.includes('초대형') || text.includes('엄청 크게')) return 2.0;
+    if (text.includes('큰') || text.includes('대형') || text.includes('크게')) return 1.5;
+    if (text.includes('작은') || text.includes('소형') || text.includes('미니') || text.includes('작게')) return 0.6;
+    if (text.includes('아주 작은') || text.includes('초소형') || text.includes('아주 작게')) return 0.4;
     return 1.0;
   };
 
@@ -480,7 +480,8 @@ const LogosGame = () => {
         height,
         name,
         message: `"${name}" 블록을 만들었어요!`,
-        color: customColor || '#6B7280'
+        color: customColor || '#6B7280',
+        sizeMultiplier
       };
     }
 
@@ -520,7 +521,8 @@ const LogosGame = () => {
       name: matched.name,
       message: matched.message,
       color: baseColor,
-      direction
+      direction,
+      sizeMultiplier
     };
   };
 
@@ -1862,14 +1864,17 @@ const LogosGame = () => {
 
         // floating: 풍선은 공중에 떠있고, 밟으면 살짝 위로 뜸
         if (obj.physics === 'floating' && isOverlapping) {
-          floatForce = -5; // 위로 뜨는 힘 (강화)
+          const floatSizeMultiplier = obj.sizeMultiplier || 1.0;
+          floatForce = -5 * floatSizeMultiplier; // 위로 뜨는 힘 (크기에 비례)
         }
 
         // magnet: 자석에 가까우면 강하게 끌어당김
         if (obj.physics === 'magnet') {
+          const magnetSizeMultiplier = obj.sizeMultiplier || 1.0;
+          const magnetRange = 250 * magnetSizeMultiplier;
           const dist = Math.sqrt((pCenterX - objCenterX) ** 2 + (pCenterY - objCenterY) ** 2);
-          if (dist < 250) { // 자석 영향 범위 확대
-            const pullStrength = (250 - dist) / 250 * 8; // 끌림 강도 대폭 증가
+          if (dist < magnetRange) {
+            const pullStrength = (magnetRange - dist) / magnetRange * 8 * magnetSizeMultiplier;
             if (pCenterX < objCenterX) p.x += pullStrength;
             else p.x -= pullStrength;
             // 세로 방향으로도 살짝 끌림
@@ -1880,9 +1885,11 @@ const LogosGame = () => {
 
         // wind: 선풍기 근처에서 왼쪽으로 밀려남
         if (obj.physics === 'wind') {
+          const windSizeMultiplier = obj.sizeMultiplier || 1.0;
+          const windRange = 300 * windSizeMultiplier;
           const dist = Math.sqrt((pCenterX - objCenterX) ** 2 + (pCenterY - objCenterY) ** 2);
-          if (dist < 300) { // 바람 영향 범위 확대
-            const pushStrength = (300 - dist) / 300 * 6; // 바람 세기 증가
+          if (dist < windRange) {
+            const pushStrength = (windRange - dist) / windRange * 6 * windSizeMultiplier;
             // 선풍기 왼쪽으로 밀기
             windForce = -pushStrength;
           }
@@ -1937,7 +1944,11 @@ const LogosGame = () => {
         p.y = bestGroundY - p.height;
         p.vy = 0;
         p.grounded = true;
-        if (bestGroundObj.physics === 'bounce') { p.vy = JUMP_FORCE * 1.5; p.grounded = false; }
+        if (bestGroundObj.physics === 'bounce') {
+          const bounceMultiplier = bestGroundObj.sizeMultiplier || 1.0;
+          p.vy = JUMP_FORCE * 1.5 * bounceMultiplier;
+          p.grounded = false;
+        }
         if (bestGroundObj.physics === 'ice') onIce = true;
         if (bestGroundObj.physics === 'button') {
           bestGroundObj.pressed = true;
