@@ -4460,21 +4460,36 @@ const LogosGame = () => {
     setCurrentWorld(world?.background || 1);
     setTokens(stage?.tokens || MAX_TOKENS);
     setGameState('planning');
-    setObjects([]);
-    objectsRef.current = [];
     setInventory([]);
     setSelectedSlot(null);
 
-    // 플레이어 초기 위치 설정
+    // 플레이어 초기 위치 및 특수 오브젝트 배치
     const canvas = canvasRef.current;
     if (canvas) {
-      const FLOOR_OFFSET = 130;
-      const floorY = canvas.height - FLOOR_OFFSET;
-      playerRef.current = {
-        ...INITIAL_PLAYER,
-        x: 50,
-        y: floorY - 100
-      };
+      const layout = getStageLayout(canvas);
+      const stageSpecialObjs = (layout && layout.specialObjects) ? layout.specialObjects : [];
+      setObjects([...stageSpecialObjs]);
+      objectsRef.current = [...stageSpecialObjs];
+
+      if (layout && layout.grounds.length > 0) {
+        const firstGround = layout.grounds[0];
+        playerRef.current = {
+          ...INITIAL_PLAYER,
+          x: firstGround.x + 30,
+          y: firstGround.y - 100
+        };
+      } else {
+        const FLOOR_OFFSET = 130;
+        const floorY = canvas.height - FLOOR_OFFSET;
+        playerRef.current = {
+          ...INITIAL_PLAYER,
+          x: 50,
+          y: floorY - 100
+        };
+      }
+    } else {
+      setObjects([]);
+      objectsRef.current = [];
     }
 
     setMessages([
