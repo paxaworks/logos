@@ -708,6 +708,9 @@ const LogosGame = () => {
     const canvas = canvasRef.current;
     const FLOOR_OFFSET = 130;
 
+    // 레이아웃 한 번만 계산
+    const layout = (!isCustomMap && canvas) ? getStageLayout(canvas) : null;
+
     // 커스텀 맵이면 커스텀 시작 위치로, 아니면 스테이지 첫 바닥 위
     let startX = 50;
     let startY = canvas ? canvas.height - FLOOR_OFFSET - 100 : 500;
@@ -715,13 +718,10 @@ const LogosGame = () => {
     if (isCustomMap && editorStart) {
       startX = editorStart.x - 20;
       startY = editorStart.y - 100;
-    } else if (canvas) {
-      const layout = getStageLayout(canvas);
-      if (layout && layout.grounds.length > 0) {
-        const firstGround = layout.grounds[0];
-        startX = firstGround.x + 30;
-        startY = firstGround.y - 100;
-      }
+    } else if (layout && layout.grounds.length > 0) {
+      const firstGround = layout.grounds[0];
+      startX = firstGround.x + 30;
+      startY = firstGround.y - 100;
     }
 
     playerRef.current = {
@@ -729,8 +729,10 @@ const LogosGame = () => {
       x: startX,
       y: startY
     };
-    setObjects([]);
-    objectsRef.current = [];
+    // 스테이지 특수 오브젝트 배치
+    const stageSpecialObjs = (layout && layout.specialObjects) ? layout.specialObjects : [];
+    setObjects([...stageSpecialObjs]);
+    objectsRef.current = [...stageSpecialObjs];
     setInventory([]);
 
     // 토큰 수 설정
@@ -3750,7 +3752,42 @@ const LogosGame = () => {
     const goalX = lastGround.x + lastGround.width - goalWidth;
     const goalY = lastGround.y - goalHeight;
 
-    return { grounds, walls, hazards, goalX, goalY, goalWidth, goalHeight, floorY, TILE_SIZE };
+    // 스테이지 특수 오브젝트 처리
+    const specialObjects = (stage.specialObjects || []).map(so => {
+      const objData = objectsData[so.name];
+      if (!objData) return null;
+      const sizeMul = so.size || 1.0;
+      const w = Math.round(objData.size[0] * sizeMul);
+      const h = Math.round(objData.size[1] * sizeMul);
+      const objX = so.x * canvas.width - w / 2;
+      const objY = floorY - (so.y * gameHeight) - h / 2;
+
+      let parts = objData.parts ? objData.parts.map(part => {
+        if (part.color) return { ...part };
+        return { ...part, color: objData.color };
+      }) : [];
+
+      return {
+        id: `stage_${so.name}_${so.x}_${so.y}`,
+        renderType: objData.renderType || 'vector',
+        imageUrl: objData.imageUrl,
+        shape: objData.shape || 'custom',
+        parts,
+        physics: objData.physics || 'solid',
+        slowEffect: objData.slowEffect,
+        waterEffect: objData.waterEffect,
+        width: w,
+        height: h,
+        x: objX,
+        y: objY,
+        name: so.name,
+        color: objData.color,
+        sizeMultiplier: sizeMul,
+        isStageObject: true
+      };
+    }).filter(Boolean);
+
+    return { grounds, walls, hazards, specialObjects, goalX, goalY, goalWidth, goalHeight, floorY, TILE_SIZE };
   };
 
   // 바닥 타일 그리기 함수
