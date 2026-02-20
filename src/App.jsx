@@ -3704,10 +3704,10 @@ const LogosGame = () => {
   };
 
   // 스테이지 레이아웃 계산 함수 (비율 기반 → 픽셀 좌표)
-  const getStageLayout = (canvas) => {
+  const getStageLayout = (canvas, overrideWorldId, overrideStageId) => {
     if (!canvas) return null;
-    const world = stagesData.worlds.find(w => w.id === selectedWorld);
-    const stage = world?.stages.find(s => s.id === selectedStage);
+    const world = stagesData.worlds.find(w => w.id === (overrideWorldId || selectedWorld));
+    const stage = world?.stages.find(s => s.id === (overrideStageId || selectedStage));
     if (!stage || !stage.grounds) return null;
 
     const FLOOR_OFFSET = 130;
@@ -4466,7 +4466,7 @@ const LogosGame = () => {
     // 플레이어 초기 위치 및 특수 오브젝트 배치
     const canvas = canvasRef.current;
     if (canvas) {
-      const layout = getStageLayout(canvas);
+      const layout = getStageLayout(canvas, wId, sId);
       const stageSpecialObjs = (layout && layout.specialObjects) ? layout.specialObjects : [];
       setObjects([...stageSpecialObjs]);
       objectsRef.current = [...stageSpecialObjs];
