@@ -4365,6 +4365,16 @@ const LogosGame = () => {
             playerRef.current.x = 50;
             playerRef.current.y = canvas.height - 130 - 100;
           }
+
+          // 특수 오브젝트가 아직 배치되지 않았으면 배치
+          if (layout && layout.specialObjects && layout.specialObjects.length > 0) {
+            const hasStageObjs = objectsRef.current.some(o => o.isStageObject);
+            if (!hasStageObjs) {
+              const combined = [...objectsRef.current, ...layout.specialObjects];
+              objectsRef.current = combined;
+              setObjects(combined);
+            }
+          }
         }
       }
     };
