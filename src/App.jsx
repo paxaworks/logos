@@ -3760,7 +3760,7 @@ const LogosGame = () => {
       const w = Math.round(objData.size[0] * sizeMul);
       const h = Math.round(objData.size[1] * sizeMul);
       const objX = so.x * canvas.width - w / 2;
-      const objY = floorY - (so.y * gameHeight) - h / 2;
+      const objY = floorY - (so.y * gameHeight) - h;
 
       let parts = objData.parts ? objData.parts.map(part => {
         if (part.color) return { ...part };
