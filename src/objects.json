@@ -1272,7 +1272,8 @@
     "size": [60, 80],
     "color": "#6B7280",
     "message": "통통 튕겨요!",
-    "physics": "bounce",
+    "physics": "solid",
+    "bounceEffect": true,
     "parts": [
       { "type": "rect", "x": 15, "y": 85, "w": 70, "h": 15, "color": "#374151" },
       { "type": "rect", "x": 10, "y": 72, "w": 80, "h": 8, "color": "#6B7280" },

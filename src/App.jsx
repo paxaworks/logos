@@ -516,6 +516,7 @@ const LogosGame = () => {
       physics: matched.physics || 'solid',
       slowEffect: matched.slowEffect,
       waterEffect: matched.waterEffect,
+      bounceEffect: matched.bounceEffect,
       width,
       height,
       name: matched.name,
@@ -1969,7 +1970,7 @@ const LogosGame = () => {
         p.y = bestGroundY - p.height;
         p.vy = 0;
         p.grounded = true;
-        if (bestGroundObj.physics === 'bounce') {
+        if (bestGroundObj.physics === 'bounce' || bestGroundObj.bounceEffect) {
           const bounceMultiplier = bestGroundObj.sizeMultiplier || 1.0;
           p.vy = JUMP_FORCE * 1.5 * bounceMultiplier;
           p.grounded = false;
@@ -3776,6 +3777,7 @@ const LogosGame = () => {
         physics: objData.physics || 'solid',
         slowEffect: objData.slowEffect,
         waterEffect: objData.waterEffect,
+        bounceEffect: objData.bounceEffect,
         width: w,
         height: h,
         x: objX,
