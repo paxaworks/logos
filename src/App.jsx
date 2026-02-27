@@ -5013,29 +5013,19 @@ const LogosGame = () => {
 
     return (
       <div className="w-screen h-screen overflow-hidden relative" style={{ maxHeight: '100dvh' }}>
-        {/* 배경 - 어두운 그래디언트 + 장식 */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1a0e2e] via-[#0f1923] to-[#0a0a0f]" />
-        {/* 장식용 빛 효과 */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px]" />
-        {/* 장식용 별 패턴 */}
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: `radial-gradient(1px 1px at 10% 20%, rgba(255,215,0,0.8) 0%, transparent 100%),
-            radial-gradient(1px 1px at 30% 60%, rgba(255,215,0,0.6) 0%, transparent 100%),
-            radial-gradient(1.5px 1.5px at 50% 10%, rgba(255,215,0,0.9) 0%, transparent 100%),
-            radial-gradient(1px 1px at 70% 40%, rgba(255,215,0,0.5) 0%, transparent 100%),
-            radial-gradient(1px 1px at 90% 80%, rgba(255,215,0,0.7) 0%, transparent 100%),
-            radial-gradient(1.5px 1.5px at 15% 85%, rgba(255,215,0,0.6) 0%, transparent 100%),
-            radial-gradient(1px 1px at 85% 15%, rgba(255,215,0,0.8) 0%, transparent 100%),
-            radial-gradient(1px 1px at 45% 75%, rgba(255,215,0,0.5) 0%, transparent 100%)`
-        }} />
+        {/* 배경 - 따뜻한 크림+살구 그래디언트 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#fef3e2] via-[#fde8d0] to-[#fce4c4]" />
+        {/* 장식용 부드러운 빛 */}
+        <div className="absolute top-[-100px] left-1/3 w-[500px] h-[500px] bg-amber-300/20 rounded-full blur-[150px]" />
+        <div className="absolute bottom-[-50px] right-1/4 w-[400px] h-[400px] bg-orange-200/25 rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-[-100px] w-[300px] h-[300px] bg-yellow-200/20 rounded-full blur-[100px]" />
 
         {/* 상단 헤더 */}
         <div className="relative z-10 px-8 pt-6 pb-4">
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => { soundManager.play('click'); setScreen('menu'); }}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 bg-amber-800/10 hover:bg-amber-800/20 border border-amber-700/20 rounded-xl text-amber-900 font-bold transition-all"
             >
               <ChevronLeft size={22} />
               뒤로
@@ -5047,24 +5037,24 @@ const LogosGame = () => {
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-3 mb-3">
               <div className="text-5xl">🏆</div>
-              <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500" style={{ textShadow: 'none' }}>
+              <h1 className="text-5xl font-black text-amber-800">
                 업적
               </h1>
             </div>
-            <p className="text-white/40 text-sm mb-4">도전하고, 정복하고, 전설이 되세요</p>
+            <p className="text-amber-700/50 text-sm mb-4">도전하고, 정복하고, 전설이 되세요</p>
 
             {/* 큰 진행률 */}
             <div className="max-w-md mx-auto">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-white/50">진행률</span>
-                <span className="text-amber-400 font-black">{unlockedCount} / {totalCount}</span>
+                <span className="text-amber-800/50">진행률</span>
+                <span className="text-amber-700 font-black">{unlockedCount} / {totalCount}</span>
               </div>
-              <div className="h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
+              <div className="h-3.5 bg-amber-900/10 rounded-full overflow-hidden border border-amber-800/10">
                 <div
-                  className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 rounded-full transition-all duration-700 relative"
+                  className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-400 rounded-full transition-all duration-700 relative"
                   style={{ width: `${progressPercent}%` }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-full" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent rounded-full" />
                 </div>
               </div>
             </div>
@@ -5077,10 +5067,10 @@ const LogosGame = () => {
             <div key={catIdx} className="mb-8">
               {/* 카테고리 헤더 */}
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-px flex-1 bg-gradient-to-r from-amber-500/30 to-transparent" />
-                <h2 className="text-lg font-black text-amber-400 tracking-wider uppercase">{cat.name}</h2>
-                <span className="text-xs text-white/30">{cat.desc}</span>
-                <div className="h-px flex-1 bg-gradient-to-l from-amber-500/30 to-transparent" />
+                <div className="h-px flex-1 bg-gradient-to-r from-amber-600/30 to-transparent" />
+                <h2 className="text-lg font-black text-amber-700 tracking-wider uppercase">{cat.name}</h2>
+                <span className="text-xs text-amber-800/40">{cat.desc}</span>
+                <div className="h-px flex-1 bg-gradient-to-l from-amber-600/30 to-transparent" />
               </div>
 
               {/* 업적 그리드 */}
@@ -5090,38 +5080,38 @@ const LogosGame = () => {
                   return (
                     <div key={a.id} className={`relative group rounded-2xl border-2 p-5 transition-all duration-300 ${
                       unlocked
-                        ? 'bg-gradient-to-br from-amber-900/30 via-amber-800/20 to-yellow-900/30 border-amber-500/40 hover:border-amber-400/60 hover:shadow-lg hover:shadow-amber-500/10'
-                        : 'bg-gradient-to-br from-white/[0.02] to-white/[0.01] border-white/[0.06] hover:border-white/10'
-                    }`}>
+                        ? 'bg-gradient-to-br from-white/80 to-amber-50/80 border-amber-400/50 hover:border-amber-500/70 hover:shadow-xl hover:shadow-amber-400/15 shadow-md shadow-amber-200/20'
+                        : 'bg-white/30 border-amber-800/10 hover:border-amber-800/20 hover:bg-white/40'
+                    }`} style={{ backdropFilter: 'blur(8px)' }}>
                       {/* 달성 시 빛나는 효과 */}
                       {unlocked && (
-                        <div className="absolute -top-px -left-px -right-px -bottom-px rounded-2xl bg-gradient-to-br from-amber-400/10 to-transparent pointer-events-none" />
+                        <div className="absolute -top-px -left-px -right-px -bottom-px rounded-2xl bg-gradient-to-br from-amber-200/20 to-transparent pointer-events-none" />
                       )}
 
                       <div className="relative flex items-start gap-4">
                         {/* 아이콘 */}
                         <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 ${
                           unlocked
-                            ? 'bg-gradient-to-br from-amber-500/30 to-yellow-600/20 shadow-inner'
-                            : 'bg-white/[0.03]'
+                            ? 'bg-gradient-to-br from-amber-100 to-yellow-100 shadow-inner border border-amber-300/50'
+                            : 'bg-amber-800/5 border border-amber-800/10'
                         }`}>
                           {unlocked ? a.icon : '🔒'}
                         </div>
 
                         {/* 텍스트 */}
                         <div className="flex-1 min-w-0 pt-1">
-                          <div className={`font-black text-base mb-1 ${unlocked ? 'text-amber-300' : 'text-white/20'}`}>
+                          <div className={`font-black text-base mb-1 ${unlocked ? 'text-amber-800' : 'text-amber-900/25'}`}>
                             {a.name}
                           </div>
-                          <div className={`text-xs leading-relaxed ${unlocked ? 'text-white/50' : 'text-white/15'}`}>
+                          <div className={`text-xs leading-relaxed ${unlocked ? 'text-amber-700/60' : 'text-amber-900/20'}`}>
                             {a.desc}
                           </div>
                         </div>
 
                         {/* 달성 체크 */}
                         {unlocked && (
-                          <div className="w-8 h-8 bg-green-500/20 border border-green-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                            <Check size={16} className="text-green-400" />
+                          <div className="w-8 h-8 bg-green-100 border border-green-300/50 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                            <Check size={16} className="text-green-600" />
                           </div>
                         )}
                       </div>

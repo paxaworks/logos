@@ -135,26 +135,18 @@ class SoundManager {
     },
 
     land(ctx) {
-      // 부드러운 발소리 (짧고 가벼운 탁 소리)
-      const bufferSize = Math.floor(ctx.sampleRate * 0.04);
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        const t = i / bufferSize;
-        data[i] = (Math.random() * 2 - 1) * 0.15 * Math.exp(-t * 12);
-      }
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(400, ctx.currentTime);
+      // 착지 사운드 - 짧은 "탁" 소리
+      const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.06, ctx.currentTime);
-      source.connect(filter);
-      filter.connect(gain);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(120, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.06);
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
+      osc.connect(gain);
       gain.connect(this.masterGain);
-      source.start(ctx.currentTime);
-      source.stop(ctx.currentTime + 0.04);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.07);
     },
 
     bounce(ctx) {
