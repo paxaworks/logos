@@ -4820,53 +4820,91 @@ const LogosGame = () => {
       <div className="w-screen h-screen overflow-hidden relative" style={{ maxHeight: '100dvh' }}>
         {/* 설정 모달 */}
         {showSettings && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-            <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-96 max-w-[90vw]">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-                  <Settings size={20} className="text-amber-400" />
-                  설정
-                </h2>
-                <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-slate-800 rounded text-white">
-                  <X size={20} />
-                </button>
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-md">
+            <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 border border-white/10 rounded-3xl p-0 w-[440px] max-w-[92vw] overflow-hidden shadow-2xl">
+              {/* 헤더 */}
+              <div className="bg-gradient-to-r from-slate-700/50 to-slate-600/30 border-b border-white/10 px-6 py-5">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                    <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                      <Settings size={22} className="text-amber-400" />
+                    </div>
+                    설정
+                  </h2>
+                  <button onClick={() => setShowSettings(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
+                    <X size={22} className="text-white/60" />
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="p-5 space-y-3">
+                {/* 오디오 섹션 */}
+                <div className="text-xs font-bold text-white/30 uppercase tracking-widest px-1 mb-2">오디오</div>
+
                 {/* 효과음 */}
-                <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
                   <div className="flex items-center gap-3">
-                    {soundEnabled ? <Volume2 size={20} className="text-amber-400" /> : <VolumeX size={20} className="text-slate-500" />}
-                    <span className="text-sm font-medium text-white">효과음</span>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${soundEnabled ? 'bg-amber-500/20' : 'bg-white/5'}`}>
+                      {soundEnabled ? <Volume2 size={20} className="text-amber-400" /> : <VolumeX size={20} className="text-white/30" />}
+                    </div>
+                    <div>
+                      <span className="text-sm font-bold text-white">효과음</span>
+                      <div className="text-xs text-white/30">게임 내 효과음</div>
+                    </div>
                   </div>
                   <button
                     onClick={() => setSoundEnabled(!soundEnabled)}
-                    className={`w-12 h-6 rounded-full transition-colors ${soundEnabled ? 'bg-amber-500' : 'bg-slate-600'}`}
+                    className={`w-14 h-7 rounded-full transition-all duration-200 ${soundEnabled ? 'bg-amber-500 shadow-lg shadow-amber-500/30' : 'bg-slate-600'}`}
                   >
-                    <div className={`w-5 h-5 bg-white rounded-full transition-transform ${soundEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                    <div className={`w-6 h-6 bg-white rounded-full transition-transform duration-200 shadow-sm ${soundEnabled ? 'translate-x-7' : 'translate-x-0.5'}`} />
                   </button>
                 </div>
 
                 {/* 배경음악 */}
-                <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
                   <div className="flex items-center gap-3">
-                    {musicEnabled ? <Music size={20} className="text-amber-400" /> : <Music2 size={20} className="text-slate-500" />}
-                    <span className="text-sm font-medium text-white">배경음악</span>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${musicEnabled ? 'bg-purple-500/20' : 'bg-white/5'}`}>
+                      {musicEnabled ? <Music size={20} className="text-purple-400" /> : <Music2 size={20} className="text-white/30" />}
+                    </div>
+                    <div>
+                      <span className="text-sm font-bold text-white">배경음악</span>
+                      <div className="text-xs text-white/30">월드별 BGM</div>
+                    </div>
                   </div>
                   <button
                     onClick={() => setMusicEnabled(!musicEnabled)}
-                    className={`w-12 h-6 rounded-full transition-colors ${musicEnabled ? 'bg-amber-500' : 'bg-slate-600'}`}
+                    className={`w-14 h-7 rounded-full transition-all duration-200 ${musicEnabled ? 'bg-purple-500 shadow-lg shadow-purple-500/30' : 'bg-slate-600'}`}
                   >
-                    <div className={`w-5 h-5 bg-white rounded-full transition-transform ${musicEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                    <div className={`w-6 h-6 bg-white rounded-full transition-transform duration-200 shadow-sm ${musicEnabled ? 'translate-x-7' : 'translate-x-0.5'}`} />
                   </button>
+                </div>
+
+                {/* 구분선 */}
+                <div className="border-t border-white/5 my-2" />
+
+                {/* 게임 정보 */}
+                <div className="text-xs font-bold text-white/30 uppercase tracking-widest px-1 mb-2">정보</div>
+                <div className="p-4 bg-black/20 rounded-2xl border border-white/5 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/40">클리어 스테이지</span>
+                    <span className="text-white font-bold">{Object.keys(clearedStages).length} / 100</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/40">생성한 오브젝트</span>
+                    <span className="text-white font-bold">{stats.totalCreated}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/40">달성 업적</span>
+                    <span className="text-amber-400 font-bold">{Object.keys(achievements).length} / {ACHIEVEMENTS.length}</span>
+                  </div>
                 </div>
 
                 {/* 저장 버튼 */}
                 <button
                   onClick={saveSettings}
-                  className="w-full py-3 bg-amber-500 hover:bg-amber-400 rounded-lg text-sm font-bold text-black flex items-center justify-center gap-2 transition-colors"
+                  className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 rounded-xl text-sm font-black text-black flex items-center justify-center gap-2 transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40"
                 >
-                  <Check size={16} />
+                  <Check size={18} />
                   저장
                 </button>
               </div>
@@ -4954,62 +4992,118 @@ const LogosGame = () => {
             <p className="text-white/60 text-lg font-bold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>© 2025 LOGOS Game</p>
           </div>
         </div>
+
+        {/* 업적 모달 (메뉴) */}
+        {showAchievements && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[90] backdrop-blur-md">
+            <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 border border-amber-500/30 rounded-3xl p-0 w-[560px] max-w-[92vw] max-h-[85vh] overflow-hidden shadow-2xl shadow-amber-500/10">
+              {/* 헤더 */}
+              <div className="bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border-b border-amber-500/20 px-6 py-5">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-black text-amber-400 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                      <Star size={22} className="text-amber-400" />
+                    </div>
+                    업적
+                    <span className="text-base font-bold text-amber-500/60 ml-1">{Object.keys(achievements).length} / {ACHIEVEMENTS.length}</span>
+                  </h2>
+                  <button onClick={() => setShowAchievements(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
+                    <X size={22} className="text-white/60" />
+                  </button>
+                </div>
+                {/* 진행률 바 */}
+                <div className="mt-3 h-2 bg-black/30 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500"
+                    style={{ width: `${(Object.keys(achievements).length / ACHIEVEMENTS.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+              {/* 업적 리스트 */}
+              <div className="p-4 overflow-y-auto max-h-[calc(85vh-100px)] space-y-2">
+                {ACHIEVEMENTS.map(a => {
+                  const unlocked = !!achievements[a.id];
+                  return (
+                    <div key={a.id} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
+                      unlocked
+                        ? 'bg-gradient-to-r from-amber-500/10 to-yellow-500/5 border-amber-500/30 hover:border-amber-400/50'
+                        : 'bg-black/20 border-white/5 hover:border-white/10'
+                    }`}>
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${
+                        unlocked ? 'bg-amber-500/20' : 'bg-white/5'
+                      }`}>
+                        {unlocked ? a.icon : '🔒'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className={`font-bold ${unlocked ? 'text-amber-300' : 'text-white/30'}`}>{a.name}</div>
+                        <div className={`text-xs mt-0.5 ${unlocked ? 'text-white/50' : 'text-white/20'}`}>{a.desc}</div>
+                      </div>
+                      {unlocked && (
+                        <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Check size={16} className="text-green-400" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
   return (
     <div className="flex flex-col md:flex-row w-screen h-screen bg-slate-950 text-slate-100 font-sans overflow-hidden select-none" style={{ maxHeight: '100dvh' }}>
-      {/* 설정 모달 */}
+      {/* 설정 모달 (게임 내) */}
       {showSettings && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 w-96 max-w-[90vw]">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                <Settings size={20} className="text-amber-400" />
-                설정
-              </h2>
-              <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-slate-800 rounded">
-                <X size={20} />
-              </button>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-md">
+          <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 border border-white/10 rounded-3xl p-0 w-[440px] max-w-[92vw] overflow-hidden shadow-2xl">
+            <div className="bg-gradient-to-r from-slate-700/50 to-slate-600/30 border-b border-white/10 px-6 py-5">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                  <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                    <Settings size={22} className="text-amber-400" />
+                  </div>
+                  설정
+                </h2>
+                <button onClick={() => setShowSettings(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
+                  <X size={22} className="text-white/60" />
+                </button>
+              </div>
             </div>
-
-            <div className="space-y-4">
-              {/* 효과음 */}
-              <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+            <div className="p-5 space-y-3">
+              <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5">
                 <div className="flex items-center gap-3">
-                  {soundEnabled ? <Volume2 size={20} className="text-amber-400" /> : <VolumeX size={20} className="text-slate-500" />}
-                  <span className="text-sm font-medium">효과음</span>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${soundEnabled ? 'bg-amber-500/20' : 'bg-white/5'}`}>
+                    {soundEnabled ? <Volume2 size={20} className="text-amber-400" /> : <VolumeX size={20} className="text-white/30" />}
+                  </div>
+                  <div>
+                    <span className="text-sm font-bold text-white">효과음</span>
+                    <div className="text-xs text-white/30">게임 내 효과음</div>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setSoundEnabled(!soundEnabled)}
-                  className={`w-12 h-6 rounded-full transition-colors ${soundEnabled ? 'bg-amber-500' : 'bg-slate-600'}`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full transition-transform ${soundEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                <button onClick={() => setSoundEnabled(!soundEnabled)} className={`w-14 h-7 rounded-full transition-all duration-200 ${soundEnabled ? 'bg-amber-500 shadow-lg shadow-amber-500/30' : 'bg-slate-600'}`}>
+                  <div className={`w-6 h-6 bg-white rounded-full transition-transform duration-200 shadow-sm ${soundEnabled ? 'translate-x-7' : 'translate-x-0.5'}`} />
                 </button>
               </div>
-
-              {/* 배경음악 */}
-              <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5">
                 <div className="flex items-center gap-3">
-                  {musicEnabled ? <Music size={20} className="text-amber-400" /> : <Music2 size={20} className="text-slate-500" />}
-                  <span className="text-sm font-medium">배경음악</span>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${musicEnabled ? 'bg-purple-500/20' : 'bg-white/5'}`}>
+                    {musicEnabled ? <Music size={20} className="text-purple-400" /> : <Music2 size={20} className="text-white/30" />}
+                  </div>
+                  <div>
+                    <span className="text-sm font-bold text-white">배경음악</span>
+                    <div className="text-xs text-white/30">월드별 BGM</div>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setMusicEnabled(!musicEnabled)}
-                  className={`w-12 h-6 rounded-full transition-colors ${musicEnabled ? 'bg-amber-500' : 'bg-slate-600'}`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full transition-transform ${musicEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                <button onClick={() => setMusicEnabled(!musicEnabled)} className={`w-14 h-7 rounded-full transition-all duration-200 ${musicEnabled ? 'bg-purple-500 shadow-lg shadow-purple-500/30' : 'bg-slate-600'}`}>
+                  <div className={`w-6 h-6 bg-white rounded-full transition-transform duration-200 shadow-sm ${musicEnabled ? 'translate-x-7' : 'translate-x-0.5'}`} />
                 </button>
               </div>
-
-              {/* 저장 버튼 */}
-              <button
-                onClick={saveSettings}
-                className="w-full py-3 bg-amber-500 hover:bg-amber-400 rounded-lg text-sm font-bold text-black flex items-center justify-center gap-2 transition-colors"
-              >
-                <Check size={16} />
-                저장
+              <button onClick={saveSettings} className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 rounded-xl text-sm font-black text-black flex items-center justify-center gap-2 transition-all shadow-lg shadow-amber-500/20">
+                <Check size={18} /> 저장
               </button>
             </div>
           </div>
@@ -5489,34 +5583,48 @@ const LogosGame = () => {
         </div>
       )}
 
-      {/* 업적 목록 모달 */}
+      {/* 업적 목록 모달 (게임 내) */}
       {showAchievements && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[90] backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-[500px] max-w-[90vw] max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-black text-amber-400 flex items-center gap-2">
-                <Star size={24} />
-                업적 ({Object.keys(achievements).length}/{ACHIEVEMENTS.length})
-              </h2>
-              <button onClick={() => setShowAchievements(false)} className="p-2 hover:bg-white/10 rounded-lg">
-                <X size={20} />
-              </button>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[90] backdrop-blur-md">
+          <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 border border-amber-500/30 rounded-3xl p-0 w-[560px] max-w-[92vw] max-h-[85vh] overflow-hidden shadow-2xl shadow-amber-500/10">
+            <div className="bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border-b border-amber-500/20 px-6 py-5">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-black text-amber-400 flex items-center gap-3">
+                  <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                    <Star size={22} className="text-amber-400" />
+                  </div>
+                  업적
+                  <span className="text-base font-bold text-amber-500/60 ml-1">{Object.keys(achievements).length} / {ACHIEVEMENTS.length}</span>
+                </h2>
+                <button onClick={() => setShowAchievements(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
+                  <X size={22} className="text-white/60" />
+                </button>
+              </div>
+              <div className="mt-3 h-2 bg-black/30 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500" style={{ width: `${(Object.keys(achievements).length / ACHIEVEMENTS.length) * 100}%` }} />
+              </div>
             </div>
-            <div className="grid grid-cols-1 gap-2">
+            <div className="p-4 overflow-y-auto max-h-[calc(85vh-100px)] space-y-2">
               {ACHIEVEMENTS.map(a => {
                 const unlocked = !!achievements[a.id];
                 return (
-                  <div key={a.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                  <div key={a.id} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
                     unlocked
-                      ? 'bg-amber-500/10 border-amber-500/30'
-                      : 'bg-slate-800/50 border-slate-700/30 opacity-50'
+                      ? 'bg-gradient-to-r from-amber-500/10 to-yellow-500/5 border-amber-500/30 hover:border-amber-400/50'
+                      : 'bg-black/20 border-white/5 hover:border-white/10'
                   }`}>
-                    <span className="text-2xl">{unlocked ? a.icon : '🔒'}</span>
-                    <div className="flex-1">
-                      <div className={`font-bold text-sm ${unlocked ? 'text-amber-400' : 'text-white/50'}`}>{a.name}</div>
-                      <div className="text-xs text-white/40">{a.desc}</div>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${unlocked ? 'bg-amber-500/20' : 'bg-white/5'}`}>
+                      {unlocked ? a.icon : '🔒'}
                     </div>
-                    {unlocked && <Check size={16} className="text-green-400" />}
+                    <div className="flex-1 min-w-0">
+                      <div className={`font-bold ${unlocked ? 'text-amber-300' : 'text-white/30'}`}>{a.name}</div>
+                      <div className={`text-xs mt-0.5 ${unlocked ? 'text-white/50' : 'text-white/20'}`}>{a.desc}</div>
+                    </div>
+                    {unlocked && (
+                      <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Check size={16} className="text-green-400" />
+                      </div>
+                    )}
                   </div>
                 );
               })}

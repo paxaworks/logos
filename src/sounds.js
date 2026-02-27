@@ -11,6 +11,8 @@ class SoundManager {
     this.bgmId = null;
     this.masterGain = null;
     this.bgmGain = null;
+    this._lastPlayTime = {};
+    this._cooldowns = { land: 150, bounce: 100 };
   }
 
   _ensureContext() {
@@ -43,6 +45,14 @@ class SoundManager {
 
   play(id) {
     if (!this.soundEnabled) return;
+    // 쿨다운 체크
+    const now = performance.now();
+    const cooldown = this._cooldowns[id] || 0;
+    if (cooldown > 0) {
+      const last = this._lastPlayTime[id] || 0;
+      if (now - last < cooldown) return;
+    }
+    this._lastPlayTime[id] = now;
     const ctx = this._ensureContext();
     const fn = this._sfx[id];
     if (fn) fn.call(this, ctx);
@@ -125,35 +135,26 @@ class SoundManager {
     },
 
     land(ctx) {
-      // 짧은 착지 쿵
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(150, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.08);
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-      osc.connect(gain);
-      gain.connect(this.masterGain);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.08);
-
-      // 노이즈 느낌
-      const bufferSize = ctx.sampleRate * 0.05;
+      // 부드러운 발소리 (짧고 가벼운 탁 소리)
+      const bufferSize = Math.floor(ctx.sampleRate * 0.04);
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * 0.1 * (1 - i / bufferSize);
+        const t = i / bufferSize;
+        data[i] = (Math.random() * 2 - 1) * 0.15 * Math.exp(-t * 12);
       }
-      const noise = ctx.createBufferSource();
-      noise.buffer = buffer;
-      const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.08, ctx.currentTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-      noise.connect(noiseGain);
-      noiseGain.connect(this.masterGain);
-      noise.start(ctx.currentTime);
-      noise.stop(ctx.currentTime + 0.05);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(400, ctx.currentTime);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.masterGain);
+      source.start(ctx.currentTime);
+      source.stop(ctx.currentTime + 0.04);
     },
 
     bounce(ctx) {
