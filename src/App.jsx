@@ -16,8 +16,22 @@ const LogosGame = () => {
   // --- 스테이지 시스템 ---
   const [selectedWorld, setSelectedWorld] = useState(1);
   const [selectedStage, setSelectedStage] = useState(1);
-  const [clearedStages, setClearedStages] = useState({});
+  const [clearedStages, setClearedStages] = useState(
+    () => JSON.parse(localStorage.getItem('cleared_stages') || '{}')
+  );
   const [stageObstacles, setStageObstacles] = useState([]);
+
+  // --- 업적 시스템 ---
+  const [achievements, setAchievements] = useState(
+    () => JSON.parse(localStorage.getItem('achievements') || '{}')
+  );
+  const [achievementPopup, setAchievementPopup] = useState(null);
+  const [stats, setStats] = useState(
+    () => JSON.parse(localStorage.getItem('game_stats') || '{"totalCreated":0,"totalFails":0}')
+  );
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [currentStageFailed, setCurrentStageFailed] = useState(false);
+  const playStartTimeRef = useRef(null);
 
   // --- 맵 에디터 ---
   const [editorStart, setEditorStart] = useState(null);
@@ -318,6 +332,72 @@ const LogosGame = () => {
     idle: [{ x: 10, y: 0, w: 98, h: 181 }]  // 서있는 자세
   };
 
+  // 업적 정의
+  const ACHIEVEMENTS = [
+    { id: 'first_clear', name: '첫 발걸음', desc: '스테이지 1개 클리어', icon: '⭐' },
+    { id: 'clear_10', name: '초보 모험가', desc: '스테이지 10개 클리어', icon: '🌟' },
+    { id: 'clear_30', name: '숙련 모험가', desc: '스테이지 30개 클리어', icon: '💫' },
+    { id: 'clear_50', name: '베테랑', desc: '스테이지 50개 클리어', icon: '🏆' },
+    { id: 'clear_100', name: '전설의 모험가', desc: '스테이지 100개 전부 클리어', icon: '👑' },
+    { id: 'world1_clear', name: '숲의 정복자', desc: '월드1 전체 클리어', icon: '🌲' },
+    { id: 'world2_clear', name: '사막의 정복자', desc: '월드2 전체 클리어', icon: '🏜️' },
+    { id: 'world3_clear', name: '산의 정복자', desc: '월드3 전체 클리어', icon: '⛰️' },
+    { id: 'world4_clear', name: '성의 정복자', desc: '월드4 전체 클리어', icon: '🏰' },
+    { id: 'create_10', name: '창조의 시작', desc: '오브젝트 10개 생성', icon: '🔨' },
+    { id: 'create_50', name: '숙련된 창조자', desc: '오브젝트 50개 생성', icon: '⚒️' },
+    { id: 'fail_10', name: '불굴의 의지', desc: '10번 실패하기', icon: '💪' },
+    { id: 'no_fail', name: '완벽주의자', desc: '실패 없이 스테이지 클리어', icon: '✨' },
+    { id: 'speed_clear', name: '스피드 러너', desc: '5초 이내 클리어', icon: '⚡' },
+    { id: 'min_token', name: '절약가', desc: '토큰 1개만 써서 클리어', icon: '💰' },
+  ];
+
+  const checkAchievements = (newCleared, newStats, extraContext = {}) => {
+    const clearCount = Object.keys(newCleared).length;
+    const newAchievements = { ...achievements };
+    const unlocked = [];
+
+    const check = (id, condition) => {
+      if (!newAchievements[id] && condition) {
+        newAchievements[id] = Date.now();
+        unlocked.push(ACHIEVEMENTS.find(a => a.id === id));
+      }
+    };
+
+    check('first_clear', clearCount >= 1);
+    check('clear_10', clearCount >= 10);
+    check('clear_30', clearCount >= 30);
+    check('clear_50', clearCount >= 50);
+    check('clear_100', clearCount >= 100);
+
+    // 월드별 클리어 체크
+    const worldClearCheck = (worldId, achievementId) => {
+      const world = stagesData.worlds.find(w => w.id === worldId);
+      if (world) {
+        const allCleared = world.stages.every(s => newCleared[`${worldId}-${s.id}`]);
+        check(achievementId, allCleared);
+      }
+    };
+    worldClearCheck(1, 'world1_clear');
+    worldClearCheck(2, 'world2_clear');
+    worldClearCheck(3, 'world3_clear');
+    worldClearCheck(4, 'world4_clear');
+
+    check('create_10', newStats.totalCreated >= 10);
+    check('create_50', newStats.totalCreated >= 50);
+    check('fail_10', newStats.totalFails >= 10);
+    check('no_fail', extraContext.clearedWithoutFail);
+    check('speed_clear', extraContext.clearTimeSeconds < 5);
+    check('min_token', extraContext.tokensUsed === 1);
+
+    if (unlocked.length > 0) {
+      setAchievements(newAchievements);
+      localStorage.setItem('achievements', JSON.stringify(newAchievements));
+      // 첫 번째 업적 팝업 표시
+      setAchievementPopup(unlocked[0]);
+      setTimeout(() => setAchievementPopup(null), 3000);
+    }
+  };
+
   // 설정 저장
   const saveSettings = () => {
     localStorage.setItem('sound_enabled', soundEnabled);
@@ -615,6 +695,10 @@ const LogosGame = () => {
 
     setInventory(prev => [...prev, newItem]);
     soundManager.play('create');
+    const newStats = { ...stats, totalCreated: stats.totalCreated + 1 };
+    setStats(newStats);
+    localStorage.setItem('game_stats', JSON.stringify(newStats));
+    checkAchievements(clearedStages, newStats);
     if (!isCreativeMode) {
       setTokens(prev => prev - 1);
     }
@@ -1801,6 +1885,7 @@ const LogosGame = () => {
               setGameState('lost');
               p.vx = 0;
               soundManager.play('fail');
+              handleFail();
               setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 위험 지역에 닿았어요..." }]);
             }
           }
@@ -1887,6 +1972,7 @@ const LogosGame = () => {
               setGameState('lost');
               p.vx = 0;
               soundManager.play('fail');
+              handleFail();
               setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 가시에 닿았어요..." }]);
             }
           });
@@ -1974,6 +2060,7 @@ const LogosGame = () => {
               p.y + p.height > obj.y && p.y < obj.y + obj.height) {
             setGameState('lost');
             soundManager.play('fail');
+            handleFail();
             setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "아야! 위험한 물체에 닿았어요!" }]);
             return;
           }
@@ -2083,6 +2170,7 @@ const LogosGame = () => {
       if (p.y > canvas.height) {
         setGameState('lost');
         soundManager.play('fail');
+        handleFail();
         setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 떨어졌어요..." }]);
       }
       // 도착 판정 - 집 영역과 일치
@@ -2112,6 +2200,7 @@ const LogosGame = () => {
         setGameState('won');
         p.vx = 0;
         soundManager.play('clear');
+        handleStageClear();
         setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "축하해요! 목표에 도착했어요!" }]);
       }
 
@@ -4510,6 +4599,28 @@ const LogosGame = () => {
     const stageKey = `${selectedWorld}-${selectedStage}`;
     const newCleared = { ...clearedStages, [stageKey]: true };
     setClearedStages(newCleared);
+    localStorage.setItem('cleared_stages', JSON.stringify(newCleared));
+
+    // 업적 체크
+    const world = stagesData.worlds.find(w => w.id === selectedWorld);
+    const stage = world?.stages.find(s => s.id === selectedStage);
+    const maxTokens = stage?.tokens || MAX_TOKENS;
+    const tokensUsed = maxTokens - tokens;
+    const clearTime = playStartTimeRef.current ? (Date.now() - playStartTimeRef.current) / 1000 : 999;
+
+    checkAchievements(newCleared, stats, {
+      clearedWithoutFail: !currentStageFailed,
+      clearTimeSeconds: clearTime,
+      tokensUsed: tokensUsed
+    });
+  };
+
+  const handleFail = () => {
+    setCurrentStageFailed(true);
+    const newStats = { ...stats, totalFails: stats.totalFails + 1 };
+    setStats(newStats);
+    localStorage.setItem('game_stats', JSON.stringify(newStats));
+    checkAchievements(clearedStages, newStats);
   };
 
   // 게임 시작 함수 (스테이지 모드)
@@ -4815,6 +4926,16 @@ const LogosGame = () => {
             >
               <PenTool size={48} />
               맵 만들기
+            </button>
+
+            {/* 업적 */}
+            <button
+              onClick={() => { soundManager.play('click'); setShowAchievements(true); }}
+              className="group bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-black text-4xl py-8 px-12 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 flex items-center gap-5"
+              style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
+            >
+              <Star size={48} />
+              업적 ({Object.keys(achievements).length}/{ACHIEVEMENTS.length})
             </button>
 
             {/* 설정 */}
@@ -5338,6 +5459,8 @@ const LogosGame = () => {
                   setGameState('playing');
                   playerRef.current.vx = PLAYER_SPEED;
                   soundManager.play('start');
+                  playStartTimeRef.current = Date.now();
+                  setCurrentStageFailed(false);
                 }}
                 disabled={gameState !== 'planning'}
                 className={`w-full mt-3 py-5 rounded-xl font-bold text-xl flex items-center justify-center gap-3 transition-all border-2 ${
@@ -5353,6 +5476,54 @@ const LogosGame = () => {
           </>
         )}
       </div>
+      {/* 업적 달성 팝업 */}
+      {achievementPopup && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] animate-bounce">
+          <div className="bg-gradient-to-r from-amber-600 to-yellow-500 text-black px-6 py-3 rounded-xl shadow-2xl shadow-amber-500/40 flex items-center gap-3 min-w-[280px]">
+            <span className="text-3xl">{achievementPopup.icon}</span>
+            <div>
+              <div className="text-xs font-bold opacity-70">업적 달성!</div>
+              <div className="font-black text-lg">{achievementPopup.name}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 업적 목록 모달 */}
+      {showAchievements && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[90] backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-[500px] max-w-[90vw] max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-black text-amber-400 flex items-center gap-2">
+                <Star size={24} />
+                업적 ({Object.keys(achievements).length}/{ACHIEVEMENTS.length})
+              </h2>
+              <button onClick={() => setShowAchievements(false)} className="p-2 hover:bg-white/10 rounded-lg">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-2">
+              {ACHIEVEMENTS.map(a => {
+                const unlocked = !!achievements[a.id];
+                return (
+                  <div key={a.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                    unlocked
+                      ? 'bg-amber-500/10 border-amber-500/30'
+                      : 'bg-slate-800/50 border-slate-700/30 opacity-50'
+                  }`}>
+                    <span className="text-2xl">{unlocked ? a.icon : '🔒'}</span>
+                    <div className="flex-1">
+                      <div className={`font-bold text-sm ${unlocked ? 'text-amber-400' : 'text-white/50'}`}>{a.name}</div>
+                      <div className="text-xs text-white/40">{a.desc}</div>
+                    </div>
+                    {unlocked && <Check size={16} className="text-green-400" />}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
