@@ -4799,10 +4799,10 @@ const LogosGame = () => {
                     : 'bg-slate-800/50 cursor-not-allowed'
                 }`}
               >
-                {!unlocked && <Lock size={48} className="text-white/30" />}
+                {!unlocked && <Lock size={48} className="text-white/40" />}
                 {unlocked && cleared && <Star size={48} className="text-yellow-300" fill="currentColor" />}
                 {unlocked && !cleared && <span className="text-5xl font-black text-white">{stage.id}</span>}
-                <span className={`text-lg font-bold ${unlocked ? 'text-white' : 'text-white/30'}`}>
+                <span className={`text-lg font-bold ${unlocked ? 'text-white' : 'text-white/40'}`}>
                   {stage.name}
                 </span>
                 {unlocked && (
@@ -4844,17 +4844,17 @@ const LogosGame = () => {
 
               <div className="p-5 space-y-3">
                 {/* 오디오 섹션 */}
-                <div className="text-xs font-bold text-white/30 uppercase tracking-widest px-1 mb-2">오디오</div>
+                <div className="text-xs font-bold text-white/50 uppercase tracking-widest px-1 mb-2">오디오</div>
 
                 {/* 효과음 */}
                 <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${soundEnabled ? 'bg-amber-500/20' : 'bg-white/5'}`}>
-                      {soundEnabled ? <Volume2 size={20} className="text-amber-400" /> : <VolumeX size={20} className="text-white/30" />}
+                      {soundEnabled ? <Volume2 size={20} className="text-amber-400" /> : <VolumeX size={20} className="text-white/50" />}
                     </div>
                     <div>
                       <span className="text-sm font-bold text-white">효과음</span>
-                      <div className="text-xs text-white/30">게임 내 효과음</div>
+                      <div className="text-xs text-white/50">게임 내 효과음</div>
                     </div>
                   </div>
                   <button
@@ -4869,11 +4869,11 @@ const LogosGame = () => {
                 <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${musicEnabled ? 'bg-purple-500/20' : 'bg-white/5'}`}>
-                      {musicEnabled ? <Music size={20} className="text-purple-400" /> : <Music2 size={20} className="text-white/30" />}
+                      {musicEnabled ? <Music size={20} className="text-purple-400" /> : <Music2 size={20} className="text-white/50" />}
                     </div>
                     <div>
                       <span className="text-sm font-bold text-white">배경음악</span>
-                      <div className="text-xs text-white/30">월드별 BGM</div>
+                      <div className="text-xs text-white/50">월드별 BGM</div>
                     </div>
                   </div>
                   <button
@@ -4888,18 +4888,18 @@ const LogosGame = () => {
                 <div className="border-t border-white/5 my-2" />
 
                 {/* 게임 정보 */}
-                <div className="text-xs font-bold text-white/30 uppercase tracking-widest px-1 mb-2">정보</div>
+                <div className="text-xs font-bold text-white/50 uppercase tracking-widest px-1 mb-2">정보</div>
                 <div className="p-4 bg-black/20 rounded-2xl border border-white/5 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/40">클리어 스테이지</span>
+                    <span className="text-white/60">클리어 스테이지</span>
                     <span className="text-white font-bold">{Object.keys(clearedStages).length} / 100</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/40">생성한 오브젝트</span>
+                    <span className="text-white/60">생성한 오브젝트</span>
                     <span className="text-white font-bold">{stats.totalCreated}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/40">달성 업적</span>
+                    <span className="text-white/60">달성 업적</span>
                     <span className="text-amber-400 font-bold">{Object.keys(achievements).length} / {ACHIEVEMENTS.length}</span>
                   </div>
                 </div>
@@ -5069,12 +5069,12 @@ const LogosGame = () => {
                 업적
               </h1>
             </div>
-            <p className="text-amber-700/50 text-sm mb-4">도전하고, 정복하고, 전설이 되세요</p>
+            <p className="text-amber-700/70 text-sm mb-4">도전하고, 정복하고, 전설이 되세요</p>
 
             {/* 큰 진행률 */}
             <div className="max-w-md mx-auto">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-amber-800/50">진행률</span>
+                <span className="text-amber-800/70">진행률</span>
                 <span className="text-amber-700 font-black">{unlockedCount} / {totalCount}</span>
               </div>
               <div className="h-3.5 bg-amber-900/10 rounded-full overflow-hidden border border-amber-800/10">
@@ -5097,7 +5097,7 @@ const LogosGame = () => {
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-px flex-1 bg-gradient-to-r from-amber-600/30 to-transparent" />
                 <h2 className="text-lg font-black text-amber-700 tracking-wider uppercase">{cat.name}</h2>
-                <span className="text-xs text-amber-800/40">{cat.desc}</span>
+                <span className="text-sm text-amber-700/60">{cat.desc}</span>
                 <div className="h-px flex-1 bg-gradient-to-l from-amber-600/30 to-transparent" />
               </div>
 
@@ -5133,10 +5133,10 @@ const LogosGame = () => {
 
                         {/* 텍스트 */}
                         <div className="flex-1 min-w-0 pt-1">
-                          <div className={`font-black text-base mb-1 ${unlocked ? 'text-amber-800' : 'text-amber-900/25'}`}>
+                          <div className={`font-black text-base mb-1 ${unlocked ? 'text-amber-800' : 'text-amber-800/50'}`}>
                             {a.name}
                           </div>
-                          <div className={`text-xs leading-relaxed ${unlocked ? 'text-amber-700/60' : 'text-amber-900/20'}`}>
+                          <div className={`text-sm leading-relaxed ${unlocked ? 'text-amber-700/80' : 'text-amber-700/45'}`}>
                             {a.desc}
                           </div>
                         </div>
@@ -5182,11 +5182,11 @@ const LogosGame = () => {
               <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${soundEnabled ? 'bg-amber-500/20' : 'bg-white/5'}`}>
-                    {soundEnabled ? <Volume2 size={20} className="text-amber-400" /> : <VolumeX size={20} className="text-white/30" />}
+                    {soundEnabled ? <Volume2 size={20} className="text-amber-400" /> : <VolumeX size={20} className="text-white/50" />}
                   </div>
                   <div>
                     <span className="text-sm font-bold text-white">효과음</span>
-                    <div className="text-xs text-white/30">게임 내 효과음</div>
+                    <div className="text-xs text-white/50">게임 내 효과음</div>
                   </div>
                 </div>
                 <button onClick={() => setSoundEnabled(!soundEnabled)} className={`w-14 h-7 rounded-full transition-all duration-200 ${soundEnabled ? 'bg-amber-500 shadow-lg shadow-amber-500/30' : 'bg-slate-600'}`}>
@@ -5196,11 +5196,11 @@ const LogosGame = () => {
               <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${musicEnabled ? 'bg-purple-500/20' : 'bg-white/5'}`}>
-                    {musicEnabled ? <Music size={20} className="text-purple-400" /> : <Music2 size={20} className="text-white/30" />}
+                    {musicEnabled ? <Music size={20} className="text-purple-400" /> : <Music2 size={20} className="text-white/50" />}
                   </div>
                   <div>
                     <span className="text-sm font-bold text-white">배경음악</span>
-                    <div className="text-xs text-white/30">월드별 BGM</div>
+                    <div className="text-xs text-white/50">월드별 BGM</div>
                   </div>
                 </div>
                 <button onClick={() => setMusicEnabled(!musicEnabled)} className={`w-14 h-7 rounded-full transition-all duration-200 ${musicEnabled ? 'bg-purple-500 shadow-lg shadow-purple-500/30' : 'bg-slate-600'}`}>
@@ -5275,7 +5275,7 @@ const LogosGame = () => {
                 <Zap className="text-white" size={20} />
               </div>
               <div>
-                <div className="text-[10px] text-white/50 font-bold tracking-wider">TOKENS</div>
+                <div className="text-[11px] text-white/70 font-bold tracking-wider">TOKENS</div>
                 <div className="text-xl font-black text-white leading-none">
                   {isCreativeMode ? '∞' : tokens}
                 </div>
@@ -5405,7 +5405,7 @@ const LogosGame = () => {
                       </button>
                     </>
                   ) : (
-                    <div className="text-white/20 text-sm font-bold">{idx + 1}</div>
+                    <div className="text-white/40 text-sm font-bold">{idx + 1}</div>
                   )}
                 </div>
               );
