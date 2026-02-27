@@ -53,6 +53,27 @@ const LogosGame = () => {
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('sound_enabled') !== 'false');
   const [musicEnabled, setMusicEnabled] = useState(() => localStorage.getItem('music_enabled') !== 'false');
 
+  // 튜토리얼 상태
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [tutorialDismissed, setTutorialDismissed] = useState(
+    () => JSON.parse(localStorage.getItem('tutorial_dismissed') || '{}')
+  );
+
+  const TUTORIAL_DATA = {
+    1: [
+      { title: "물체 만들기", text: "채팅창에 만들고 싶은 물체를 입력하세요!\n예: 상자, 다리, 계단", highlight: "chat" },
+      { title: "아이템 선택", text: "만든 아이템이 인벤토리에 추가됩니다.\n아이템을 클릭해서 선택하세요!", highlight: "inventory" },
+      { title: "배치하기", text: "게임 화면을 클릭해서\n아이템을 배치하세요!", highlight: "canvas" },
+      { title: "출발!", text: "준비가 되면 START 버튼을 눌러\n캐릭터를 출발시키세요!", highlight: "start" }
+    ],
+    2: [
+      { title: "크기 조절", text: "더 큰 물체가 필요할 때는\n'큰 다리', '긴 상자'처럼\n크기를 지정해보세요!", highlight: "chat" }
+    ],
+    3: [
+      { title: "물체 조합", text: "여러 개의 물체를 조합해서\n길을 만들어보세요!\n토큰이 허락하는 만큼 사용 가능!", highlight: "canvas" }
+    ]
+  };
+
   // 채팅 상태
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -4545,6 +4566,13 @@ const LogosGame = () => {
       { id: 2, role: 'ai', text: stage?.description || "목표를 향해 가세요!" }
     ]);
 
+    // 튜토리얼 트리거 (월드1 스테이지 1~3, 아직 안 본 경우)
+    if (wId === 1 && sId <= 3 && TUTORIAL_DATA[sId] && !tutorialDismissed[sId]) {
+      setTimeout(() => setTutorialStep(1), 500);
+    } else {
+      setTutorialStep(0);
+    }
+
     // 배경 이미지 로드 확인 후 게임 시작
     if (bgImagesLoadedRef.current) {
       setScreen('game');
@@ -4966,6 +4994,56 @@ const LogosGame = () => {
                 다시 시작
               </button>
             </div>
+          )}
+
+          {/* 튜토리얼 팝업 */}
+          {tutorialStep > 0 && selectedWorld === 1 && TUTORIAL_DATA[selectedStage] && (
+            (() => {
+              const steps = TUTORIAL_DATA[selectedStage];
+              const step = steps[tutorialStep - 1];
+              if (!step) return null;
+              return (
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-40 backdrop-blur-[2px]">
+                  <div className="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-amber-500/60 rounded-2xl p-6 w-80 max-w-[85vw] shadow-2xl shadow-amber-500/20">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sparkles size={20} className="text-amber-400" />
+                      <h3 className="text-lg font-bold text-amber-400">{step.title}</h3>
+                      <span className="ml-auto text-xs text-white/40">{tutorialStep}/{steps.length}</span>
+                    </div>
+                    <p className="text-white/90 text-sm leading-relaxed whitespace-pre-line mb-5">{step.text}</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          const newDismissed = { ...tutorialDismissed, [selectedStage]: true };
+                          setTutorialDismissed(newDismissed);
+                          localStorage.setItem('tutorial_dismissed', JSON.stringify(newDismissed));
+                          setTutorialStep(0);
+                        }}
+                        className="flex-1 py-2 text-sm text-white/50 hover:text-white/80 transition-colors"
+                      >
+                        건너뛰기
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (tutorialStep < steps.length) {
+                            setTutorialStep(tutorialStep + 1);
+                          } else {
+                            const newDismissed = { ...tutorialDismissed, [selectedStage]: true };
+                            setTutorialDismissed(newDismissed);
+                            localStorage.setItem('tutorial_dismissed', JSON.stringify(newDismissed));
+                            setTutorialStep(0);
+                          }
+                          soundManager.play('click');
+                        }}
+                        className="flex-1 py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg transition-colors"
+                      >
+                        {tutorialStep < steps.length ? '다음' : '시작하기!'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()
           )}
         </div>
 
