@@ -6,7 +6,7 @@ import { soundManager } from './sounds';
 
 const LogosGame = () => {
   // --- 게임 화면 상태 ---
-  const [screen, setScreen] = useState('menu'); // 'menu' | 'stageSelect' | 'game'
+  const [screen, setScreen] = useState('menu'); // 'menu' | 'stageSelect' | 'game' | 'achievements'
 
   // --- 게임 모드 ---
   const [gameMode, setGameMode] = useState('stage'); // 'stage' | 'creative'
@@ -415,7 +415,7 @@ const LogosGame = () => {
 
   // 화면 전환 시 BGM 변경
   useEffect(() => {
-    if (screen === 'menu') {
+    if (screen === 'menu' || screen === 'achievements') {
       soundManager.playBGM('menu');
     } else if (screen === 'stageSelect') {
       soundManager.stopBGM();
@@ -4821,9 +4821,9 @@ const LogosGame = () => {
         {/* 설정 모달 */}
         {showSettings && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-md">
-            <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 border border-white/10 rounded-3xl p-0 w-[440px] max-w-[92vw] overflow-hidden shadow-2xl">
+            <div className="relative bg-gradient-to-b from-[#1a1525] to-[#0f0d18] border border-amber-500/20 rounded-3xl p-0 w-[440px] max-w-[92vw] overflow-hidden shadow-2xl shadow-black/50">
               {/* 헤더 */}
-              <div className="bg-gradient-to-r from-slate-700/50 to-slate-600/30 border-b border-white/10 px-6 py-5">
+              <div className="bg-gradient-to-r from-amber-900/20 to-amber-800/10 border-b border-amber-500/10 px-6 py-5">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-black text-white flex items-center gap-3">
                     <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
@@ -4968,7 +4968,7 @@ const LogosGame = () => {
 
             {/* 업적 */}
             <button
-              onClick={() => { soundManager.play('click'); setShowAchievements(true); }}
+              onClick={() => { soundManager.play('click'); setScreen('achievements'); }}
               className="group bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-black text-4xl py-8 px-12 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
@@ -4993,63 +4993,145 @@ const LogosGame = () => {
           </div>
         </div>
 
-        {/* 업적 모달 (메뉴) */}
-        {showAchievements && (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[90] backdrop-blur-md">
-            <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 border border-amber-500/30 rounded-3xl p-0 w-[560px] max-w-[92vw] max-h-[85vh] overflow-hidden shadow-2xl shadow-amber-500/10">
-              {/* 헤더 */}
-              <div className="bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border-b border-amber-500/20 px-6 py-5">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-black text-amber-400 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
-                      <Star size={22} className="text-amber-400" />
-                    </div>
-                    업적
-                    <span className="text-base font-bold text-amber-500/60 ml-1">{Object.keys(achievements).length} / {ACHIEVEMENTS.length}</span>
-                  </h2>
-                  <button onClick={() => setShowAchievements(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
-                    <X size={22} className="text-white/60" />
-                  </button>
-                </div>
-                {/* 진행률 바 */}
-                <div className="mt-3 h-2 bg-black/30 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500"
-                    style={{ width: `${(Object.keys(achievements).length / ACHIEVEMENTS.length) * 100}%` }}
-                  />
+      </div>
+    );
+  }
+
+  // ============ 업적 전체 화면 ============
+  if (screen === 'achievements') {
+    const unlockedCount = Object.keys(achievements).length;
+    const totalCount = ACHIEVEMENTS.length;
+    const progressPercent = (unlockedCount / totalCount) * 100;
+
+    // 카테고리별 분류
+    const categories = [
+      { name: '모험', desc: '스테이지를 클리어하세요', items: ACHIEVEMENTS.filter(a => a.id.startsWith('clear_') || a.id === 'first_clear') },
+      { name: '정복', desc: '월드를 정복하세요', items: ACHIEVEMENTS.filter(a => a.id.includes('world')) },
+      { name: '창조', desc: '오브젝트를 만드세요', items: ACHIEVEMENTS.filter(a => a.id.startsWith('create_')) },
+      { name: '도전', desc: '특별한 도전에 성공하세요', items: ACHIEVEMENTS.filter(a => ['fail_10', 'no_fail', 'speed_clear', 'min_token'].includes(a.id)) },
+    ];
+
+    return (
+      <div className="w-screen h-screen overflow-hidden relative" style={{ maxHeight: '100dvh' }}>
+        {/* 배경 - 어두운 그래디언트 + 장식 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1a0e2e] via-[#0f1923] to-[#0a0a0f]" />
+        {/* 장식용 빛 효과 */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px]" />
+        {/* 장식용 별 패턴 */}
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: `radial-gradient(1px 1px at 10% 20%, rgba(255,215,0,0.8) 0%, transparent 100%),
+            radial-gradient(1px 1px at 30% 60%, rgba(255,215,0,0.6) 0%, transparent 100%),
+            radial-gradient(1.5px 1.5px at 50% 10%, rgba(255,215,0,0.9) 0%, transparent 100%),
+            radial-gradient(1px 1px at 70% 40%, rgba(255,215,0,0.5) 0%, transparent 100%),
+            radial-gradient(1px 1px at 90% 80%, rgba(255,215,0,0.7) 0%, transparent 100%),
+            radial-gradient(1.5px 1.5px at 15% 85%, rgba(255,215,0,0.6) 0%, transparent 100%),
+            radial-gradient(1px 1px at 85% 15%, rgba(255,215,0,0.8) 0%, transparent 100%),
+            radial-gradient(1px 1px at 45% 75%, rgba(255,215,0,0.5) 0%, transparent 100%)`
+        }} />
+
+        {/* 상단 헤더 */}
+        <div className="relative z-10 px-8 pt-6 pb-4">
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => { soundManager.play('click'); setScreen('menu'); }}
+              className="flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white font-bold transition-all"
+            >
+              <ChevronLeft size={22} />
+              뒤로
+            </button>
+            <div className="w-24" />
+          </div>
+
+          {/* 타이틀 + 진행률 */}
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center gap-3 mb-3">
+              <div className="text-5xl">🏆</div>
+              <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500" style={{ textShadow: 'none' }}>
+                업적
+              </h1>
+            </div>
+            <p className="text-white/40 text-sm mb-4">도전하고, 정복하고, 전설이 되세요</p>
+
+            {/* 큰 진행률 */}
+            <div className="max-w-md mx-auto">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-white/50">진행률</span>
+                <span className="text-amber-400 font-black">{unlockedCount} / {totalCount}</span>
+              </div>
+              <div className="h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 rounded-full transition-all duration-700 relative"
+                  style={{ width: `${progressPercent}%` }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent rounded-full" />
                 </div>
               </div>
-              {/* 업적 리스트 */}
-              <div className="p-4 overflow-y-auto max-h-[calc(85vh-100px)] space-y-2">
-                {ACHIEVEMENTS.map(a => {
+            </div>
+          </div>
+        </div>
+
+        {/* 업적 카테고리 스크롤 영역 */}
+        <div className="relative z-10 px-8 pb-8 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 260px)' }}>
+          {categories.map((cat, catIdx) => (
+            <div key={catIdx} className="mb-8">
+              {/* 카테고리 헤더 */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-px flex-1 bg-gradient-to-r from-amber-500/30 to-transparent" />
+                <h2 className="text-lg font-black text-amber-400 tracking-wider uppercase">{cat.name}</h2>
+                <span className="text-xs text-white/30">{cat.desc}</span>
+                <div className="h-px flex-1 bg-gradient-to-l from-amber-500/30 to-transparent" />
+              </div>
+
+              {/* 업적 그리드 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {cat.items.map(a => {
                   const unlocked = !!achievements[a.id];
                   return (
-                    <div key={a.id} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
+                    <div key={a.id} className={`relative group rounded-2xl border-2 p-5 transition-all duration-300 ${
                       unlocked
-                        ? 'bg-gradient-to-r from-amber-500/10 to-yellow-500/5 border-amber-500/30 hover:border-amber-400/50'
-                        : 'bg-black/20 border-white/5 hover:border-white/10'
+                        ? 'bg-gradient-to-br from-amber-900/30 via-amber-800/20 to-yellow-900/30 border-amber-500/40 hover:border-amber-400/60 hover:shadow-lg hover:shadow-amber-500/10'
+                        : 'bg-gradient-to-br from-white/[0.02] to-white/[0.01] border-white/[0.06] hover:border-white/10'
                     }`}>
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${
-                        unlocked ? 'bg-amber-500/20' : 'bg-white/5'
-                      }`}>
-                        {unlocked ? a.icon : '🔒'}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className={`font-bold ${unlocked ? 'text-amber-300' : 'text-white/30'}`}>{a.name}</div>
-                        <div className={`text-xs mt-0.5 ${unlocked ? 'text-white/50' : 'text-white/20'}`}>{a.desc}</div>
-                      </div>
+                      {/* 달성 시 빛나는 효과 */}
                       {unlocked && (
-                        <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Check size={16} className="text-green-400" />
-                        </div>
+                        <div className="absolute -top-px -left-px -right-px -bottom-px rounded-2xl bg-gradient-to-br from-amber-400/10 to-transparent pointer-events-none" />
                       )}
+
+                      <div className="relative flex items-start gap-4">
+                        {/* 아이콘 */}
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 ${
+                          unlocked
+                            ? 'bg-gradient-to-br from-amber-500/30 to-yellow-600/20 shadow-inner'
+                            : 'bg-white/[0.03]'
+                        }`}>
+                          {unlocked ? a.icon : '🔒'}
+                        </div>
+
+                        {/* 텍스트 */}
+                        <div className="flex-1 min-w-0 pt-1">
+                          <div className={`font-black text-base mb-1 ${unlocked ? 'text-amber-300' : 'text-white/20'}`}>
+                            {a.name}
+                          </div>
+                          <div className={`text-xs leading-relaxed ${unlocked ? 'text-white/50' : 'text-white/15'}`}>
+                            {a.desc}
+                          </div>
+                        </div>
+
+                        {/* 달성 체크 */}
+                        {unlocked && (
+                          <div className="w-8 h-8 bg-green-500/20 border border-green-500/30 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                            <Check size={16} className="text-green-400" />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
               </div>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
     );
   }
@@ -5059,8 +5141,8 @@ const LogosGame = () => {
       {/* 설정 모달 (게임 내) */}
       {showSettings && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-md">
-          <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 border border-white/10 rounded-3xl p-0 w-[440px] max-w-[92vw] overflow-hidden shadow-2xl">
-            <div className="bg-gradient-to-r from-slate-700/50 to-slate-600/30 border-b border-white/10 px-6 py-5">
+          <div className="relative bg-gradient-to-b from-[#1a1525] to-[#0f0d18] border border-amber-500/20 rounded-3xl p-0 w-[440px] max-w-[92vw] overflow-hidden shadow-2xl shadow-black/50">
+            <div className="bg-gradient-to-r from-amber-900/20 to-amber-800/10 border-b border-amber-500/10 px-6 py-5">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-black text-white flex items-center gap-3">
                   <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
@@ -5583,55 +5665,6 @@ const LogosGame = () => {
         </div>
       )}
 
-      {/* 업적 목록 모달 (게임 내) */}
-      {showAchievements && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[90] backdrop-blur-md">
-          <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 border border-amber-500/30 rounded-3xl p-0 w-[560px] max-w-[92vw] max-h-[85vh] overflow-hidden shadow-2xl shadow-amber-500/10">
-            <div className="bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border-b border-amber-500/20 px-6 py-5">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-black text-amber-400 flex items-center gap-3">
-                  <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
-                    <Star size={22} className="text-amber-400" />
-                  </div>
-                  업적
-                  <span className="text-base font-bold text-amber-500/60 ml-1">{Object.keys(achievements).length} / {ACHIEVEMENTS.length}</span>
-                </h2>
-                <button onClick={() => setShowAchievements(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
-                  <X size={22} className="text-white/60" />
-                </button>
-              </div>
-              <div className="mt-3 h-2 bg-black/30 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500" style={{ width: `${(Object.keys(achievements).length / ACHIEVEMENTS.length) * 100}%` }} />
-              </div>
-            </div>
-            <div className="p-4 overflow-y-auto max-h-[calc(85vh-100px)] space-y-2">
-              {ACHIEVEMENTS.map(a => {
-                const unlocked = !!achievements[a.id];
-                return (
-                  <div key={a.id} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
-                    unlocked
-                      ? 'bg-gradient-to-r from-amber-500/10 to-yellow-500/5 border-amber-500/30 hover:border-amber-400/50'
-                      : 'bg-black/20 border-white/5 hover:border-white/10'
-                  }`}>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${unlocked ? 'bg-amber-500/20' : 'bg-white/5'}`}>
-                      {unlocked ? a.icon : '🔒'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className={`font-bold ${unlocked ? 'text-amber-300' : 'text-white/30'}`}>{a.name}</div>
-                      <div className={`text-xs mt-0.5 ${unlocked ? 'text-white/50' : 'text-white/20'}`}>{a.desc}</div>
-                    </div>
-                    {unlocked && (
-                      <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Check size={16} className="text-green-400" />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
