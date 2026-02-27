@@ -12,7 +12,7 @@ class SoundManager {
     this.masterGain = null;
     this.bgmGain = null;
     this._lastPlayTime = {};
-    this._cooldowns = { land: 150, bounce: 100 };
+    this._cooldowns = { land: 150, bounce: 100, walk: 220 };
   }
 
   _ensureContext() {
@@ -147,6 +147,23 @@ class SoundManager {
       gain.connect(this.masterGain);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 0.07);
+    },
+
+    walk(ctx) {
+      // 가벼운 발소리 - 짧은 "톡톡" 느낌
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      // 약간의 랜덤 피치로 자연스러움 추가
+      const pitch = 90 + Math.random() * 30;
+      osc.frequency.setValueAtTime(pitch, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.05);
     },
 
     bounce(ctx) {

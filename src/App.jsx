@@ -2209,6 +2209,11 @@ const LogosGame = () => {
         soundManager.play('land');
       }
       prevGroundedRef.current = p.grounded;
+
+      // 걷기 발소리 (땅 위에서 이동 중일 때)
+      if (p.grounded && p.vx !== 0) {
+        soundManager.play('walk');
+      }
     }
   };
 
@@ -5015,10 +5020,33 @@ const LogosGame = () => {
       <div className="w-screen h-screen overflow-hidden relative" style={{ maxHeight: '100dvh' }}>
         {/* 배경 - 따뜻한 크림+살구 그래디언트 */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#fef3e2] via-[#fde8d0] to-[#fce4c4]" />
+        {/* 픽셀 도트 패턴 */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: 'radial-gradient(circle, #b45309 1px, transparent 1px)',
+          backgroundSize: '24px 24px'
+        }} />
         {/* 장식용 부드러운 빛 */}
         <div className="absolute top-[-100px] left-1/3 w-[500px] h-[500px] bg-amber-300/20 rounded-full blur-[150px]" />
         <div className="absolute bottom-[-50px] right-1/4 w-[400px] h-[400px] bg-orange-200/25 rounded-full blur-[120px]" />
         <div className="absolute top-1/2 left-[-100px] w-[300px] h-[300px] bg-yellow-200/20 rounded-full blur-[100px]" />
+        {/* 픽셀 장식 - 떠다니는 블록들 */}
+        <div className="absolute top-[15%] left-[8%] w-4 h-4 bg-amber-400/15 rotate-12" style={{ imageRendering: 'pixelated' }} />
+        <div className="absolute top-[25%] right-[12%] w-6 h-6 bg-orange-300/12 -rotate-6" style={{ imageRendering: 'pixelated' }} />
+        <div className="absolute top-[60%] left-[5%] w-5 h-5 bg-yellow-400/10 rotate-45" style={{ imageRendering: 'pixelated' }} />
+        <div className="absolute top-[45%] right-[7%] w-3 h-3 bg-amber-500/15 rotate-12" style={{ imageRendering: 'pixelated' }} />
+        <div className="absolute bottom-[20%] left-[15%] w-4 h-4 bg-orange-400/10 -rotate-12" style={{ imageRendering: 'pixelated' }} />
+        <div className="absolute bottom-[30%] right-[18%] w-5 h-5 bg-yellow-300/12 rotate-6" style={{ imageRendering: 'pixelated' }} />
+        {/* 픽셀 테두리 장식 - 상단/하단 */}
+        <div className="absolute top-0 left-0 right-0 h-2 flex">
+          {Array.from({ length: 60 }, (_, i) => (
+            <div key={i} className="flex-1 h-full" style={{ backgroundColor: i % 3 === 0 ? 'rgba(217,119,6,0.08)' : i % 3 === 1 ? 'rgba(245,158,11,0.06)' : 'transparent' }} />
+          ))}
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-2 flex">
+          {Array.from({ length: 60 }, (_, i) => (
+            <div key={i} className="flex-1 h-full" style={{ backgroundColor: i % 3 === 0 ? 'rgba(217,119,6,0.08)' : i % 3 === 1 ? 'rgba(245,158,11,0.06)' : 'transparent' }} />
+          ))}
+        </div>
 
         {/* 상단 헤더 */}
         <div className="relative z-10 px-8 pt-6 pb-4">
@@ -5083,9 +5111,14 @@ const LogosGame = () => {
                         ? 'bg-gradient-to-br from-white/80 to-amber-50/80 border-amber-400/50 hover:border-amber-500/70 hover:shadow-xl hover:shadow-amber-400/15 shadow-md shadow-amber-200/20'
                         : 'bg-white/30 border-amber-800/10 hover:border-amber-800/20 hover:bg-white/40'
                     }`} style={{ backdropFilter: 'blur(8px)' }}>
-                      {/* 달성 시 빛나는 효과 */}
+                      {/* 달성 시 빛나는 효과 + 픽셀 장식 */}
                       {unlocked && (
-                        <div className="absolute -top-px -left-px -right-px -bottom-px rounded-2xl bg-gradient-to-br from-amber-200/20 to-transparent pointer-events-none" />
+                        <>
+                          <div className="absolute -top-px -left-px -right-px -bottom-px rounded-2xl bg-gradient-to-br from-amber-200/20 to-transparent pointer-events-none" />
+                          <div className="absolute top-2 right-2 w-2 h-2 bg-amber-400/40" />
+                          <div className="absolute top-2 right-5 w-1.5 h-1.5 bg-yellow-400/30" />
+                          <div className="absolute bottom-2 left-3 w-1.5 h-1.5 bg-orange-300/25" />
+                        </>
                       )}
 
                       <div className="relative flex items-start gap-4">
