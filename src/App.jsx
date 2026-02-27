@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, RotateCcw, Send, Coins, PenTool, X, Settings, Check, Package, MessageSquare, Zap, Volume2, VolumeX, Music, Music2, ChevronLeft, ChevronRight, Lock, Star, Sparkles, Home, MapPin, Flag, Square, Triangle, Minus, Plus, Save, Trash2 } from 'lucide-react';
 import objectsData from './objects.json';
 import stagesData from './stages.json';
+import { soundManager } from './sounds';
 
 const LogosGame = () => {
   // --- 게임 화면 상태 ---
@@ -87,6 +88,7 @@ const LogosGame = () => {
   const goalImageRef = useRef(null);
   const goalImageLoadedRef = useRef(false);
   const objectImagesRef = useRef({});
+  const prevGroundedRef = useRef(true);
 
   // 사다리 스프라이트 ref 추가
   const ladderSpriteRef = useRef(null);
@@ -299,8 +301,28 @@ const LogosGame = () => {
   const saveSettings = () => {
     localStorage.setItem('sound_enabled', soundEnabled);
     localStorage.setItem('music_enabled', musicEnabled);
+    soundManager.setSoundEnabled(soundEnabled);
+    soundManager.setMusicEnabled(musicEnabled);
     setShowSettings(false);
   };
+
+  // 사운드 초기 설정 동기화
+  useEffect(() => {
+    soundManager.setSoundEnabled(soundEnabled);
+    soundManager.setMusicEnabled(musicEnabled);
+  }, []);
+
+  // 화면 전환 시 BGM 변경
+  useEffect(() => {
+    if (screen === 'menu') {
+      soundManager.playBGM('menu');
+    } else if (screen === 'stageSelect') {
+      soundManager.stopBGM();
+    } else if (screen === 'game') {
+      const worldBgm = `world${selectedWorld}`;
+      soundManager.playBGM(worldBgm);
+    }
+  }, [screen, selectedWorld]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -571,6 +593,7 @@ const LogosGame = () => {
     };
 
     setInventory(prev => [...prev, newItem]);
+    soundManager.play('create');
     if (!isCreativeMode) {
       setTokens(prev => prev - 1);
     }
@@ -629,6 +652,7 @@ const LogosGame = () => {
     objectsRef.current = [...objectsRef.current, newObj];
     setInventory(prev => prev.filter((_, i) => i !== selectedSlot));
     setSelectedSlot(null);
+    soundManager.play('place');
   };
 
   const handleDeleteItem = (index, e) => {
@@ -1755,6 +1779,7 @@ const LogosGame = () => {
                 p.y + p.height > obsTop && p.y < obsBottom) {
               setGameState('lost');
               p.vx = 0;
+              soundManager.play('fail');
               setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 위험 지역에 닿았어요..." }]);
             }
           }
@@ -1840,6 +1865,7 @@ const LogosGame = () => {
                 p.y + p.height > hazard.y - 35 && p.y < hazard.y + hazard.height) {
               setGameState('lost');
               p.vx = 0;
+              soundManager.play('fail');
               setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 가시에 닿았어요..." }]);
             }
           });
@@ -1926,6 +1952,7 @@ const LogosGame = () => {
           if (p.x < obj.x + obj.width && p.x + p.width > obj.x &&
               p.y + p.height > obj.y && p.y < obj.y + obj.height) {
             setGameState('lost');
+            soundManager.play('fail');
             setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "아야! 위험한 물체에 닿았어요!" }]);
             return;
           }
@@ -1974,6 +2001,7 @@ const LogosGame = () => {
           const bounceMultiplier = bestGroundObj.sizeMultiplier || 1.0;
           p.vy = JUMP_FORCE * 1.5 * bounceMultiplier;
           p.grounded = false;
+          soundManager.play('bounce');
         }
         if (bestGroundObj.physics === 'ice') onIce = true;
         if (bestGroundObj.physics === 'button') {
@@ -2033,6 +2061,7 @@ const LogosGame = () => {
       // 떨어지면 게임 오버 (화면 완전히 밖으로 떨어졌을 때)
       if (p.y > canvas.height) {
         setGameState('lost');
+        soundManager.play('fail');
         setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "앗! 떨어졌어요..." }]);
       }
       // 도착 판정 - 집 영역과 일치
@@ -2061,8 +2090,15 @@ const LogosGame = () => {
           p.y + p.height > goalY && p.y < goalY + goalHeight) {
         setGameState('won');
         p.vx = 0;
+        soundManager.play('clear');
         setMessages(prev => [...prev, { id: Date.now(), role: 'ai', text: "축하해요! 목표에 도착했어요!" }]);
       }
+
+      // 착지 감지 (바운스가 아닌 일반 착지)
+      if (p.grounded && !prevGroundedRef.current) {
+        soundManager.play('land');
+      }
+      prevGroundedRef.current = p.grounded;
     }
   };
 
@@ -4717,7 +4753,7 @@ const LogosGame = () => {
           <div className="flex flex-col gap-6 w-[500px]">
             {/* 스테이지 모드 */}
             <button
-              onClick={() => setScreen('stageSelect')}
+              onClick={() => { soundManager.play('click'); setScreen('stageSelect'); }}
               className="group bg-amber-500 hover:bg-amber-400 text-black font-black text-4xl py-8 px-12 rounded-3xl transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50 flex items-center gap-5"
               style={{ boxShadow: '6px 6px 0px rgba(0,0,0,0.5)' }}
             >
@@ -5223,6 +5259,7 @@ const LogosGame = () => {
                 onClick={() => {
                   setGameState('playing');
                   playerRef.current.vx = PLAYER_SPEED;
+                  soundManager.play('start');
                 }}
                 disabled={gameState !== 'planning'}
                 className={`w-full mt-3 py-5 rounded-xl font-bold text-xl flex items-center justify-center gap-3 transition-all border-2 ${
